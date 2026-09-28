@@ -219,7 +219,7 @@ Không thay đổi dữ liệu hệ thống.
 **Actor chính:** Customer  
 **Quan hệ:** `<<include>>` bởi CUS-06 và EMP-01.  
 **Tóm tắt:** Customer xem Showtime theo phim/rạp/ngày và chọn một Showtime.  
-**Tiền điều kiện:** Có Showtime phù hợp với điều kiện tìm kiếm.
+**Tiền điều kiện:** Không yêu cầu đăng nhập.
 
 ### Dòng sự kiện chính
 1. Customer chọn phim hoặc chọn rạp/ngày trực tiếp.
@@ -408,7 +408,7 @@ Booking được thanh toán thành công hoặc vẫn ở trạng thái chưa t
 ## EMP-03 — Soát vé
 
 **Actor chính:** Employee  
-**Quan hệ:** `<<include>>` EMP-05 nếu cần tra cứu Booking.  
+**Quan hệ:** `<<extend>>` EMP-05 nếu cần tra cứu Booking.  
 **Tóm tắt:** Employee dùng QR của Booking để kiểm tra và xác nhận từng Ticket.  
 **Tiền điều kiện:** Booking đã thanh toán và có Ticket.
 
@@ -425,6 +425,7 @@ Booking được thanh toán thành công hoặc vẫn ở trạng thái chưa t
 10. Hệ thống hiển thị kết quả.
 
 ### Dòng sự kiện phụ
+- 1.1 QR không quét được -> tra cứu Booking để quét
 - 3.1. QR không tồn tại → thông báo QR không hợp lệ.
 - 4.1. Booking chưa PAID → không cho soát.
 - 4.2. Showtime không phù hợp → không cho soát.
