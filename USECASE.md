@@ -40,6 +40,7 @@ System cung cấp các nghiệp vụ chính:
 | Employee | Bán vé, thanh toán tại quầy, soát vé, giao bắp nước, tra cứu và hủy vé |
 | Admin | Quản lý dữ liệu vận hành và cấu hình hệ thống |
 | SystemScheduler | Thực hiện tác vụ nền giải phóng Hold hết hạn |
+
 Đăng nhập của Employee/Admin dùng chung cơ chế xác thực, không tách thành UC riêng vì không có nghiệp vụ khác biệt so với CUS-02.
 ## 1.3. Phân hệ
 
