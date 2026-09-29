@@ -214,6 +214,7 @@ Không thay đổi dữ liệu hệ thống.
 
 **Actor chính:** Customer  
 **Quan hệ:** `<<include>>` bởi CUS-06 và EMP-01. CUS-05 có actor chính là Customer; Employee tái sử dụng qua quan hệ include vì cùng logic nghiệp vụ xem suất chiếu, không phát sinh actor chính mới.
+
 **Tóm tắt:** Customer xem Showtime theo phim/rạp/ngày và chọn một Showtime.  
 **Tiền điều kiện:** Có Showtime phù hợp với điều kiện tìm kiếm.
 
