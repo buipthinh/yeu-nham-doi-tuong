@@ -40,7 +40,7 @@ System cung cấp các nghiệp vụ chính:
 | Employee | Bán vé, thanh toán tại quầy, soát vé, giao bắp nước, tra cứu và hủy vé |
 | Admin | Quản lý dữ liệu vận hành và cấu hình hệ thống |
 | SystemScheduler | Thực hiện tác vụ nền giải phóng Hold hết hạn |
-**Đăng nhập của Employee/Admin dùng chung cơ chế xác thực, không tách thành UC riêng vì không có nghiệp vụ khác biệt so với CUS-02.**
+Đăng nhập của Employee/Admin dùng chung cơ chế xác thực, không tách thành UC riêng vì không có nghiệp vụ khác biệt so với CUS-02.
 ## 1.3. Phân hệ
 
 | # | Phân hệ | UC | Actor |
@@ -212,7 +212,7 @@ Không thay đổi dữ liệu hệ thống.
 ## CUS-05 — Xem suất chiếu
 
 **Actor chính:** Customer  
-**Quan hệ:** `<<include>>` bởi CUS-06 và EMP-01. **CUS-05 có actor chính là Customer; Employee tái sử dụng qua quan hệ include vì cùng logic nghiệp vụ xem suất chiếu, không phát sinh actor chính mới.**
+**Quan hệ:** `<<include>>` bởi CUS-06 và EMP-01. CUS-05 có actor chính là Customer; Employee tái sử dụng qua quan hệ include vì cùng logic nghiệp vụ xem suất chiếu, không phát sinh actor chính mới.
 **Tóm tắt:** Customer xem Showtime theo phim/rạp/ngày và chọn một Showtime.  
 **Tiền điều kiện:** Có Showtime phù hợp với điều kiện tìm kiếm.
 
