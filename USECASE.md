@@ -41,7 +41,7 @@ System cung cấp các nghiệp vụ chính:
 | Admin | Quản lý dữ liệu vận hành và cấu hình hệ thống |
 | SystemScheduler | Thực hiện tác vụ nền giải phóng Hold hết hạn |
 
-Đăng nhập của Employee/Admin dùng chung cơ chế xác thực, không tách thành UC riêng vì không có nghiệp vụ khác biệt so với CUS-02.
+> Đăng nhập của Employee/Admin dùng chung cơ chế xác thực, không tách thành UC riêng vì không có nghiệp vụ khác biệt so với CUS-02.
 ## 1.3. Phân hệ
 
 | # | Phân hệ | UC | Actor |
