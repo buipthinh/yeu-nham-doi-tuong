@@ -92,7 +92,7 @@ System cung cấp các nghiệp vụ chính:
 | EMP-01 | Bán vé tại quầy |
 | EMP-02 | Thanh toán tại quầy |
 | EMP-03 | Soát vé |
-| EMP-04 | Giao dịch vụ đi kèm |
+| EMP-04 | Giao Bắp và Nước |
 | EMP-05 | Tra cứu đặt vé |
 | EMP-06 | Hủy vé |
 
@@ -105,7 +105,7 @@ System cung cấp các nghiệp vụ chính:
 | ADM-03 | Quản lý Sơ đồ chỗ ngồi |
 | ADM-04 | Quản lý Suất chiếu |
 | ADM-05 | Quản lý Giá vé |
-| ADM-06 | Quản lý Dịch vụ đi kèm |
+| ADM-06 | Quản lý Bắp và Nước |
 | ADM-07 | Quản lý Nhân viên |
 | ADM-08 | Quản lý Khách hàng |
 | ADM-09 | Quản lý Báo cáo và Thống kê |
