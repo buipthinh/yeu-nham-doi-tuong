@@ -143,7 +143,7 @@ System cung cấp các nghiệp vụ chính:
   
 **Ghi chú:** Đăng nhập chỉ có một luồng nghiệp vụ duy nhất cho cả 3 actor (nhập tài khoản/mật khẩu, xác thực, tạo phiên), khác nhau duy nhất ở bước gán quyền — nên không tách thành 3 UC riêng theo actor.
 
-## A. CUSTOMER
+## B. CUSTOMER
 
 ## CUS-01 — Đăng ký tài khoản
 
@@ -323,7 +323,7 @@ Không thay đổi dữ liệu.
 
 ---
 
-# B. EMPLOYEE
+# C. EMPLOYEE
 
 ## EMP-01 — Bán vé tại quầy
 
@@ -489,7 +489,7 @@ Vé được chọn `CANCELLED`; ShowtimeSeat tương ứng `AVAILABLE`.
 
 ---
 
-# C. ADMIN
+# D. ADMIN
 
 ## ADM-01 — Quản lý Danh mục phim
 
@@ -704,7 +704,7 @@ Thông tin hoặc trạng thái Employee được cập nhật.
 ### Hậu điều kiện: 
 - Không thay đổi dữ liệu nghiệp vụ; chỉ đọc và tổng hợp dữ liệu hiện có.
 
-# D. SYSTEM
+# E. SYSTEM
 
 ## SYS-01 — Giải phóng Hold hết hạn
 
