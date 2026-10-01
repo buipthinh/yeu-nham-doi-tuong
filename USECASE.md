@@ -3,8 +3,8 @@
 > **Baseline đã chốt**
 >
 > - 01 System chính: **Hệ thống Quản lý Rạp chiếu phim**
-> - 07 Phân hệ theo domain nghiệp vụ.
-> - 23 Use Case chính thức.
+> - 08 Phân hệ theo domain nghiệp vụ.
+> - 24 Use Case chính thức.
 > - Kiến trúc Domain-oriented.
 > - `Đặt vé` là Aggregate Root của giao dịch đặt vé.
 > - `ShowtimeSeat` quản lý trạng thái ghế theo từng suất chiếu: `AVAILABLE → HOLD → SOLD`.
@@ -23,36 +23,33 @@
 System cung cấp các nghiệp vụ chính:
 
 - Quản lý phim, rạp, phòng, ghế và suất chiếu.
-- Cho phép Customer xem phim và suất chiếu.
-- Đặt vé và thanh toán online.
+- Cho phép Customer xem phim và suất chiếu và đặt vé trực tuyến.
+- Nhân viên bán vé và thanh toán tại quầy, soát vé, giao bắp nước.
+- Quản lý tài khoản Nhân viên và Khách hàng.
 - Bán vé và thanh toán tại quầy.
-- Quản lý Đặt vé.
-- Soát vé bằng QR.
-- Quản lý Bắp và Nước.
-- Quản trị nhân viên.
 - Tự động giải phóng ghế Hold hết hạn.
 
 ## 1.2. Actor
 
 | Actor | Vai trò |
 |---|---|
-| Customer | Đăng ký, đăng nhập, tìm phim, suất chiếu, đặt vé, thanh toán online, xem lịch sử đặt vé |
+| Customer | Đăng ký, đăng nhập, tìm phim, suất chiếu, đặt vé, thanh toán trực tuyến, xem lịch sử đặt vé |
 | Employee | Bán vé, thanh toán tại quầy, soát vé, giao bắp nước, tra cứu và hủy vé |
-| Admin | Quản lý dữ liệu vận hành và cấu hình hệ thống |
+| Admin | Đăng nhập, quản lý dữ liệu vận hành, quản lý tài khoản Employee và Customer |
 | SystemScheduler | Thực hiện tác vụ nền giải phóng Hold hết hạn |
 
-> Đăng nhập của Employee/Admin dùng chung cơ chế xác thực, không tách thành UC riêng vì không có nghiệp vụ khác biệt so với CUS-02.
 ## 1.3. Phân hệ
 
 | # | Phân hệ | UC | Actor |
 |---|---|---|---|
-| 1 | Đặt vé & Thanh toán | CUS-05, CUS-06, CUS-07, CUS-08, EMP-01, EMP-02, EMP-06 | Customer, Employee |
+| 1 | Đặt vé & Thanh toán | CUS-04, CUS-05, CUS-06, CUS-07, CUS-08, EMP-01, EMP-02, EMP-06 | Customer, Employee |
 | 2 | Vận hành tại rạp | EMP-03, EMP-04, EMP-05 | Employee |
-| 3 | Tài khoản khách hàng | CUS-01, CUS-02, CUS-03 | Customer |
-| 4 | Danh mục & Lịch chiếu | CUS-04, ADM-01..ADM-06 | Customer, Admin |
-| 5 | Bắp Nước | ADM-07 | Admin |
-| 6 | Quản trị nhân viên | ADM-08 | Admin |
-| 7 | Tác vụ nền | SYS-01 | SystemScheduler |
+| 3 | Tài khoản khách hàng | AUTH-01, CUS-01, CUS-02 | Customer |
+| 4 | Danh mục & Lịch chiếu | CUS-04, ADM-01 -> ADM-05 | Customer, Admin |
+| 5 | Dịch vụ đi kèm | ADM-06 | Admin |
+| 6 | Quản trị tài khoản | ADM-07, ADM-08 | Admin |
+| 7 | Báo cáo và thống kê | ADM-09 | Admin
+| 8 | Tác vụ nền | SYS-01 | SystemScheduler |
 
 ### Nguyên tắc chia Phân hệ
 
@@ -60,26 +57,32 @@ System cung cấp các nghiệp vụ chính:
 - Một Actor có thể tương tác với nhiều Phân hệ.
 - Phân hệ là nhóm/boundary tổ chức UC, **không phải Use Case**.
 - Actor kết nối trực tiếp với UC; `include/extend` chỉ dùng giữa các UC.
-- `CUS-04` và `CUS-05` là các UC xem dữ liệu; không biến các bước UI như "Chọn ghế", "Hold ghế", "Tính tiền", "Sinh QR" thành UC độc lập.
+- `CUS-03` và `CUS-04` là các UC xem dữ liệu; không biến các bước UI như "Chọn ghế", "Hold ghế", "Tính tiền", "Sinh QR" thành UC độc lập.
 - `EMP-03 Soát vé` và `EMP-04 Giao Bắp Nước` độc lập dù cùng có thể tra cứu Đặt vé/QR.
 - `EMP-05 Tra cứu Đặt vé` là UC dùng chung cho các nghiệp vụ vận hành cần tìm.
+- `AUTH-01 Đăng nhập` đặt ở Phân hệ 3 vì gần với domain tài khoản nhất, dù cả 3 actor đều nối trực tiếp vào UC này (không phải qua include).
 
 ---
 
 # 2. DANH SÁCH 23 USE CASE
+
+## Dùng chung
+
+| ID | Use Case |
+|---|---|
+| AUTH-01 | Đăng nhập |
 
 ## Customer
 
 | ID | Use Case |
 |---|---|
 | CUS-01 | Đăng ký tài khoản |
-| CUS-02 | Đăng nhập |
-| CUS-03 | Quản lý thông tin cá nhân |
-| CUS-04 | Xem phim |
-| CUS-05 | Xem suất chiếu |
-| CUS-06 | Đặt vé online |
-| CUS-07 | Thanh toán online |
-| CUS-08 | Xem lịch sử đặt vé |
+| CUS-02 | Quản lý thông tin cá nhân |
+| CUS-03 | Xem phim |
+| CUS-04 | Xem suất chiếu |
+| CUS-05 | Đặt vé online |
+| CUS-06 | Thanh toán online |
+| CUS-07 | Xem lịch sử đặt vé |
 
 
 ## Employee
@@ -89,7 +92,7 @@ System cung cấp các nghiệp vụ chính:
 | EMP-01 | Bán vé tại quầy |
 | EMP-02 | Thanh toán tại quầy |
 | EMP-03 | Soát vé |
-| EMP-04 | Giao Bắp Nước |
+| EMP-04 | Giao dịch vụ đi kèm |
 | EMP-05 | Tra cứu đặt vé |
 | EMP-06 | Hủy vé |
 
@@ -97,14 +100,15 @@ System cung cấp các nghiệp vụ chính:
 
 | ID | Use Case |
 |---|---|
-| ADM-01 | Quản lý Phim |
-| ADM-02 | Quản lý Rạp |
-| ADM-03 | Quản lý Phòng chiếu |
-| ADM-04 | Quản lý Ghế |
-| ADM-05 | Quản lý Suất chiếu |
-| ADM-06 | Quản lý Giá vé |
-| ADM-07 | Quản lý Bắp Nước |
-| ADM-08 | Quản lý Nhân viên |
+| ADM-01 | Quản lý Danh mục phim |
+| ADM-02 | Quản lý Phòng chiếu |
+| ADM-03 | Quản lý Sơ đồ chỗ ngồi |
+| ADM-04 | Quản lý Suất chiếu |
+| ADM-05 | Quản lý Giá vé |
+| ADM-06 | Quản lý Dịch vụ đi kèm |
+| ADM-07 | Quản lý Nhân viên |
+| ADM-08 | Quản lý Khách hàng |
+| ADM-09 | Quản lý Báo cáo và Thống kê |
 
 ## System
 
@@ -114,7 +118,30 @@ System cung cấp các nghiệp vụ chính:
 
 ---
 
-# 3. USE CASE SPECIFICATION
+# 3. ĐẶC TẢ USE CASE
+
+## A. DÙNG CHUNG
+
+## AUTH-01 - Đăng nhập
+**Actor chính:** Customer, Employee, Admin (dùng chung một UC, không tách theo actor) 
+**Quan hệ: — Tóm tắt:** Cho phép người dùng đăng nhập bằng tài khoản đã có, hệ thống phân quyền tương ứng theo vai trò sau khi xác thực thành công. 
+**Tiền điều kiện:** Người dùng đã có tài khoản (Customer tự đăng ký qua CUS-01; Employee/Admin được Admin tạo qua ADM-08/ADM-09).
+
+### Dòng sự kiện chính
+1. Người dùng nhập tài khoản (email/số điện thoại với Customer, mã nhân viên với Employee/Admin) và mật khẩu.
+2. Hệ thống xác thực thông tin.
+3. Hệ thống kiểm tra trạng thái tài khoản.
+4. Hệ thống tạo phiên đăng nhập và gán quyền theo vai trò (Customer/Employee/Admin).
+5. Hệ thống chuyển người dùng vào giao diện tương ứng với vai trò.
+   
+### Dòng sự kiện phụ
+- 2.1. Sai tài khoản/mật khẩu → thông báo lỗi → quay lại bước 1.
+- 3.1. Tài khoản bị khóa/vô hiệu hóa → thông báo tài khoản bị khóa → kết thúc.
+ 
+### Hậu điều kiện:
+- Người dùng có phiên đăng nhập hợp lệ với quyền tương ứng vai trò.
+  
+**Ghi chú:** Đăng nhập chỉ có một luồng nghiệp vụ duy nhất cho cả 3 actor (nhập tài khoản/mật khẩu, xác thực, tạo phiên), khác nhau duy nhất ở bước gán quyền — nên không tách thành 3 UC riêng theo actor.
 
 ## A. CUSTOMER
 
@@ -142,30 +169,7 @@ System cung cấp các nghiệp vụ chính:
 
 ---
 
-## CUS-02 — Đăng nhập
-
-**Actor chính:** Customer  
-**Quan hệ:** —  
-**Tóm tắt:** Cho phép Customer đăng nhập bằng tài khoản đã đăng ký.  
-**Tiền điều kiện:** Customer đã có tài khoản.
-
-### Dòng sự kiện chính
-1. Customer nhập email/số điện thoại và mật khẩu.
-2. Hệ thống xác thực thông tin.
-3. Hệ thống kiểm tra trạng thái tài khoản.
-4. Hệ thống tạo phiên đăng nhập.
-5. Hệ thống chuyển Customer vào trang chính.
-
-### Dòng sự kiện phụ
-- 2.1. Sai tài khoản/mật khẩu → thông báo lỗi → quay lại bước 1.
-- 3.1. Tài khoản bị khóa → thông báo tài khoản bị khóa → kết thúc.
-
-### Hậu điều kiện
-Customer có phiên đăng nhập hợp lệ.
-
----
-
-## CUS-03 — Quản lý Thông tin cá nhân
+## CUS-02 — Quản lý Thông tin cá nhân
 
 **Actor chính:** Customer  
 **Quan hệ:** —  
@@ -189,7 +193,7 @@ Thông tin Profile được cập nhật.
 
 ---
 
-## CUS-04 — Xem phim
+## CUS-03 — Xem phim
 
 **Actor chính:** Customer  
 **Quan hệ:** —  
@@ -210,7 +214,7 @@ Không thay đổi dữ liệu hệ thống.
 
 ---
 
-## CUS-05 — Xem suất chiếu
+## CUS-04 — Xem suất chiếu
 
 **Actor chính:** Customer  
 **Quan hệ:** `<<include>>` bởi CUS-06 và EMP-01. CUS-05 có actor chính là Customer; Employee tái sử dụng qua quan hệ include vì cùng logic nghiệp vụ xem suất chiếu, không phát sinh actor chính mới.
@@ -233,7 +237,7 @@ Customer chọn được Showtime.
 
 ---
 
-## CUS-06 — Đặt vé online
+## CUS-05 — Đặt vé online
 
 **Actor chính:** Customer  
 **Actor liên quan:** SystemScheduler (gián tiếp qua timeout)  
@@ -247,14 +251,14 @@ Customer chọn được Showtime.
 3. Customer chọn tối đa 8 ghế `AVAILABLE`.
 4. Hệ thống thực hiện atomic update để chuyển các ghế sang `HOLD`.
 5. Hệ thống đặt `holdExpiresAt = now + 5 phút`.
-6. Customer có thể thêm Bắp Nước.
+6. Customer có thể thêm Bắp và Nước.
 7. Hệ thống tính tổng tiền từ Đặt vé.
-8. Customer thực hiện CUS-07.
+8. Customer thực hiện `CUS-06`.
 9. Thanh toán thành công → Đặt vé `PAID`.
-10. Các `ShowtimeSeat` chuyển `HOLD → SOLD`.
+10. Các ShowtimeSeat chuyển `HOLD` → `SOLD`.
 11. Hệ thống tạo vé tương ứng với các ghế đã bán, vé ban đầu `VALID`.
-12. Hệ thống sinh `Đặt vé.qrCodeString` duy nhất.
-13. Hệ thống hiển thị vé điện tử/QR.
+12. Hệ thống sinh Đặt vé.maVe (mã vé) duy nhất.
+13. Hệ thống hiển thị vé điện tử kèm mã vé.
 
 ### Dòng sự kiện phụ
 - 4.1. Một hoặc nhiều ghế đã bị Hold/Sold bởi request khác → thông báo ghế conflict → rollback toàn bộ ghế đã Hold thành công trong request → quay lại bước 3.
@@ -267,7 +271,7 @@ Customer chọn được Showtime.
 
 ---
 
-## CUS-07 — Thanh toán online
+## CUS-06 — Thanh toán online
 
 **Actor chính:** Customer  
 **Quan hệ:** `<<include>>` bởi CUS-06.  
@@ -297,7 +301,7 @@ Customer chọn được Showtime.
 
 ---
 
-## CUS-08 — Xem lịch sử Đặt vé
+## CUS-07 — Xem lịch sử Đặt vé
 
 **Actor chính:** Customer  
 **Quan hệ:** —  
@@ -386,22 +390,21 @@ Không thay đổi dữ liệu.
 **Tiền điều kiện:** Đặt vé đã thanh toán và có vé.
 
 ### Dòng sự kiện chính
-1. Employee quét QR.
-2. Frontend lấy `qrCodeString`.
-3. Backend tìm Đặt vé.
-4. Hệ thống kiểm tra Đặt vé và Showtime.
-5. Hệ thống lấy toàn bộ vé của Đặt vé.
-6. Hệ thống hiển thị danh sách vé và trạng thái vé.
-7. Employee chọn tất cả vé `VALID` hoặc chọn từng vé.
-8. Hệ thống xác nhận các vé được chọn.
-9. Vé được chọn chuyển `VALID → USED`.
-10. Hệ thống hiển thị kết quả.
+1. Employee nhập mã vé của Đặt vé (do khách cung cấp hoặc đọc trên vé in/điện tử).
+2. Hệ thống tìm Đặt vé theo mã vé.
+3. Hệ thống kiểm tra Đặt vé và Showtime.
+4. Hệ thống lấy toàn bộ vé của Đặt vé.
+5. Hệ thống hiển thị danh sách vé và trạng thái vé.
+6. Employee chọn tất cả vé VALID hoặc chọn từng vé.
+7. Hệ thống xác nhận các vé được chọn.
+8. Vé được chọn chuyển `VALID` → `USED`.
+9. Hệ thống hiển thị kết quả.
 
 ### Dòng sự kiện phụ
-- 3.1. QR không tồn tại → thông báo QR không hợp lệ.
-- 4.1. Đặt vé chưa PAID → không cho soát.
-- 4.2. Showtime không phù hợp → không cho soát.
-- 7.1. Vé `USED` hoặc `CANCELLED` → không thể chọn.
+- 2.1. Mã vé không tồn tại → thông báo mã vé không hợp lệ.
+- 3.1. Đặt vé chưa PAID → không cho soát.
+- 3.2. Showtime không phù hợp → không cho soát.
+- 6.1. Vé USED hoặc CANCELLED → không thể chọn.
 - Một số vé đã USED nhưng còn vé VALID → chỉ cho xử lý vé VALID.
 
 ### Hậu điều kiện
@@ -411,25 +414,25 @@ Chỉ các vé được chọn chuyển sang `USED`; các vé còn lại không 
 
 ---
 
-## EMP-04 — Giao Bắp Nước
+## EMP-04 — Giao Bắp và Nước
 
 **Actor chính:** Employee  
-**Quan hệ:** `<<include>>` EMP-05 nếu cần tra cứu Đặt Vé. Không include EMP-03.  
-**Tóm tắt:** Employee xác nhận giao Bắp Nước thuộc Đặt Vé.  
-**Tiền điều kiện:** Đặt vé tồn tại và có Bắp Nước.
+**Quan hệ:** `<<include>>` EMP-05 nếu cần tra cứu Đặt vé. Không include EMP-03.  
+**Tóm tắt:** Employee xác nhận giao Bắp và Nước thuộc Đặt Vé.  
+**Tiền điều kiện:** Đặt vé tồn tại và có Bắp nước.
 
 ### Dòng sự kiện chính
-1. Employee tra cứu Đặt Vé.
-2. Hệ thống hiển thị Bắp Nước.
-3. Employee chọn Bắp Nước cần giao.
+1. Employee tra cứu Đặt vé.
+2. Hệ thống hiển thị Bắp và Nước.
+3. Employee chọn Bắp và Nước cần giao.
 4. Employee xác nhận giao.
-5. Hệ thống cập nhật trạng thái Bắp Nước thành `DELIVERED`.
+5. Hệ thống cập nhật trạng thái Bắp và Nước thành `DELIVERED`.
 6. Hệ thống thông báo thành công.
 
 ### Dòng sự kiện phụ
-- Không tìm thấy Đặt Vé → thông báo.
-- Đặt Vé không có Bắp Nước → thông báo.
-- Bắp Nước đã `DELIVERED` → không cho giao lại.
+- Không tìm thấy Đặt vé → thông báo.
+- Đặt vé không có Bắp và Nước → thông báo.
+- Bắp và Nước đã `DELIVERED` → không cho giao lại.
 
 ### Hậu điều kiện
 Bắp Nước được đánh dấu đã giao.
@@ -488,7 +491,7 @@ Vé được chọn `CANCELLED`; ShowtimeSeat tương ứng `AVAILABLE`.
 
 # C. ADMIN
 
-## ADM-01 — Quản lý Phim
+## ADM-01 — Quản lý Danh mục phim
 
 **Actor chính:** Admin  
 **Tóm tắt:** Thêm/sửa/xóa/xem Movie và trạng thái Movie.  
@@ -512,29 +515,7 @@ Thông tin Movie được cập nhật.
 
 ---
 
-## ADM-02 — Quản lý Rạp
-
-**Actor chính:** Admin  
-**Tóm tắt:** Quản lý Cinema.  
-**Tiền điều kiện:** Admin đã đăng nhập.
-
-### Dòng sự kiện chính
-1. Admin mở danh sách Cinema.
-2. Chọn Thêm/Sửa/Xóa.
-3. Nhập/chỉnh thông tin.
-4. Hệ thống validate.
-5. Admin xác nhận.
-6. Hệ thống cập nhật.
-
-### Dòng sự kiện phụ
-- Cinema đang có Room hoạt động/phụ thuộc → chặn xóa cứng.
-
-### Hậu điều kiện
-Danh sách Cinema được cập nhật.
-
----
-
-## ADM-03 — Quản lý Phòng chiếu
+## ADM-02 — Quản lý Phòng chiếu
 
 **Actor chính:** Admin  
 **Tóm tắt:** Quản lý Room thuộc Cinema.  
@@ -556,7 +537,7 @@ Danh sách Room được cập nhật.
 
 ---
 
-## ADM-04 — Quản lý Ghế
+## ADM-03 — Quản lý Sơ đồ chỗ ngồi
 
 **Actor chính:** Admin  
 **Tóm tắt:** Quản lý Seat vật lý thuộc Room.  
@@ -631,14 +612,14 @@ Cấu hình giá vé được cập nhật.
 
 ---
 
-## ADM-07 — Quản lý Bắp Nước
+## ADM-08 — Quản lý Bắp và Nước
 
 **Actor chính:** Admin  
-**Tóm tắt:** Quản lý Bắp Nước, giá và trạng thái bán.  
+**Tóm tắt:** Quản lý Bắp và Nước, giá và trạng thái bán.  
 **Tiền điều kiện:** Admin đã đăng nhập.
 
 ### Dòng sự kiện chính
-1. Admin mở danh sách Bắp Nước.
+1. Admin mở danh sách Bắp và Nước.
 2. Admin thêm/sửa/xóa món.
 3. Admin nhập tên, giá, hình ảnh và trạng thái.
 4. Hệ thống validate.
@@ -650,11 +631,11 @@ Cấu hình giá vé được cập nhật.
 - Món không còn bán → chuyển trạng thái ngừng bán thay vì cho thêm vào Đặt vé mới.
 
 ### Hậu điều kiện
-Danh mục Bắp Nước được cập nhật.
+Danh mục Bắp và Nước được cập nhật.
 
 ---
 
-## ADM-08 — Quản lý Nhân viên
+## ADM-07 — Quản lý Nhân viên
 
 **Actor chính:** Admin  
 **Tóm tắt:** Quản lý thông tin và trạng thái Employee.  
@@ -676,6 +657,52 @@ Danh mục Bắp Nước được cập nhật.
 Thông tin hoặc trạng thái Employee được cập nhật.
 
 ---
+
+## ADM-08 — Quản lý Khách hàng
+**Actor chính:** Admin 
+**Quan hệ: — Tóm tắt:** Admin xem danh sách Customer, khóa/mở tài khoản vi phạm, điều chỉnh điểm tích lũy khi cần. 
+**Tiền điều kiện:** Admin đã đăng nhập.
+
+### Dòng sự kiện chính
+1. Admin mở danh sách Customer.
+2. Hệ thống hiển thị thông tin Customer: họ tên, liên hệ, ngày đăng ký, điểm tích lũy, hạng thành viên, trạng thái tài khoản.
+3. Admin tìm kiếm/lọc theo tiêu chí (tên, trạng thái, hạng thành viên...).
+4. Admin chọn một Customer để xem chi tiết hoặc chỉnh sửa.
+5. Admin thực hiện thao tác: khóa/mở tài khoản, hoặc điều chỉnh điểm tích lũy.
+6. Hệ thống yêu cầu xác nhận.
+7. Admin xác nhận.
+8. Hệ thống cập nhật trạng thái/điểm của Customer.
+9. Hệ thống thông báo thành công.
+
+### Dòng sự kiện phụ
+• 5.1. Customer đã bị khóa → chỉ hiển thị tùy chọn mở khóa.
+• 5.2. Điểm điều chỉnh âm vượt quá điểm hiện có → báo lỗi, không cho điểm âm.
+• Không tìm thấy Customer phù hợp → thông báo.
+
+### Hậu điều kiện: 
+- Trạng thái tài khoản hoặc điểm tích lũy của Customer được cập nhật; không ảnh hưởng tới Đặt vé/Vé đã có của Customer đó.
+
+### Phân biệt với ADM-08: ADM-08 quản lý tài khoản nội bộ (Employee) với dữ liệu chức vụ/phân quyền; ADM-09 quản lý tài khoản người dùng cuối (Customer) với dữ liệu điểm tích lũy/hạng thành viên — hai domain khác nhau nên tách UC riêng theo đúng nguyên tắc chia Phân hệ của tài liệu.
+
+---
+
+## ADM-09 — Quản lý Báo cáo và Thống kê
+**Actor chính:** Admin 
+**Quan hệ: — Tóm tắt:** Admin xem báo cáo doanh thu, số vé bán ra, tỷ lệ lấp đầy ghế theo phim/suất chiếu/khoảng thời gian. 
+**Tiền điều kiện:** Admin đã đăng nhập; có dữ liệu Đặt vé đã PAID trong khoảng thời gian chọn.
+
+### Dòng sự kiện chính
+1. Admin mở Báo cáo và Thống kê.
+2. Admin chọn loại báo cáo (doanh thu, số vé bán, tỷ lệ lấp đầy ghế) và khoảng thời gian/bộ lọc (theo phim, theo suất chiếu).
+3. Hệ thống tổng hợp dữ liệu từ các Đặt vé PAID trong phạm vi đã chọn.
+4. Hệ thống hiển thị báo cáo dạng bảng/biểu đồ.
+5. Admin có thể xuất báo cáo ra file (Excel/PDF).
+
+### Dòng sự kiện phụ
+• 3.1. Không có dữ liệu trong khoảng thời gian chọn → hiển thị báo cáo rỗng, không báo lỗi.
+
+### Hậu điều kiện: 
+- Không thay đổi dữ liệu nghiệp vụ; chỉ đọc và tổng hợp dữ liệu hiện có.
 
 # D. SYSTEM
 
@@ -707,23 +734,25 @@ Các ShowtimeSeat hết hạn trở thành `AVAILABLE` và có thể được Ho
 
 | UC chính | Quan hệ | UC được gọi/mở rộng |
 |---|---|---|
-| CUS-06 Đặt vé online | `include` | CUS-05 Xem suất chiếu |
-| CUS-06 Đặt vé online | `include` | CUS-07 Thanh toán online |
-| EMP-01 Bán vé tại quầy | `include` | CUS-05 Xem suất chiếu |
+| CUS-06 Đặt vé online | `include` | CUS-04 Xem suất chiếu |
+| CUS-06 Đặt vé online | `include` | CUS-06 Thanh toán online |
+| EMP-01 Bán vé tại quầy | `include` | CUS-04 Xem suất chiếu |
 | EMP-01 Bán vé tại quầy | `include` | EMP-02 Thanh toán tại quầy |
 | EMP-03 Soát vé | `include` | EMP-05 Tra cứu Đặt vé |
 | EMP-04 Giao Bắp Nước | `include` | EMP-05 Tra cứu Đặt vé |
 | EMP-06 Hủy vé | `include` | EMP-05 Tra cứu Đặt vé |
 
+## Lưu ý về AUTH-01: không nằm trong bảng include/extend vì cả 3 actor (Customer, Employee, Admin) nối trực tiếp tới AUTH-01 — đây là quan hệ actor–UC thông thường, không phải include/extend giữa hai UC.
+
 ### Các hành vi tùy chọn trong lúc Đặt vé
 
 Các hành vi:
 
-- Đặt Bắp Nước
+- Đặt Bắp và Nước
 
 được xem là **optional behavior của Đặt vé**, không tính thêm vào 23 UC chính thức nếu nhóm không quyết định nâng chúng thành UC độc lập.
 
-> Không tạo UC riêng cho: Chọn ghế, Hold ghế, Tính tiền, Sinh vé, Sinh QR. Đây là các bước/business behavior bên trong CUS-06/EMP-01.
+> Không tạo UC riêng cho: Chọn ghế, Hold ghế, Tính tiền, Sinh vé, Sinh QR. Đây là các bước/business behavior bên trong CUS-05/EMP-01.
 
 ---
 
@@ -764,12 +793,12 @@ Các hành vi:
 - Cash
 - Credit Card POS
 
-Cash không được sử dụng trong CUS-07.
+Cash không được sử dụng trong CUS-06.
 
 ## Bắp Nước
 
-- Đặt vé có thể chứa Bắp Nước.
-- Giao Bắp Nước là UC độc lập với Soát vé.
+- Đặt vé có thể chứa Bắp và Nước.
+- Giao Bắp và Nước là UC độc lập với Soát vé.
 - Bắp Nước có trạng thái giao để ngăn giao trùng.
 
 ## Scheduler
@@ -827,10 +856,10 @@ Tài liệu UC của project được tổ chức theo thứ tự:
 ```text
 SYSTEM
  ├── Phân hệ 1: Đặt vé & Thanh toán
+ │    ├── CUS-04
  │    ├── CUS-05
  │    ├── CUS-06
  │    ├── CUS-07
- │    ├── CUS-08
  │    ├── EMP-01
  │    ├── EMP-02
  │    └── EMP-06
@@ -841,22 +870,25 @@ SYSTEM
  │    └── EMP-05
  │
  ├── Phân hệ 3: Tài khoản khách hàng
+ │    ├── AUTH-01
  │    ├── CUS-01
- │    ├── CUS-02
- │    └── CUS-03
+ │    └── CUS-02
  │
  ├── Phân hệ 4: Danh mục & Lịch chiếu
- │    ├── CUS-04
- │    └── ADM-01 → ADM-06
+ │    ├── CUS-03
+ │    └── ADM-01 → ADM-05
  │
  ├── Phân hệ 5: Bắp Nước
- │    └── ADM-07
+ │    └── ADM-06
  │
  ├── Phân hệ 6: Quản trị nhân viên
- │    └── ADM-08
+ │    └── ADM-07, ADM-08
  │
- └── Phân hệ 7: Tác vụ nền
+ ├── Phân hệ 8: Báo cáo và thống kê
+ |    └── ADM-09
+ |
+ └── Phân hệ 9: Tác vụ nền
       └── SYS-01
 ```
 
-**Tổng: 1 System → 7 Phân hệ → 23 UC.**
+**Tổng: 1 System → 8 Phân hệ → 24 UC.**
