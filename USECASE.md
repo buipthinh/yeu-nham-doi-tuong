@@ -106,8 +106,8 @@ System cung cấp các nghiệp vụ chính:
 | ADM-04 | Quản lý Suất chiếu |
 | ADM-05 | Quản lý Giá vé |
 | ADM-06 | Quản lý Bắp và Nước |
-| ADM-07 | Quản lý Nhân viên |
-| ADM-08 | Quản lý Khách hàng |
+| ADM-07 | Quản lý Tài khoản |
+| ADM-08 | Cài đặt hệ thống |
 | ADM-09 | Quản lý Báo cáo và Thống kê |
 
 ## System
