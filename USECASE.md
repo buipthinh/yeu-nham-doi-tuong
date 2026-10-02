@@ -100,15 +100,15 @@ System cung cấp các nghiệp vụ chính:
 
 | ID | Use Case |
 |---|---|
-| ADM-01 | Quản lý Danh mục phim |
+| ADM-01 | Quản lý Phim |
 | ADM-02 | Quản lý Phòng chiếu |
 | ADM-03 | Quản lý Sơ đồ chỗ ngồi |
 | ADM-04 | Quản lý Suất chiếu |
 | ADM-05 | Quản lý Giá vé |
 | ADM-06 | Quản lý Bắp và Nước |
 | ADM-07 | Quản lý Tài khoản |
-| ADM-08 | Cài đặt hệ thống |
-| ADM-09 | Quản lý Báo cáo và Thống kê |
+| ADM-08 | Quản lý Báo cáo và Thống kê |
+| ADM-09 | Cài đặt hệ thống |
 
 ## System
 
@@ -492,7 +492,7 @@ Vé được chọn `CANCELLED`; ShowtimeSeat tương ứng `AVAILABLE`.
 
 # D. ADMIN
 
-## ADM-01 — Quản lý Danh mục phim
+## ADM-01 — Quản lý Phim
 
 **Actor chính:** Admin  
 **Tóm tắt:** Thêm/sửa/xóa/xem Phim và trạng thái phim.  
@@ -520,22 +520,22 @@ Thông tin Movie được cập nhật.
 ## ADM-02 — Quản lý Phòng chiếu
 
 **Actor chính:** Admin  
-**Tóm tắt:** Quản lý Room thuộc Cinema.  
-**Tiền điều kiện:** Admin đã đăng nhập; Cinema tồn tại.
+**Tóm tắt:** Quản lý Phòng chiếu.  
+**Tiền điều kiện:** Admin đã đăng nhập.
 
 ### Dòng sự kiện chính
-1. Admin chọn Cinema.
-2. Hệ thống hiển thị Room.
-3. Admin Thêm/Sửa/Xóa Room.
+1. Admin mở Danh sách phòng chiếu.
+2. Hệ thống hiển thị Phòng chiếu.
+3. Admin Thêm/Sửa/Xóa Phòng chiếu.
 4. Hệ thống validate.
 5. Admin xác nhận.
 6. Hệ thống cập nhật.
 
 ### Dòng sự kiện phụ
-- Room đang có Showtime chưa diễn ra → chặn xóa.
+- Phòng chiếu đang có Suất chiếu chưa diễn ra → chặn xóa.
 
 ### Hậu điều kiện
-Danh sách Room được cập nhật.
+Danh sách Phòng chiếu được cập nhật.
 
 ---
 
@@ -546,7 +546,7 @@ Danh sách Room được cập nhật.
 **Tiền điều kiện:** Admin đã đăng nhập; Room tồn tại.
 
 ### Dòng sự kiện chính
-1. Admin chọn Room.
+1. Admin chọn Phòng chiếu.
 2. Hệ thống hiển thị Seat.
 3. Admin Thêm/Sửa/Xóa Seat.
 4. Hệ thống kiểm tra mã/vị trí ghế.
@@ -558,13 +558,13 @@ Danh sách Room được cập nhật.
 - Seat đang có dữ liệu phụ thuộc → không xóa nếu vi phạm ràng buộc.
 
 ### Hậu điều kiện
-Cấu hình Seat của Room được cập nhật.
+Cấu hình Ghế của Phòng chiếu được cập nhật.
 
 > `Seat` chỉ quản lý cấu hình vật lý. Trạng thái `AVAILABLE/HOLD/SOLD` thuộc `ShowtimeSeat`.
 
 ---
 
-## ADM-05 — Quản lý Suất chiếu
+## ADM-04 — Quản lý Suất chiếu
 
 **Actor chính:** Admin  
 **Tóm tắt:** Quản lý Showtime.  
@@ -573,11 +573,12 @@ Cấu hình Seat của Room được cập nhật.
 ### Dòng sự kiện chính
 1. Admin chọn Movie, Room và thời gian.
 2. Admin xác nhận tạo Showtime.
-3. Hệ thống kiểm tra conflict thời gian trong Room.
-4. Hệ thống tạo Showtime.
-5. Hệ thống tự động tạo `ShowtimeSeat` cho toàn bộ Seat của Room.
-6. Các ShowtimeSeat mới có trạng thái `AVAILABLE`.
-7. Hệ thống thông báo thành công.
+3. Admin có thể tìm kiếm/lọc suất chiếu theo phim, phòng chiếu, ngày hoặc trạng thái.
+4. Hệ thống kiểm tra conflict thời gian trong Room.
+5. Hệ thống tạo Showtime.
+6. Hệ thống tự động tạo `ShowtimeSeat` cho toàn bộ Seat của Room.
+7. Các ShowtimeSeat mới có trạng thái `AVAILABLE`.
+8. Hệ thống thông báo thành công.
 
 ### Dòng sự kiện phụ
 - 3.1. Trùng khung giờ → cảnh báo conflict → yêu cầu chọn lại.
@@ -589,20 +590,21 @@ Showtime và toàn bộ ShowtimeSeat tương ứng được tạo/cập nhật h
 
 ---
 
-## ADM-06 — Quản lý Giá vé
+## ADM-05 — Quản lý Giá vé
 
 **Actor chính:** Admin  
 **Tóm tắt:** Cấu hình giá vé theo loại ghế/loại phòng/khung giờ/ngày.  
 **Tiền điều kiện:** Admin đã đăng nhập.
 
 ### Dòng sự kiện chính
-1. Admin mở danh sách Price Rule.
-2. Admin thêm/sửa/xóa rule.
-3. Admin nhập điều kiện áp dụng và giá.
+1. Admin mở danh sách Giá vé.
+2. Admin thêm/sửa/xóa giá.
+3. Admin nhập điều kiện áp dụng (loại vé, khung giờ, ngày, đối tượng khách) và giá.
 4. Hệ thống validate.
 5. Hệ thống kiểm tra conflict/overlap.
 6. Admin xác nhận.
 7. Hệ thống lưu cấu hình.
+8. Admin có thể tra cứu lịch sử thay đổi giá vé theo thời gian.
 
 ### Dòng sự kiện phụ
 - Giá không hợp lệ → báo lỗi.
@@ -614,7 +616,7 @@ Cấu hình giá vé được cập nhật.
 
 ---
 
-## ADM-08 — Quản lý Bắp và Nước
+## ADM-06 — Quản lý Bắp và Nước
 
 **Actor chính:** Admin  
 **Tóm tắt:** Quản lý Bắp và Nước, giá và trạng thái bán.  
@@ -637,58 +639,32 @@ Danh mục Bắp và Nước được cập nhật.
 
 ---
 
-## ADM-07 — Quản lý Nhân viên
+## ADM-07 — Quản lý Tài khoản
 
 **Actor chính:** Admin  
-**Tóm tắt:** Quản lý thông tin và trạng thái Employee.  
+**Tóm tắt:** Quản lý tài khoản Nhân viên và tài khoản Khách hàng, gồm hai nhánh thao tác riêng theo loại tài khoản.
 **Tiền điều kiện:** Admin đã đăng nhập.
 
 ### Dòng sự kiện chính
-1. Admin mở danh sách Employee.
-2. Admin chọn Thêm/Sửa/Vô hiệu hóa.
-3. Admin nhập/chỉnh thông tin.
+1. Admin chọn loại tài khoản cần quản lý: Nhân viên hoặc Khách hàng.
+2. Hệ thống hiển thị danh sách tài khoản tương ứng.
+3. Admin tìm kiếm/lọc theo tiêu chí (tên, trạng thái...).
+   4.1. (Nhánh Nhân viên) Admin chọn Thêm/Sửa/Vô hiệu hóa tài khoản, nhập thông tin và phân quyền vai trò (Nhân viên bán vé/Nhân viên soát vé).
+   4.2. (Nhánh Khách hàng) Admin chọn một Customer để xem chi tiết, chỉnh sửa, khóa/mở hoặc xóa tài khoản.
 4. Hệ thống validate.
 5. Admin xác nhận.
-6. Hệ thống cập nhật.
-
+6. Hệ thống cập nhật tài khoản tương ứng.
+7. Hệ thống thông báo thành công.
 ### Dòng sự kiện phụ
-- Tài khoản/thông tin định danh bị trùng → báo lỗi.
-- Employee bị vô hiệu hóa → không được đăng nhập/sử dụng quyền Employee.
-
+- Không tìm thấy tài khoản phù hợp → thông báo.
+- (Nhân viên) Thông tin định danh bị trùng → báo lỗi; bị vô hiệu hóa → không được đăng nhập/sử dụng quyền Employee.
+- (Khách hàng) Đã bị khóa → chỉ hiển thị tùy chọn mở khóa; đang có Đặt vé/Vé hiệu lực → chỉ cho khóa, không cho xóa cứng.
 ### Hậu điều kiện
-Thông tin hoặc trạng thái Employee được cập nhật.
+- Thông tin/trạng thái/phân quyền tài khoản Nhân viên hoặc Khách hàng được cập nhật, hoặc tài khoản Khách hàng bị xóa (tùy nhánh).
 
 ---
 
-## ADM-08 — Quản lý Khách hàng
-**Actor chính:** Admin 
-**Quan hệ: — Tóm tắt:** Admin xem danh sách Customer, khóa/mở tài khoản vi phạm, điều chỉnh điểm tích lũy khi cần. 
-**Tiền điều kiện:** Admin đã đăng nhập.
-
-### Dòng sự kiện chính
-1. Admin mở danh sách Customer.
-2. Hệ thống hiển thị thông tin Customer: họ tên, liên hệ, ngày đăng ký, điểm tích lũy, hạng thành viên, trạng thái tài khoản.
-3. Admin tìm kiếm/lọc theo tiêu chí (tên, trạng thái, hạng thành viên...).
-4. Admin chọn một Customer để xem chi tiết hoặc chỉnh sửa.
-5. Admin thực hiện thao tác: khóa/mở tài khoản, hoặc điều chỉnh điểm tích lũy.
-6. Hệ thống yêu cầu xác nhận.
-7. Admin xác nhận.
-8. Hệ thống cập nhật trạng thái/điểm của Customer.
-9. Hệ thống thông báo thành công.
-
-### Dòng sự kiện phụ
-• 5.1. Customer đã bị khóa → chỉ hiển thị tùy chọn mở khóa.
-• 5.2. Điểm điều chỉnh âm vượt quá điểm hiện có → báo lỗi, không cho điểm âm.
-• Không tìm thấy Customer phù hợp → thông báo.
-
-### Hậu điều kiện: 
-- Trạng thái tài khoản hoặc điểm tích lũy của Customer được cập nhật; không ảnh hưởng tới Đặt vé/Vé đã có của Customer đó.
-
-### Phân biệt với ADM-08: ADM-08 quản lý tài khoản nội bộ (Employee) với dữ liệu chức vụ/phân quyền; ADM-09 quản lý tài khoản người dùng cuối (Customer) với dữ liệu điểm tích lũy/hạng thành viên — hai domain khác nhau nên tách UC riêng theo đúng nguyên tắc chia Phân hệ của tài liệu.
-
----
-
-## ADM-09 — Quản lý Báo cáo và Thống kê
+## ADM-08 — Quản lý Báo cáo và Thống kê
 **Actor chính:** Admin 
 **Quan hệ: — Tóm tắt:** Admin xem báo cáo doanh thu, số vé bán ra, tỷ lệ lấp đầy ghế theo phim/suất chiếu/khoảng thời gian. 
 **Tiền điều kiện:** Admin đã đăng nhập; có dữ liệu Đặt vé đã PAID trong khoảng thời gian chọn.
@@ -705,6 +681,24 @@ Thông tin hoặc trạng thái Employee được cập nhật.
 
 ### Hậu điều kiện: 
 - Không thay đổi dữ liệu nghiệp vụ; chỉ đọc và tổng hợp dữ liệu hiện có.
+
+## ADM-09 — Cài đặt hệ thống
+**Actor chính:** Admin 
+**Quan hệ: — Tóm tắt:** Admin cấu hình các thông số vận hành chung của hệ thống.
+**Tiền điều kiện:** Admin đã đăng nhập.
+
+### Dòng sự kiện chính
+1. Admin mở mục Cài đặt hệ thống.
+2. Admin chỉnh các thông số: thời gian giữ ghế tối đa khi đặt online, thời gian buffer giữa hai suất chiếu liên tiếp, chính sách hủy/đổi vé.
+3. Hệ thống validate.
+4. Admin xác nhận.
+5. Hệ thống lưu cấu hình.
+
+### Dòng sự kiện phụ
+- Thông số không hợp lệ (ví dụ số âm) → báo lỗi, giữ giá trị cũ.
+
+### Hậu điều kiện: 
+- Thông số vận hành hệ thống được cập nhật, áp dụng toàn hệ thống.
 
 # E. SYSTEM
 
@@ -875,7 +869,7 @@ SYSTEM
  │    ├── AUTH-01
  │    ├── CUS-01
  │    └── CUS-02
- │
+ │   `
  ├── Phân hệ 4: Danh mục & Lịch chiếu
  │    ├── CUS-03
  │    └── ADM-01 → ADM-05
