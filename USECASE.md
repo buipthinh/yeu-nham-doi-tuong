@@ -125,7 +125,7 @@ System cung cấp các nghiệp vụ chính:
 ## AUTH-01 - Đăng nhập
 **Actor chính:** Customer, Employee, Admin (dùng chung một UC, không tách theo actor) 
 **Quan hệ: — Tóm tắt:** Cho phép người dùng đăng nhập bằng tài khoản đã có, hệ thống phân quyền tương ứng theo vai trò sau khi xác thực thành công. 
-**Tiền điều kiện:** Người dùng đã có tài khoản (Customer tự đăng ký qua CUS-01; Employee/Admin được Admin tạo qua ADM-08/ADM-09).
+**Tiền điều kiện:** Người dùng đã có tài khoản (Customer tự đăng ký qua CUS-01; Employee/Admin được Admin tạo qua ADM-07).
 
 ### Dòng sự kiện chính
 1. Người dùng nhập tài khoản (email/số điện thoại với Customer, mã nhân viên với Employee/Admin) và mật khẩu.
@@ -197,14 +197,15 @@ Thông tin Profile được cập nhật.
 
 **Actor chính:** Customer  
 **Quan hệ:** —  
-**Tóm tắt:** Customer xem danh sách và chi tiết phim.  
+**Tóm tắt:** Customer tìm kiếm, xem danh sách, chi tiết phim.  
 **Tiền điều kiện:** Không bắt buộc đăng nhập.
 
 ### Dòng sự kiện chính
 1. Customer mở trang Phim.
 2. Hệ thống hiển thị danh sách phim đang/sắp chiếu.
-3. Customer chọn một phim.
-4. Hệ thống hiển thị chi tiết phim.
+3. Customer có thể nhập từ khóa để tìm kiếm phim theo tên, hoặc lọc theo thể loại/trạng thái.
+4. Customer chọn một phim.
+5. Hệ thống hiển thị chi tiết phim.
 
 ### Dòng sự kiện phụ
 - 2.1. Không có phim phù hợp → thông báo.
@@ -494,17 +495,18 @@ Vé được chọn `CANCELLED`; ShowtimeSeat tương ứng `AVAILABLE`.
 ## ADM-01 — Quản lý Danh mục phim
 
 **Actor chính:** Admin  
-**Tóm tắt:** Thêm/sửa/xóa/xem Movie và trạng thái Movie.  
+**Tóm tắt:** Thêm/sửa/xóa/xem Phim và trạng thái phim.  
 **Tiền điều kiện:** Admin đã đăng nhập.
 
 ### Dòng sự kiện chính
 1. Admin mở Quản lý Phim.
 2. Hệ thống hiển thị danh sách.
-3. Admin chọn Thêm/Sửa/Xóa/Đổi trạng thái.
-4. Admin nhập hoặc chỉnh thông tin.
-5. Hệ thống validate.
-6. Admin xác nhận.
-7. Hệ thống cập nhật.
+3. Admin có thể tìm kiếm/lọc theo tên phim, thể loại, hoặc trạng thái.
+4. Admin chọn Thêm/Sửa/Xóa/Đổi trạng thái.
+5. Admin nhập hoặc chỉnh thông tin.
+6. Hệ thống validate.
+7. Admin xác nhận.
+8. Hệ thống cập nhật.
 
 ### Dòng sự kiện phụ
 - Dữ liệu không hợp lệ → báo lỗi.
