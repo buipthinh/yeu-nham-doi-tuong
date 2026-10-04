@@ -43,7 +43,7 @@ System cung cấp các nghiệp vụ chính:
 | # | Phân hệ | UC | Actor |
 |---|---|---|---|
 | 1 | Đặt vé & Thanh toán | CUS-04, CUS-05, CUS-06, CUS-07, CUS-08, EMP-01, EMP-02, EMP-06 | Customer, Employee |
-| 2 | Vận hành tại rạp | EMP-03, EMP-04, EMP-05 | Employee |
+| 2 | Vận hành tại rạp | EMP-03, EMP-04, EMP-05, EMP-07| Employee |
 | 3 | Tài khoản khách hàng | AUTH-01, CUS-01, CUS-02 | Customer |
 | 4 | Danh mục & Lịch chiếu | CUS-04, ADM-01 -> ADM-05 | Customer, Admin |
 | 5 | Dịch vụ đi kèm | ADM-06 | Admin |
@@ -437,13 +437,13 @@ Bắp Nước được đánh dấu đã giao.
 **Tiền điều kiện:** Employee đã đăng nhập.
 
 ### Dòng sự kiện chính
-1. Employee nhập ticketCode hoặc thông tin tìm kiếm được hỗ trợ.
-2. Hệ thống tìm Booking/Ticket.
+1. Nhân viên nhập mã vé hoặc thông tin tìm kiếm được hỗ trợ.
+2. Hệ thống tìm Đặt vé/Vé.
 3. Hệ thống hiển thị thông tin phù hợp.
 
 ### Dòng sự kiện phụ
 - 2.1 Không tìm thấy → thông báo.
-- 2.1 Có nhiều kết quả → Employee chọn Đặt Vé cần xem.
+- 2.1 Có nhiều kết quả → Nhân viên chọn Đặt Vé cần xem.
 
 ### Hậu điều kiện
 Không thay đổi dữ liệu.
@@ -874,6 +874,7 @@ SYSTEM
  │    ├── EMP-03
  │    ├── EMP-04
  │    └── EMP-05
+ |    └── EMP-07
  │
  ├── Phân hệ 3: Tài khoản khách hàng
  │    ├── AUTH-01
