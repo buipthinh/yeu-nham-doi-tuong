@@ -58,13 +58,14 @@ System cung cấp các nghiệp vụ chính:
 - Phân hệ là nhóm/boundary tổ chức UC, **không phải Use Case**.
 - Actor kết nối trực tiếp với UC; `include/extend` chỉ dùng giữa các UC.
 - `CUS-03` và `CUS-04` là các UC xem dữ liệu; không biến các bước UI như "Chọn ghế", "Hold ghế", "Tính tiền", "Sinh QR" thành UC độc lập.
-- `EMP-03 Soát vé` và `EMP-04 Giao Bắp Nước` độc lập dù cùng có thể tra cứu Đặt vé/QR.
+- `EMP-03 Soát vé` và `EMP-04 Giao Bắp Nước` độc lập 
 - `EMP-05 Tra cứu Đặt vé` là UC dùng chung cho các nghiệp vụ vận hành cần tìm.
 - `AUTH-01 Đăng nhập` đặt ở Phân hệ 3 vì gần với domain tài khoản nhất, dù cả 3 actor đều nối trực tiếp vào UC này (không phải qua include).
-
+- `EMP-07` In vé xử lý việc in vé giấy sau khi giao dịch đã thanh toán thành công.
+- Không có UC Promotion, Membership hoặc Quản lý rạp trong baseline hiện tại.
 ---
 
-# 2. DANH SÁCH 23 USE CASE
+# 2. DANH SÁCH 25 USE CASE
 
 ## Dùng chung
 
@@ -95,6 +96,7 @@ System cung cấp các nghiệp vụ chính:
 | EMP-04 | Giao Bắp và Nước |
 | EMP-05 | Tra cứu đặt vé |
 | EMP-06 | Hủy vé |
+| EMP-07 | In vé |
 
 ## Admin
 
@@ -255,11 +257,8 @@ Customer chọn được Showtime.
 6. Customer có thể thêm Bắp và Nước.
 7. Hệ thống tính tổng tiền từ Đặt vé.
 8. Customer thực hiện `CUS-06`.
-9. Thanh toán thành công → Đặt vé `PAID`.
-10. Các ShowtimeSeat chuyển `HOLD` → `SOLD`.
-11. Hệ thống tạo vé tương ứng với các ghế đã bán, vé ban đầu `VALID`.
-12. Hệ thống sinh Đặt vé.maVe (mã vé) duy nhất.
-13. Hệ thống hiển thị vé điện tử kèm mã vé.
+9. Sau khi thanh toán thành công, hệ thống tạo ticket `VALID` và Mã vé
+12. Hệ thống hiển thị vé điện tử kèm mã vé cho khách hàng.
 
 ### Dòng sự kiện phụ
 - 4.1. Một hoặc nhiều ghế đã bị Hold/Sold bởi request khác → thông báo ghế conflict → rollback toàn bộ ghế đã Hold thành công trong request → quay lại bước 3.
@@ -267,7 +266,7 @@ Customer chọn được Showtime.
 - 8.2. Hold hết hạn trước khi thanh toán hoàn tất → SYS-01 release về `AVAILABLE`; Customer phải thực hiện lại việc giữ ghế.
 
 ### Hậu điều kiện
-- **Thành công:** Đặt vé = `PAID`, Vé = `VALID`, `ShowtimeSeat = SOLD`, QR được sinh.
+- **Thành công:** Đặt vé = `PAID`, Vé = `VALID`, `ShowtimeSeat = SOLD`, có Mã vé.
 - **Thất bại:** Đặt vé chưa hoàn tất; Hold được giải phóng khi timeout/cancel theo nghiệp vụ.
 
 ---
@@ -287,10 +286,8 @@ Customer chọn được Showtime.
 4. Hệ thống chuyển sang cổng thanh toán.
 5. Cổng thanh toán trả kết quả.
 6. Hệ thống xác nhận giao dịch.
-7. Đặt vé được cập nhật `PAID`.
-8. Vé được tạo.
-9. ShowtimeSeat chuyển sang `SOLD`.
-10. QR của Đặt vé được sinh nếu chưa có.
+7. Nếu thành công, Booking chuyển `PAID`, Ghế chuyển `SOLD`
+10. Hệ thống tạo ticket VALID và Mã vé
 
 ### Dòng sự kiện phụ
 - 5.1. Thanh toán thất bại/hủy → thông báo thất bại → Hold tiếp tục nếu còn hạn.
@@ -311,10 +308,10 @@ Customer chọn được Showtime.
 
 ### Dòng sự kiện chính
 1. Customer mở "Lịch sử đặt vé".
-2. Hệ thống chỉ lấy Đặt vé của Customer hiện tại.
+2. Hệ thống chỉ lấy Booking của Customer hiện tại.
 3. Hệ thống hiển thị danh sách theo thời gian.
-4. Customer chọn một Đặt vé.
-5. Hệ thống hiển thị chi tiết Đặt vé, vé, Bắp Nước, QR và trạng thái.
+4. Customer chọn một đơn để xem chi tiết.
+5. Hệ thống hiển thị chi tiết Đặt vé, vé, Bắp Nước, mã vé (nếu có) và trạng thái.
 
 ### Dòng sự kiện phụ
 - 2.1. Không có Đặt vé → thông báo chưa có lịch sử.
@@ -329,23 +326,20 @@ Không thay đổi dữ liệu.
 ## EMP-01 — Bán vé tại quầy
 
 **Actor chính:** Employee  
-**Quan hệ:** `<<include>>` CUS-05, EMP-02; Bắp Nước là hành vi tùy chọn.  
+**Quan hệ:** `<<include>>` CUS-05, EMP-02; EMP-07 `<<extend>>` EMP-01; Bắp Nước là hành vi tùy chọn.  
 **Tóm tắt:** Employee đặt vé thay khách mua trực tiếp tại quầy.  
 **Tiền điều kiện:** Employee đã đăng nhập và đang làm việc tại quầy.
 
 ### Dòng sự kiện chính
-1. Employee chọn phim/Showtime.
+1. Employee chọn phim/suất chiếu.
 2. Employee chọn tối đa 8 ghế.
 3. Hệ thống atomic Hold các ghế.
 4. Nếu thành công, các ghế chuyển `HOLD`.
 5. Employee có thể thêm Bắp Nước.
 6. Hệ thống tính tổng tiền.
 7. Employee thực hiện EMP-02.
-8. Thanh toán thành công → Đặt vé `PAID`.
-9. Hệ thống tạo vé `VALID`.
-10. ShowtimeSeat chuyển `SOLD`.
-11. Hệ thống sinh QR.
-12. Hệ thống in/hiển thị vé.
+8. Thanh toán thành công → Đặt vé `PAID`, ticket `VALID`, ghế `SOLD`.
+12. Hệ thống in vé.
 
 ### Dòng sự kiện phụ
 - 3.1. Ghế bị Hold/Sold đồng thời → thông báo conflict → rollback các ghế đã Hold trong request → quay lại bước 2.
@@ -365,18 +359,15 @@ Không thay đổi dữ liệu.
 **Tiền điều kiện:** Đặt vé đã được tạo và ghế đang `HOLD`.
 
 ### Dòng sự kiện chính
-1. Hệ thống hiển thị tổng tiền.
-2. Employee chọn Cash hoặc Credit Card.
-3. Nếu Cash, Employee nhập số tiền khách đưa.
-4. Hệ thống tính tiền thừa.
-5. Nếu Card, hệ thống gửi giao dịch tới POS.
-6. Hệ thống nhận kết quả thanh toán.
-7. Đặt vé được cập nhật `PAID`.
-
+1. Nhân viên chọn phương thức thanh toán được hỗ trợ tại quầy.
+2. Nhân viên nhập/xác nhận số tiền nhận được hoặc kết quả POS.
+3. Hệ thống xác nhận thanh toán.
+3. Booking chuyển `PAID`.
+4. Ghế chuyển `HOLD → SOLD`.
+5. Ticket được tạo ở trạng thái `VALID`.
 ### Dòng sự kiện phụ
-- 3.1. Tiền khách đưa nhỏ hơn tổng tiền → thông báo không đủ tiền → nhập lại.
-- 5.1. Card thất bại → thông báo → cho phép thực hiện lại.
-- Phương thức chỉ dành cho online không được dùng ở quầy.
+- 3.1. Tiền nhận không đủ → báo lỗi.
+- 3.2. Thanh toán thất bại → Booking không `PAID`.
 
 ### Hậu điều kiện
 Đặt Vé được thanh toán thành công hoặc vẫn ở trạng thái chưa thanh toán nếu giao dịch thất bại.
@@ -386,12 +377,12 @@ Không thay đổi dữ liệu.
 ## EMP-03 — Soát vé
 
 **Actor chính:** Employee  
-**Quan hệ:** `<<include>>` EMP-05 nếu cần tra cứu Đặt Vé.  
-**Tóm tắt:** Employee dùng QR của Đặt vé để kiểm tra và xác nhận từng vé.  
+**Quan hệ:** `<<include>>` EMP-05 
+**Tóm tắt:** Nhân viên kiểm tra vé giấy trước khi cho khách vào rạp và xác nhận vé đã sử dụng bằng cách xé một nửa vé.
 **Tiền điều kiện:** Đặt vé đã thanh toán và có vé.
 
 ### Dòng sự kiện chính
-1. Employee nhập mã vé của Đặt vé (do khách cung cấp hoặc đọc trên vé in/điện tử).
+1. Employee nhập mã vé của Đặt vé (do khách cung cấp trên vé in).
 2. Hệ thống tìm Đặt vé theo mã vé.
 3. Hệ thống kiểm tra Đặt vé và Showtime.
 4. Hệ thống lấy toàn bộ vé của Đặt vé.
@@ -411,29 +402,28 @@ Không thay đổi dữ liệu.
 ### Hậu điều kiện
 Chỉ các vé được chọn chuyển sang `USED`; các vé còn lại không thay đổi.
 
-> **Quyết định quan trọng:** QR thuộc Đặt vé, nhưng trạng thái sử dụng thuộc từng vé. Vì vậy cùng một QR có thể được quét lại để xử lý các vé VALID còn lại.
 
 ---
 
 ## EMP-04 — Giao Bắp và Nước
 
 **Actor chính:** Employee  
-**Quan hệ:** `<<include>>` EMP-05 nếu cần tra cứu Đặt vé. Không include EMP-03.  
-**Tóm tắt:** Employee xác nhận giao Bắp và Nước thuộc Đặt Vé.  
-**Tiền điều kiện:** Đặt vé tồn tại và có Bắp nước.
+**Quan hệ:** `<<include>>` EMP-05
+**Tóm tắt:** Nhân viên tra cứu đơn đã thanh toán và giao đúng bắp/nước cho khách.
+**Tiền điều kiện:** Đặt vé tồn tại và có Bắp nước cần giao.
 
 ### Dòng sự kiện chính
-1. Employee tra cứu Đặt vé.
-2. Hệ thống hiển thị Bắp và Nước.
-3. Employee chọn Bắp và Nước cần giao.
-4. Employee xác nhận giao.
+1. Employee tra cứu Đặt vé
+2. Hệ thống tra cứu Đặt vé.
+3. Hệ thống hiển thị Bắp và Nước chưa giao cho khách.
+4. Nhân viên giao đúng số lượng cho khách và xác nhận đã giao trong hệ thống
 5. Hệ thống cập nhật trạng thái Bắp và Nước thành `DELIVERED`.
 6. Hệ thống thông báo thành công.
 
 ### Dòng sự kiện phụ
-- Không tìm thấy Đặt vé → thông báo.
-- Đặt vé không có Bắp và Nước → thông báo.
-- Bắp và Nước đã `DELIVERED` → không cho giao lại.
+- 2.1 Không tìm thấy Đặt vé → thông báo.
+- 2.2 Đặt vé không có Bắp và Nước → thông báo.
+- 2.3 Bắp và Nước đã `DELIVERED` → không cho giao lại.
 
 ### Hậu điều kiện
 Bắp Nước được đánh dấu đã giao.
@@ -447,15 +437,13 @@ Bắp Nước được đánh dấu đã giao.
 **Tiền điều kiện:** Employee đã đăng nhập.
 
 ### Dòng sự kiện chính
-1. Employee nhập tiêu chí tra cứu được hỗ trợ.
-2. Hệ thống tìm Đặt Vé.
-3. Hệ thống hiển thị Đặt Vé phù hợp.
-4. Hệ thống hiển thị trạng thái vé.
-5. Hệ thống hiển thị vé, Bắp Nước, Showtime và QR nếu có.
+1. Employee nhập ticketCode hoặc thông tin tìm kiếm được hỗ trợ.
+2. Hệ thống tìm Booking/Ticket.
+3. Hệ thống hiển thị thông tin phù hợp.
 
 ### Dòng sự kiện phụ
-- Không tìm thấy → thông báo.
-- Có nhiều kết quả → Employee chọn Đặt Vé cần xem.
+- 2.1 Không tìm thấy → thông báo.
+- 2.1 Có nhiều kết quả → Employee chọn Đặt Vé cần xem.
 
 ### Hậu điều kiện
 Không thay đổi dữ liệu.
@@ -487,6 +475,28 @@ Không thay đổi dữ liệu.
 
 ### Hậu điều kiện
 Vé được chọn `CANCELLED`; ShowtimeSeat tương ứng `AVAILABLE`.
+
+---
+## EMP-07 — In vé
+**Actor chính:** Employee
+**Quan hệ:**: --
+**Tóm tắt:** Nhân viên in vé giấy cho Booking đã thanh toán; đặc biệt dùng khi khách đặt online đến rạp và cung cấp ticketCode.
+**Tiền điều kiện:** Booking đã PAID; Ticket tồn tại và chưa bị hủy.
+
+### Dòng sự kiện chính
+1. Employee nhập mã vé hoặc tra cứu Đặt vé.
+2. Hệ thống kiểm tra Đặt vé đã thanh toán.
+3. Hệ thống kiểm tra vé đủ điều kiện in.
+4. Hệ thống tạo/in vé giấy chứa thông tin cần thiết và mã vé.
+5. Nhân viên giao vé giấy cho Khách hàng.
+
+### Dòng sự kiện phụ
+- 2.1. Đặt chưa thanh toán → không cho in.
+- 3.1. Vé đã hủy → không cho in.
+- 3.2. Vé đã được in trước đó → xử lý theo chính sách in lại của hệ thống.
+
+### Hậu điều kiện
+Khách hàng nhận được vé giấy để sử dụng trong EMP-03.
 
 ---
 
