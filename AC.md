@@ -1,316 +1,787 @@
-# Tiêu chí nghiệm thu (Acceptance Criteria - AC) — Hệ thống Quản lý Rạp chiếu phim
+# ACCEPTANCE CRITERIA — HỆ THỐNG QUẢN LÝ RẠP CHIẾU PHIM
 
-## Quy ước chung (Cần nhớ khi code)
-
-- Một đơn đặt vé (`Booking`) chứa tối đa **6 vé** (`Ticket`).
-- Một `Booking` chỉ thuộc về đúng một suất chiếu (`Showtime`). Nó có thể bao gồm nhiều `Ticket` (vé) và `Combo` (đồ ăn/uống).
-- Một `Booking` chỉ được áp dụng tối đa **1 mã khuyến mãi** (`Promotion`).
-- Trạng thái ghế ngồi của từng suất chiếu sẽ do bảng `ShowtimeSeat` quản lý.
-- Bảng ghế vật lý (`Seat`) của phòng chiếu chỉ lưu thông tin cấu hình ghế, **KHÔNG** lưu trạng thái `AVAILABLE/HOLD/SOLD` (Trống/Đang giữ/Đã bán).
-- Thời gian giữ ghế (Hold) khi đang đặt vé mặc định là **5 phút** (Có thể cấu hình qua ADM-09).
-- Mã `Booking.qrCodeString` là mã QR **duy nhất (unique)** dùng để tra cứu thông tin của một đơn đặt vé.
-- Trạng thái vé (đã dùng hay chưa) phải được lưu trên từng vé (`Ticket.ticketStatus`), **tuyệt đối không** dùng chung cờ `Booking.isUsed` cho cả đơn.
-- Phải dùng hàm `Booking.calculateTotal()` để tính tổng tiền của một đơn đặt vé.
-
-### Luồng chuyển đổi trạng thái (State) chính
-
-```text
-Trạng thái ghế của suất chiếu (ShowtimeSeat):
-AVAILABLE (Trống) → HOLD (Đang giữ chỗ) → SOLD (Đã bán)
-HOLD → AVAILABLE (Khi hết hạn giữ chỗ hoặc bị hủy)
-
-Trạng thái vé (Ticket):
-VALID (Hợp lệ/Chưa dùng) → USED (Đã sử dụng để vào rạp)
-VALID → CANCELLED (Bị hủy)
-```
+> **Nguồn:** `USECASE.md` — baseline Use Case mới nhất của nhóm.
+>
+> **Baseline áp dụng:** 01 System, 02 Actor nghiệp vụ (`Customer`, `Admin`), 15 Use Case.
+>
+> **Quy ước AC:**
+> - Mỗi Acceptance Criteria mô tả một kết quả nghiệp vụ có thể kiểm tra được.
+> - `Given` = điều kiện ban đầu.
+> - `When` = hành động/sự kiện.
+> - `Then` = kết quả hệ thống phải đảm bảo.
+> - AC không mô tả chi tiết UI, API, Controller, Repository hoặc cách triển khai.
+> - Các bước nội bộ như Hold ghế, tính tiền, tạo Ticket và sinh `ticketCode` chỉ được kiểm tra thông qua kết quả nghiệp vụ cuối cùng.
 
 ---
 
-# A. DÙNG CHUNG (SHARED)
-
-## AUTH-01 — Đăng nhập
-
-| ID | Tiêu chí nghiệm thu (AC) |
-|---|---|
-| AC-01 | Người dùng (Customer/Employee/Admin) có thể nhập thông tin định danh (Email/SĐT hoặc Mã NV) và Mật khẩu. |
-| AC-02 | Hệ thống phải xác thực (authenticate) thông tin với Database trước khi tạo phiên đăng nhập (session/token). |
-| AC-03 | Sai tài khoản hoặc mật khẩu -> Đăng nhập thất bại, báo lỗi cụ thể. |
-| AC-04 | Đăng nhập thất bại thì không được cấp session hay token hợp lệ nào. |
-| AC-05 | Hệ thống phải check xem tài khoản có đang bị khóa (deactivated/banned) hay không. Bị khóa -> Cấm đăng nhập. |
-| AC-06 | Thông tin đúng + Tài khoản hợp lệ -> Đăng nhập thành công, trả về session/token. |
-| AC-07 | **Điều hướng (Routing):** Dựa vào Role (Vai trò), hệ thống phải cấp quyền và điều hướng đúng: Customer vào Web/App khách, Employee vào POS quầy, Admin vào Dashboard quản trị. |
-| AC-08 | Token trả về phải chứa thông tin Role để Client sử dụng cho các API tiếp theo. |
-
----
-
-# B. CUSTOMER (KHÁCH HÀNG)
+# 1. CUSTOMER
 
 ## CUS-01 — Đăng ký tài khoản
 
-| ID | Tiêu chí nghiệm thu (AC) |
-|---|---|
-| AC-01 | Khách hàng có thể truy cập vào màn hình/chức năng Đăng ký. |
-| AC-02 | Hệ thống yêu cầu nhập các thông tin: email hoặc số điện thoại, mật khẩu và họ tên. |
-| AC-03 | Dữ liệu đầu vào phải được kiểm tra (validate format) kỹ trước khi tạo tài khoản. |
-| AC-04 | Không cho phép tạo tài khoản nếu email hoặc số điện thoại đã tồn tại trong hệ thống. |
-| AC-05 | Nếu nhập sai định dạng hoặc thiếu thông tin, hệ thống từ chối và hiển thị lỗi rõ ràng. |
-| AC-06 | Dữ liệu hợp lệ sẽ tạo ra đúng 1 tài khoản `Customer` mới. |
-| AC-07 | Nếu quá trình tạo bị lỗi giữa chừng, phải rollback DB, tuyệt đối không để lại dữ liệu rác. |
-| AC-08 | Hiển thị thông báo đăng ký thành công cho Khách hàng. |
+**Mục tiêu:** Customer tạo được tài khoản hợp lệ để sử dụng các chức năng dành cho khách.
 
-## CUS-02 — Quản lý Thông tin cá nhân
+### AC-01 — Đăng ký thành công
+**Given** Customer chưa có tài khoản hợp lệ và cung cấp đầy đủ thông tin hợp lệ  
+**When** Customer xác nhận đăng ký  
+**Then** hệ thống tạo tài khoản Customer và thông báo đăng ký thành công.
 
-| ID | Tiêu chí nghiệm thu (AC) |
-|---|---|
-| AC-01 | Khách hàng chỉ được phép xem Profile của chính mình. |
-| AC-02 | Màn hình hiển thị đúng thông tin của user đang đăng nhập lấy từ token. |
-| AC-03 | Cho phép user sửa những trường thông tin được phép (VD: Tên, SĐT, không cho sửa ID). |
-| AC-04 | Validate dữ liệu trước khi lưu vào database. |
-| AC-05 | Dữ liệu sai định dạng -> Báo lỗi, không cập nhật. |
-| AC-06 | Dữ liệu chuẩn -> Lưu thành công vào database. |
-| AC-07 | Cập nhật xong, load lại trang phải ra thông tin mới nhất. |
-| AC-08 | **Bảo mật (IDOR):** User A không thể gọi API truyền ID để sửa Profile của User B. |
-| AC-09 | Nếu quá trình lưu bị lỗi mạng/DB, dữ liệu không được cập nhật nửa vời. |
+### AC-02 — Từ chối dữ liệu đăng ký không hợp lệ
+**Given** Customer nhập thông tin đăng ký không hợp lệ  
+**When** Customer xác nhận đăng ký  
+**Then** hệ thống thông báo lỗi, không tạo tài khoản và yêu cầu Customer nhập lại.
 
-## CUS-03 — Xem phim
-
-| ID | Tiêu chí nghiệm thu (AC) |
-|---|---|
-| AC-01 | Khách hàng xem được danh sách phim (`Movie`). |
-| AC-02 | Chỉ hiển thị các phim có trạng thái được phép (VD: Đang chiếu, Sắp chiếu). |
-| AC-03 | Khách hàng có thể tìm kiếm theo từ khóa hoặc lọc theo thể loại/trạng thái. |
-| AC-04 | Khách hàng click chọn được một bộ phim cụ thể để vào trang chi tiết. |
-| AC-05 | Nếu không có phim nào khớp, hiển thị màn hình Empty State (Không có dữ liệu). |
-| AC-06 | Hành động xem phim là Read-only, không làm thay đổi dữ liệu. |
-
-## CUS-04 — Xem suất chiếu
-
-| ID | Tiêu chí nghiệm thu (AC) |
-|---|---|
-| AC-01 | Khách hàng có thể tìm suất chiếu (`Showtime`) từ trang Chi tiết Phim, hoặc chọn Rạp/Ngày. |
-| AC-02 | Hệ thống chỉ trả về các suất chiếu match với điều kiện tìm kiếm và đang mở bán. |
-| AC-03 | Trên kết quả tìm kiếm phải hiện đủ: Tên Rạp, Tên Phòng chiếu, Giờ chiếu và Giá vé. |
-| AC-04 | Nếu suất chiếu đã bị hủy hoặc trôi qua giờ chiếu, không trả về hoặc không cho click. |
-| AC-05 | Nếu không có suất chiếu phù hợp -> Báo "Không có suất chiếu". |
-| AC-06 | Thao tác xem lịch chiếu không làm thay đổi trạng thái ghế. |
-
-## CUS-05 — Đặt vé online (Aggregate Root)
-
-| ID | Tiêu chí nghiệm thu (AC) |
-|---|---|
-| AC-01 | Khách hàng chọn một suất chiếu hợp lệ. |
-| AC-02 | Hệ thống render sơ đồ ghế (`ShowtimeSeat`) của suất chiếu. |
-| AC-03 | **Quy tắc chọn:** Chỉ những ghế màu trắng/trống (`AVAILABLE`) mới cho phép user chọn. |
-| AC-04 | **Giới hạn:** Mỗi đơn (`Booking`) chỉ được chọn tối đa **8 ghế/vé**. |
-| AC-05 | **Lock ghế (Hold):** Khi ấn "Tiếp tục", hệ thống kiểm tra atomic xem ghế có bị tranh mua không. |
-| AC-06 | Giữ ghế thành công -> Trạng thái ghế đổi thành `HOLD` (Đang giữ). |
-| AC-07 | Lưu thời điểm hết hạn giữ ghế (`holdExpiresAt`) = Thời gian hiện tại + 5 phút. |
-| AC-08 | Nếu 1 trong số các ghế user định giữ đã bị lấy mất, request Hold thất bại (báo lỗi "Ghế đã có người chọn"). |
-| AC-09 | Request Hold thất bại phải tự động rollback các ghế đã lỡ khóa trong cùng request đó về `AVAILABLE`. |
-| AC-10 | **Concurrency:** Nếu 2 người cùng bấm giữ 1 ghế tại cùng mili-giây, chỉ 1 người thành công. |
-| AC-11 | Giữ ghế thành công, chuyển qua bước mua Combo/Bắp Nước (Optional). |
-| AC-12 | Bắp nước không bị tính vào giới hạn 8 vé. |
-| AC-13 | Hàm `Booking.calculateTotal()` tính toán chính xác: Tiền vé + Tiền Combo - Khuyến mãi. |
-| AC-14 | Chuyển user sang CUS-06 để thanh toán. |
-
-## CUS-06 — Thanh toán online
-
-| ID | Tiêu chí nghiệm thu (AC) |
-|---|---|
-| AC-01 | UI hiển thị chính xác tổng số tiền phải thanh toán cuối cùng. |
-| AC-02 | Khách chỉ được chọn các cổng thanh toán online (MoMo, VNPay, Credit Card). |
-| AC-03 | Dev áp dụng `PaymentStrategy` để gọi API cổng thanh toán tương ứng. |
-| AC-04 | Số tiền đẩy sang cổng thanh toán phải khớp 100% với tổng tiền `Booking`. |
-| AC-05 | Hệ thống phải chờ webhook/callback từ cổng thanh toán báo "Thành công" mới chốt đơn. |
-| AC-06 | **Thanh toán thành công:** Chuyển `Booking` sang `PAID`. |
-| AC-07 | Các ghế (`ShowtimeSeat`) chính thức chuyển `HOLD` -> `SOLD`. |
-| AC-08 | Tạo vé (`Ticket`) tương ứng với số ghế, trạng thái vé `VALID`. |
-| AC-09 | Sinh chuỗi mã `qrCodeString` duy nhất cho Booking và hiển thị/gửi email. |
-| AC-10 | **Thanh toán lỗi/hủy:** Đơn KHÔNG được `PAID`, ghế KHÔNG được `SOLD`. |
-| AC-11 | Thanh toán lỗi mà thời gian Hold vẫn còn -> Khách có thể thanh toán lại. |
-| AC-12 | Nếu Hold đã hết hạn (quá 5p) mà webhook trả về thành công -> Báo lỗi/hoàn tiền quy trình ngoại lệ, KHÔNG chốt ghế nếu ghế đã bị người khác mua. |
-
-## CUS-07 — Xem lịch sử đặt vé
-
-| ID | Tiêu chí nghiệm thu (AC) |
-|---|---|
-| AC-01 | Khách vào được mục Lịch sử vé. |
-| AC-02 | Chỉ gọi API lấy những đơn của đúng user đang login (Chống leo thang đặc quyền). |
-| AC-03 | Đơn vé hiển thị theo thứ tự thời gian chuẩn (mới nhất xếp trên). |
-| AC-04 | Xem chi tiết hiển thị rõ: Số vé, số ghế, rạp, bắp nước, QR. |
-| AC-05 | Hiện rõ trạng thái của đơn: Đã thanh toán, Đã hủy, Vé đã dùng... |
-| AC-06 | Nếu chưa từng mua vé nào -> Hiện màn hình Empty State. |
+### AC-03 — Từ chối thông tin định danh đã tồn tại
+**Given** thông tin định danh tài khoản đã tồn tại trong hệ thống  
+**When** Customer thực hiện đăng ký  
+**Then** hệ thống thông báo thông tin đã tồn tại và không tạo tài khoản mới.
 
 ---
 
-# C. EMPLOYEE (NHÂN VIÊN)
+## CUS-02 — Đăng nhập
 
-## EMP-01 — Bán vé tại quầy
+**Mục tiêu:** Người dùng truy cập hệ thống bằng tài khoản hợp lệ và được chuyển đến chức năng phù hợp với vai trò.
 
-| ID | Tiêu chí nghiệm thu (AC) |
-|---|---|
-| AC-01 | Nhân viên (NV) chọn Phim/Suất chiếu trên POS. |
-| AC-02 | Hiện sơ đồ ghế, chỉ chọn được ghế trắng (`AVAILABLE`). |
-| AC-03 | Giới hạn tối đa **8 vé/đơn**. |
-| AC-04 | Việc NV bấm chọn ghế áp dụng cơ chế Hold atomic chặt chẽ y như khách mua online. |
-| AC-05 | NV và Khách mua online đụng ghế -> Ai API tới trước người đó ăn, người kia báo lỗi. |
-| AC-06 | NV có thể thêm Bắp/Nước vào đơn. Hệ thống tính tổng tiền. |
-| AC-07 | Đẩy qua EMP-02 để tính tiền. |
-| AC-08 | Thu tiền xong -> Booking `PAID`, Ticket `VALID`, Ghế `SOLD`, sinh QR. |
-| AC-09 | Lỗi/Khách hủy kèo -> Rollback, nhả ghế về trắng, không sinh vé. |
+### AC-01 — Đăng nhập thành công
+**Given** người dùng có tài khoản hợp lệ và tài khoản không bị khóa/vô hiệu hóa  
+**When** người dùng nhập đúng thông tin đăng nhập  
+**Then** hệ thống xác thực thành công, tạo phiên đăng nhập và chuyển người dùng đến các chức năng phù hợp với vai trò Customer hoặc Admin.
 
-## EMP-02 — Thanh toán tại quầy
+### AC-02 — Từ chối thông tin đăng nhập sai
+**Given** người dùng có tài khoản  
+**When** người dùng nhập sai thông tin đăng nhập  
+**Then** hệ thống thông báo lỗi và không tạo phiên đăng nhập hợp lệ.
 
-| ID | Tiêu chí nghiệm thu (AC) |
-|---|---|
-| AC-01 | Hỗ trợ Tiền mặt (Cash) và Quẹt thẻ POS tĩnh (Credit Card POS). Không dùng MoMo/VNPay online. |
-| AC-02 | Tiền mặt: NV nhập số tiền khách đưa. Nhập thiếu -> Báo lỗi. Nhập đủ/dư -> Tính tiền thối. |
-| AC-03 | Quẹt thẻ: Máy POS quẹt xong, NV bấm "Xác nhận đã quẹt" trên app. |
-| AC-04 | Xác nhận xong -> Đơn đổi thành `PAID`. |
-| AC-05 | Hủy thanh toán -> Đơn không `PAID`. |
-
-## EMP-03 — Soát vé (Check-in)
-
-| ID | Tiêu chí nghiệm thu (AC) |
-|---|---|
-| AC-01 | NV dùng máy quét QR dịch thành `qrCodeString`. |
-| AC-02 | Backend tìm `Booking`, không thấy hoặc sai -> Báo lỗi từ chối. |
-| AC-03 | Load toàn bộ danh sách vé (`Ticket`) của đơn. |
-| AC-04 | Hiển thị trạng thái từng vé: Xanh (VALID - chưa dùng), Xám (USED - đã vào), Đỏ (CANCELLED - đã hủy). |
-| AC-05 | NV chỉ được tick chọn các vé `VALID`. Cấm tick vé `USED` hoặc `CANCELLED`. |
-| AC-06 | NV có thể check-in lẻ (VD chọn 2 trên 5 vé). |
-| AC-07 | Xác nhận -> Các vé được chọn chuyển `VALID` -> `USED`. Các vé chưa chọn giữ nguyên `VALID`. |
-| AC-08 | Không dùng `Booking.isUsed`. Mã QR có thể quét nhiều lần để check-in nốt các vé chưa tới. |
-| AC-09 | Sai suất chiếu (đi nhầm ngày, nhầm giờ, nhầm rạp) -> Báo lỗi "Sai suất chiếu". |
-
-## EMP-04 — Giao Bắp và Nước
-
-| ID | Tiêu chí nghiệm thu (AC) |
-|---|---|
-| AC-01 | Quét QR lấy thông tin đơn. Sai QR -> Từ chối. |
-| AC-02 | Load list Combo khách đã mua. |
-| AC-03 | Hiện trạng thái: Đã giao hay chưa. Đã giao rồi cấm giao lại (xin thêm). |
-| AC-04 | Bấm "Xác nhận giao" -> Combo đổi thành `DELIVERED`. |
-| AC-05 | Không ảnh hưởng đến trạng thái vé xem phim. Độc lập hoàn toàn với EMP-03. |
-
-## EMP-05 — Tra cứu Đặt vé
-
-| ID | Tiêu chí nghiệm thu (AC) |
-|---|---|
-| AC-01 | NV search theo SĐT, Email, Mã Booking, Mã QR. |
-| AC-02 | Backend trả đúng đơn. Có nhiều đơn (theo SĐT) -> Hiện list cho NV chọn. |
-| AC-03 | Không tìm thấy -> Báo lỗi nhẹ nhàng. |
-| AC-04 | Xem chi tiết đủ Vé, Bắp, QR, Trạng thái. Màn hình chỉ là Read-only. |
-
-## EMP-06 — Hủy vé
-
-| ID | Tiêu chí nghiệm thu (AC) |
-|---|---|
-| AC-01 | NV/Quản lý mở đúng Booking. |
-| AC-02 | Chỉ được phép thao tác Hủy đối với vé còn `VALID`. Cấm hủy vé `USED` hoặc `CANCELLED`. |
-| AC-03 | NV tick chọn các vé khách xin hủy. |
-| AC-04 | Bấm xác nhận -> Trạng thái vé đổi `VALID` -> `CANCELLED`. |
-| AC-05 | **Bắt buộc:** Ghế tương ứng trong `ShowtimeSeat` phải đổi từ `SOLD` -> `AVAILABLE` để bán lại. |
-| AC-06 | Hủy lẻ vé không làm ảnh hưởng đến các vé không hủy trong cùng Booking. |
-| AC-07 | Ghi Log: Ai hủy, hủy lúc nào, lý do. |
+### AC-03 — Từ chối tài khoản bị khóa/vô hiệu hóa
+**Given** tài khoản đang ở trạng thái bị khóa/vô hiệu hóa  
+**When** người dùng nhập đúng thông tin đăng nhập  
+**Then** hệ thống vẫn từ chối đăng nhập và không tạo phiên đăng nhập.
 
 ---
 
-# D. ADMIN (QUẢN TRỊ HỆ THỐNG)
+## CUS-03 — Quản lý thông tin cá nhân
 
-## ADM-01 — Quản lý Phim
+**Mục tiêu:** Customer xem và cập nhật được thông tin cá nhân của chính mình.
 
-| ID | Tiêu chí nghiệm thu (AC) |
-|---|---|
-| AC-01 | Thêm/Sửa/Danh sách Phim. |
-| AC-02 | Validation: Các trường bắt buộc không để trống. Thời lượng > 0. |
-| AC-03 | **Toàn vẹn:** Nếu Phim đã lên lịch chiếu hoặc đã bán vé -> CẤM xóa cứng (hard-delete). |
-| AC-04 | Chỉ hỗ trợ xóa mềm (Ẩn/Ngừng chiếu) để không làm crash lịch sử hóa đơn cũ. |
+### AC-01 — Xem thông tin cá nhân
+**Given** Customer đã đăng nhập  
+**When** Customer mở thông tin cá nhân  
+**Then** hệ thống hiển thị thông tin hiện tại của đúng tài khoản Customer.
 
-## ADM-02 — Quản lý Phòng chiếu
+### AC-02 — Cập nhật thông tin thành công
+**Given** Customer đã đăng nhập và nhập dữ liệu cập nhật hợp lệ  
+**When** Customer xác nhận cập nhật  
+**Then** hệ thống lưu thông tin mới và thông báo cập nhật thành công.
 
-| ID | Tiêu chí nghiệm thu (AC) |
-|---|---|
-| AC-01 | Admin tạo/sửa/xem danh sách Phòng chiếu (Room). |
-| AC-02 | Nếu phòng đã xếp lịch chiếu hoặc có vé -> Cấm xóa cứng. |
-| AC-03 | Sửa đổi phòng không làm thay đổi lịch sử vé đã bán. |
+### AC-03 — Từ chối dữ liệu cập nhật không hợp lệ
+**Given** Customer đã đăng nhập nhưng dữ liệu cập nhật không hợp lệ  
+**When** Customer xác nhận cập nhật  
+**Then** hệ thống thông báo lỗi và không lưu dữ liệu không hợp lệ.
 
-## ADM-03 — Quản lý Sơ đồ chỗ ngồi
+### AC-04 — Xử lý lỗi khi cập nhật
+**Given** Customer đã nhập dữ liệu hợp lệ nhưng hệ thống không thể cập nhật thông tin  
+**When** Customer xác nhận cập nhật  
+**Then** hệ thống thông báo lỗi và không xác nhận cập nhật thành công.
 
-| ID | Tiêu chí nghiệm thu (AC) |
-|---|---|
-| AC-01 | Thêm/Xóa/Sửa cấu hình ghế (`Seat`) vật lý của phòng chiếu. |
-| AC-02 | Mã ghế (VD: A1, B2) không trùng nhau trong 1 phòng. |
-| AC-03 | Bảng này chỉ chứa cấu hình, tuyệt đối không chèn cờ trạng thái `HOLD/SOLD` vào đây. |
-| AC-04 | Cấm xóa ghế nếu ghế đó từng xuất hiện trong lịch sử vé đã bán. |
+---
 
-## ADM-04 — Quản lý Suất chiếu
+## CUS-04 — Xem phim và suất chiếu
 
-| ID | Tiêu chí nghiệm thu (AC) |
-|---|---|
-| AC-01 | Admin tạo suất chiếu: Chọn Phim, Phòng chiếu, Thời gian. |
-| AC-02 | **Check Conflict:** API phải tính xem khung giờ đó phòng có trống không. Bị đè -> Cấm tạo. |
-| AC-03 | **Quan trọng:** Tạo thành công -> Tự động copy ghế từ `Seat` sang `ShowtimeSeat` cho suất này với trạng thái `AVAILABLE`. |
-| AC-04 | Update giờ/phòng chỉ được thực hiện nếu chưa có khách nào mua vé. Đã có vé -> Cấm sửa/xóa. |
+**Mục tiêu:** Customer tìm và chọn được phim, sau đó xem và chọn suất chiếu phù hợp.
 
-## ADM-05 — Quản lý Giá vé
+### AC-01 — Xem danh sách phim
+**Given** hệ thống có các phim đang được hiển thị  
+**When** Customer truy cập danh sách phim  
+**Then** hệ thống hiển thị các phim đang được phép hiển thị cho Customer.
 
-| ID | Tiêu chí nghiệm thu (AC) |
-|---|---|
-| AC-01 | Cấu hình Price Rule (Loại ngày, khung giờ, giá). Giá > 0. |
-| AC-02 | Không cho 2 luật giá mâu thuẫn đè lên nhau cùng khung giờ. |
-| AC-03 | Luật giá hết hạn không tự áp dụng cho suất chiếu mới. |
-| AC-04 | Sửa/Tăng luật giá -> Những hóa đơn cũ đã mua giữ nguyên số tiền, không update hồi tố. |
+### AC-02 — Tìm kiếm/lọc phim có kết quả
+**Given** có phim phù hợp với điều kiện tìm kiếm/lọc  
+**When** Customer tìm kiếm hoặc lọc phim  
+**Then** hệ thống hiển thị các phim phù hợp.
 
-## ADM-06 — Quản lý Bắp và Nước
+### AC-03 — Không tìm thấy phim
+**Given** không có phim phù hợp với điều kiện tìm kiếm/lọc  
+**When** Customer thực hiện tìm kiếm/lọc  
+**Then** hệ thống thông báo không có phim phù hợp.
 
-| ID | Tiêu chí nghiệm thu (AC) |
-|---|---|
-| AC-01 | Thêm/Sửa/Danh sách F&B. Giá bán > 0. |
-| AC-02 | Ngưng bán món -> Dùng cờ `isActive = false`, cấm xóa cứng nếu món đã có trong hóa đơn. |
-| AC-03 | Thay đổi giá bắp không làm đổi giá trong hóa đơn cũ. |
+### AC-04 — Xem suất chiếu của phim
+**Given** Customer đã chọn một phim đang hiển thị  
+**When** Customer xem chi tiết phim  
+**Then** hệ thống hiển thị thông tin phim và các suất chiếu đang mở bán của phim.
 
-## ADM-07 — Quản lý Tài khoản (NV & Khách)
+### AC-05 — Không có suất chiếu phù hợp
+**Given** phim được chọn không có suất chiếu phù hợp/đang mở bán  
+**When** Customer xem suất chiếu  
+**Then** hệ thống thông báo không có suất chiếu phù hợp.
 
-| ID | Tiêu chí nghiệm thu (AC) |
-|---|---|
-| AC-01 | Admin xem danh sách NV và Khách hàng. Tìm kiếm theo Tên, Email, SĐT, Trạng thái. |
-| AC-02 | Admin tạo/sửa tài khoản Nhân viên, cấp quyền Role (VD: Soát vé, Quầy vé). |
-| AC-03 | SĐT/Email không được trùng lặp. |
-| AC-04 | Khóa (Deactivate) NV/KH. Người dùng bị khóa lập tức mất quyền đăng nhập, token hiện tại bị phế. |
-| AC-05 | Cấm xóa cứng tài khoản nếu đã có lịch sử tương tác (mua vé, thao tác POS) để bảo toàn Log dữ liệu. |
+### AC-06 — Chọn suất chiếu
+**Given** có suất chiếu đang mở bán  
+**When** Customer chọn suất chiếu  
+**Then** hệ thống ghi nhận suất chiếu được chọn để tiếp tục đặt vé.
 
-## ADM-08 — Quản lý Báo cáo và Thống kê
+---
 
-| ID | Tiêu chí nghiệm thu (AC) |
-|---|---|
-| AC-01 | Admin chọn loại báo cáo: Doanh thu, Số vé bán, Tỷ lệ lấp đầy. |
-| AC-02 | Bộ lọc thời gian (Từ ngày - Đến ngày) và cấp độ (Theo phim, Theo suất chiếu). |
-| AC-03 | Hệ thống chỉ tính toán số liệu dựa trên các Booking có trạng thái `PAID`. (Bỏ qua Đã hủy, Chờ thanh toán). |
-| AC-04 | Nếu không có dữ liệu trong khoảng thời gian chọn -> Hiển thị bảng trống (Empty State), không crash UI. |
-| AC-05 | Có chức năng xuất báo cáo (Export Excel/PDF) khớp 100% với dữ liệu đang hiển thị trên màn hình. |
+## CUS-05 — Đặt vé online
+
+**Mục tiêu:** Customer chọn ghế, tùy chọn Bắp Nước, thanh toán trực tuyến và nhận vé điện tử sau khi thanh toán thành công.
+
+### AC-01 — Chọn ghế còn trống và tạo Booking PENDING
+**Given** Customer đã đăng nhập, suất chiếu đang mở bán và ghế ở trạng thái `AVAILABLE`  
+**When** Customer chọn ghế hợp lệ  
+**Then** hệ thống giữ các ghế đã chọn ở trạng thái `HOLD` trong 5 phút và tạo Booking ở trạng thái `PENDING`.
+
+### AC-02 — Không cho chọn quá số lượng vé cho phép
+**Given** Customer đang chọn ghế và số ghế đã chọn đạt giới hạn theo thông số rạp phim  
+**When** Customer chọn thêm ghế vượt giới hạn  
+**Then** hệ thống thông báo vượt số lượng vé cho phép và yêu cầu Customer điều chỉnh lựa chọn.
+
+### AC-03 — Không bán trùng ghế
+**Given** một ghế đã được Customer khác giữ hoặc mua  
+**When** Customer cố chọn ghế đó  
+**Then** hệ thống từ chối lựa chọn ghế, thông báo ghế không còn khả dụng và yêu cầu chọn ghế khác.
+
+### AC-04 — Chọn Bắp Nước còn bán và còn hàng
+**Given** món Bắp Nước đang được bán và còn tồn kho  
+**When** Customer chọn món trong quá trình đặt vé  
+**Then** hệ thống chấp nhận món đã chọn và tính món đó vào tổng tiền Booking.
+
+### AC-05 — Không cho chọn Bắp Nước hết hàng/ngừng bán
+**Given** món Bắp Nước đã hết hàng hoặc ngừng bán  
+**When** Customer cố chọn món đó  
+**Then** hệ thống thông báo món không khả dụng và không thêm món vào Booking.
+
+### AC-06 — Tính tổng tiền đúng theo cấu hình hiện tại
+**Given** Customer đã chọn ghế và tùy chọn Bắp Nước hợp lệ  
+**When** hệ thống tính tổng tiền  
+**Then** tổng tiền được tính theo giá vé đang áp dụng và các dịch vụ đã chọn.
+
+### AC-07 — Thanh toán thành công
+**Given** Booking đang `PENDING`, các ghế vẫn còn `HOLD` và Customer thực hiện thanh toán trực tuyến thành công  
+**When** hệ thống xác nhận thanh toán thành công  
+**Then** Booking chuyển sang `PAID`, các `ShowtimeSeat` tương ứng chuyển từ `HOLD` sang `SOLD`, Ticket được tạo và mỗi Ticket có `ticketCode` duy nhất.
+
+### AC-08 — Hiển thị thông tin vé sau khi thanh toán
+**Given** Booking đã chuyển sang `PAID` và Ticket đã được tạo  
+**When** quá trình đặt vé hoàn tất  
+**Then** hệ thống hiển thị thông tin đặt vé và `ticketCode` cho Customer.
+
+### AC-09 — Thanh toán thất bại hoặc bị hủy
+**Given** Customer đang thanh toán một Booking `PENDING`  
+**When** thanh toán thất bại hoặc bị hủy  
+**Then** Booking chuyển sang `CANCELLED`, không chuyển sang `PAID` và không tạo Ticket mới.
+
+### AC-10 — Hết thời gian Hold trước khi thanh toán
+**Given** Booking đang `PENDING` và các ghế đang `HOLD`  
+**When** hết thời gian giữ ghế 5 phút trước khi thanh toán thành công  
+**Then** hệ thống giải phóng các ghế về `AVAILABLE`, Booking chuyển sang `EXPIRED` và đặt vé không được hoàn tất.
+
+### AC-11 — Không cho tiếp tục với suất chiếu không còn khả dụng
+**Given** Customer đã chọn một suất chiếu nhưng suất chiếu không còn khả dụng  
+**When** Customer tiếp tục đặt vé  
+**Then** hệ thống không cho tiếp tục đặt vé đối với suất chiếu đó.
+
+### AC-12 — Đảm bảo một ghế không bị giữ/bán đồng thời
+**Given** nhiều yêu cầu cùng thao tác trên một `ShowtimeSeat` đang `AVAILABLE`  
+**When** các yêu cầu đồng thời cố giữ hoặc mua ghế  
+**Then** chỉ một yêu cầu được giữ ghế thành công; các yêu cầu còn lại phải nhận trạng thái ghế không còn khả dụng.
+
+### AC-13 — Không ảnh hưởng Booking đã tạo khi giá thay đổi
+**Given** một Booking đã được tạo với giá vé đang áp dụng  
+**When** Admin thay đổi cấu hình giá vé sau đó  
+**Then** giá của Booking đã tạo không bị thay đổi.
+
+---
+
+## CUS-06 — Quản lý vé điện tử và lịch sử đặt vé
+
+**Mục tiêu:** Customer xem được lịch sử Booking và vé điện tử của các Booking đã thanh toán.
+
+### AC-01 — Chỉ xem Booking của chính Customer
+**Given** Customer đã đăng nhập và hệ thống có Booking của nhiều khách hàng  
+**When** Customer mở lịch sử đặt vé  
+**Then** hệ thống chỉ hiển thị các Booking thuộc tài khoản Customer hiện tại.
+
+### AC-02 — Hiển thị lịch sử đặt vé
+**Given** Customer có lịch sử Booking  
+**When** Customer mở lịch sử đặt vé  
+**Then** hệ thống hiển thị danh sách Booking theo thời gian.
+
+### AC-03 — Không có lịch sử đặt vé
+**Given** Customer chưa có Booking  
+**When** Customer mở lịch sử đặt vé  
+**Then** hệ thống hiển thị trạng thái không có dữ liệu.
+
+### AC-04 — Xem chi tiết Booking
+**Given** Customer đã chọn một Booking thuộc tài khoản của mình  
+**When** Customer mở chi tiết Booking  
+**Then** hệ thống hiển thị phim, suất chiếu, ghế, Bắp Nước, tổng tiền và trạng thái Booking.
+
+### AC-05 — Hiển thị vé điện tử cho Booking PAID
+**Given** Booking được chọn có trạng thái `PAID` và có Ticket  
+**When** Customer xem chi tiết Booking  
+**Then** hệ thống hiển thị vé điện tử và `ticketCode`.
+
+### AC-06 — Không hiển thị vé điện tử cho Booking chưa PAID
+**Given** Booking được chọn chưa ở trạng thái `PAID`  
+**When** Customer xem chi tiết Booking  
+**Then** hệ thống không hiển thị vé điện tử.
+
+---
+
+# 2. ADMIN
+
+> **Điều kiện chung:** Admin đã đăng nhập qua `CUS-02` và có quyền quản trị phù hợp với UC đang thực hiện.
+
+## ADM-01 — Quản lý phim
+
+**Mục tiêu:** Admin xem, tìm kiếm và cập nhật phim bằng các thao tác thêm, sửa hoặc thay đổi trạng thái.
+
+### AC-01 — Hiển thị danh sách phim
+**Given** Admin đã đăng nhập  
+**When** Admin mở Quản lý phim  
+**Then** hệ thống hiển thị danh sách phim.
+
+### AC-02 — Tìm kiếm/lọc phim
+**Given** hệ thống có phim phù hợp với điều kiện tìm kiếm/lọc  
+**When** Admin tìm kiếm/lọc phim  
+**Then** hệ thống hiển thị các phim phù hợp.
+
+### AC-03 — Không tìm thấy phim
+**Given** không có phim phù hợp  
+**When** Admin tìm kiếm/lọc  
+**Then** hệ thống thông báo không tìm thấy phim phù hợp và Admin vẫn có thể thêm phim mới.
+
+### AC-04 — Thêm phim thành công
+**Given** Admin nhập thông tin phim hợp lệ  
+**When** Admin xác nhận thêm phim  
+**Then** hệ thống tạo phim mới và hiển thị phim trong danh sách theo trạng thái phù hợp.
+
+### AC-05 — Sửa phim thành công
+**Given** phim tồn tại và Admin có quyền quản lý  
+**When** Admin sửa thông tin phim hợp lệ và xác nhận  
+**Then** hệ thống lưu thông tin phim mới.
+
+### AC-06 — Thay đổi trạng thái phim
+**Given** phim tồn tại  
+**When** Admin thay đổi trạng thái phim và xác nhận  
+**Then** hệ thống lưu trạng thái mới; phim ở trạng thái không hiển thị/ngừng chiếu không xuất hiện cho Customer.
+
+### AC-07 — Từ chối dữ liệu phim không hợp lệ
+**Given** Admin nhập dữ liệu phim không hợp lệ  
+**When** Admin xác nhận thao tác  
+**Then** hệ thống thông báo lỗi và không lưu thay đổi.
+
+---
+
+## ADM-02 — Quản lý suất chiếu
+
+**Mục tiêu:** Admin xem, tìm kiếm và cập nhật suất chiếu hợp lệ theo phim, phòng, ngày và giờ.
+
+### AC-01 — Hiển thị danh sách suất chiếu
+**Given** Admin đã đăng nhập và dữ liệu phim/phòng chiếu phù hợp tồn tại  
+**When** Admin mở Quản lý suất chiếu  
+**Then** hệ thống hiển thị danh sách suất chiếu.
+
+### AC-02 — Tìm kiếm/lọc suất chiếu
+**Given** có suất chiếu phù hợp điều kiện tìm kiếm/lọc  
+**When** Admin thực hiện tìm kiếm/lọc  
+**Then** hệ thống hiển thị các suất chiếu phù hợp.
+
+### AC-03 — Thêm suất chiếu thành công
+**Given** phim và phòng chiếu phù hợp tồn tại, thông tin ngày/giờ hợp lệ và không xung đột lịch phòng  
+**When** Admin thêm suất chiếu và xác nhận  
+**Then** hệ thống lưu suất chiếu và tạo `ShowtimeSeat` tương ứng với các ghế của phòng ở trạng thái `AVAILABLE`.
+
+### AC-04 — Sửa suất chiếu chưa phát sinh Booking
+**Given** suất chiếu chưa phát sinh Booking và dữ liệu mới hợp lệ  
+**When** Admin sửa phim/phòng/ngày/giờ của suất chiếu và xác nhận  
+**Then** hệ thống lưu thay đổi hợp lệ.
+
+### AC-05 — Không cho sửa thông tin của suất chiếu đã phát sinh Booking
+**Given** suất chiếu đã phát sinh Booking  
+**When** Admin cố sửa phim, phòng hoặc giờ chiếu  
+**Then** hệ thống từ chối thay đổi và chỉ cho phép thay đổi trạng thái.
+
+### AC-06 — Từ chối suất chiếu trùng lịch phòng
+**Given** việc tạo hoặc sửa suất chiếu gây xung đột thời gian/phòng  
+**When** Admin xác nhận  
+**Then** hệ thống từ chối thao tác và yêu cầu điều chỉnh dữ liệu.
+
+### AC-07 — Từ chối dữ liệu suất chiếu không hợp lệ
+**Given** thông tin suất chiếu không hợp lệ  
+**When** Admin xác nhận thao tác  
+**Then** hệ thống thông báo lỗi và không lưu.
+
+### AC-08 — Thay đổi trạng thái suất chiếu
+**Given** suất chiếu tồn tại  
+**When** Admin thay đổi trạng thái suất chiếu hợp lệ  
+**Then** hệ thống lưu trạng thái mới và chỉ hiển thị cho Customer khi suất chiếu ở trạng thái phù hợp để mở bán.
+
+---
+
+## ADM-03 — Quản lý phòng chiếu và sơ đồ chỗ ngồi
+
+**Mục tiêu:** Admin quản lý phòng chiếu và cấu hình sơ đồ ghế mà không làm mất tính toàn vẹn dữ liệu đã được tham chiếu.
+
+### AC-01 — Xem danh sách phòng chiếu
+**Given** Admin đã đăng nhập  
+**When** Admin mở Quản lý phòng chiếu và sơ đồ chỗ ngồi  
+**Then** hệ thống hiển thị danh sách phòng chiếu.
+
+### AC-02 — Tìm kiếm phòng chiếu
+**Given** có phòng chiếu phù hợp điều kiện tìm kiếm  
+**When** Admin tìm kiếm phòng chiếu  
+**Then** hệ thống hiển thị phòng chiếu phù hợp.
+
+### AC-03 — Không tìm thấy phòng chiếu
+**Given** không có phòng chiếu phù hợp  
+**When** Admin tìm kiếm  
+**Then** hệ thống thông báo không tìm thấy phòng chiếu.
+
+### AC-04 — Thêm phòng chiếu
+**Given** Admin nhập thông tin phòng chiếu hợp lệ  
+**When** Admin xác nhận thêm  
+**Then** hệ thống tạo phòng chiếu mới.
+
+### AC-05 — Sửa phòng chiếu hợp lệ
+**Given** phòng chiếu tồn tại và thay đổi không vi phạm ràng buộc dữ liệu  
+**When** Admin sửa thông tin và xác nhận  
+**Then** hệ thống lưu thông tin phòng chiếu mới.
+
+### AC-06 — Ẩn phòng chiếu
+**Given** phòng chiếu tồn tại  
+**When** Admin chọn ẩn phòng chiếu và xác nhận  
+**Then** hệ thống thay đổi trạng thái hiển thị của phòng mà không xóa dữ liệu.
+
+### AC-07 — Xem sơ đồ chỗ ngồi
+**Given** Admin chọn một phòng chiếu  
+**When** Admin mở sơ đồ chỗ ngồi  
+**Then** hệ thống hiển thị danh sách/sơ đồ các ghế của phòng.
+
+### AC-08 — Thiết lập và phân loại ghế
+**Given** Admin có quyền cấu hình sơ đồ và dữ liệu ghế hợp lệ  
+**When** Admin thiết lập sơ đồ hoặc phân loại ghế và xác nhận  
+**Then** hệ thống lưu cấu hình ghế.
+
+### AC-09 — Thay đổi trạng thái ghế vật lý
+**Given** ghế tồn tại và thay đổi không làm mất tính toàn vẹn dữ liệu  
+**When** Admin thay đổi trạng thái sử dụng của ghế và xác nhận  
+**Then** hệ thống lưu trạng thái mới của `Seat`.
+
+### AC-10 — Từ chối mã/vị trí ghế trùng hoặc không hợp lệ
+**Given** Admin nhập mã hoặc vị trí ghế bị trùng/không hợp lệ  
+**When** Admin xác nhận thay đổi sơ đồ  
+**Then** hệ thống thông báo lỗi và không lưu thay đổi.
+
+### AC-11 — Bảo vệ dữ liệu đã được tham chiếu
+**Given** phòng hoặc ghế đã được tham chiếu bởi suất chiếu hoặc Booking  
+**When** Admin thực hiện thao tác làm mất tính toàn vẹn dữ liệu  
+**Then** hệ thống từ chối thao tác đó và chỉ cho phép ẩn/đổi trạng thái phù hợp.
+
+---
+
+## ADM-04 — Quản lý loại vé và giá vé
+
+**Mục tiêu:** Admin quản lý loại vé, cấu hình giá và tra cứu lịch sử thay đổi giá.
+
+### AC-01 — Hiển thị loại vé và giá hiện tại
+**Given** Admin đã đăng nhập  
+**When** Admin mở Quản lý loại vé và giá vé  
+**Then** hệ thống hiển thị danh sách loại vé và cấu hình giá hiện tại.
+
+### AC-02 — Thêm loại vé
+**Given** thông tin loại vé hợp lệ  
+**When** Admin thêm loại vé và xác nhận  
+**Then** hệ thống tạo loại vé mới.
+
+### AC-03 — Sửa loại vé
+**Given** loại vé tồn tại và dữ liệu sửa hợp lệ  
+**When** Admin sửa loại vé và xác nhận  
+**Then** hệ thống lưu thay đổi.
+
+### AC-04 — Thay đổi trạng thái loại vé
+**Given** loại vé tồn tại  
+**When** Admin thay đổi trạng thái và xác nhận  
+**Then** hệ thống lưu trạng thái mới của loại vé.
+
+### AC-05 — Thiết lập đối tượng áp dụng
+**Given** Admin nhập cấu hình đối tượng áp dụng hợp lệ  
+**When** Admin xác nhận  
+**Then** hệ thống lưu cấu hình đối tượng áp dụng cho loại vé.
+
+### AC-06 — Thiết lập/sửa giá vé
+**Given** cấu hình giá vé hợp lệ và không xung đột  
+**When** Admin thiết lập hoặc sửa giá vé và xác nhận  
+**Then** hệ thống lưu giá mới và ghi nhận lịch sử thay đổi giá.
+
+### AC-07 — Tra cứu lịch sử giá
+**Given** hệ thống có lịch sử thay đổi giá  
+**When** Admin tra cứu lịch sử  
+**Then** hệ thống hiển thị các thay đổi giá tương ứng và không thay đổi dữ liệu.
+
+### AC-08 — Từ chối giá hoặc cấu hình không hợp lệ
+**Given** dữ liệu giá/cấu hình không hợp lệ hoặc bị trùng/xung đột  
+**When** Admin xác nhận  
+**Then** hệ thống thông báo lỗi và không lưu thay đổi.
+
+### AC-09 — Không ảnh hưởng Booking đã tạo
+**Given** Booking đã được tạo trước khi giá vé thay đổi  
+**When** Admin thay đổi giá vé  
+**Then** giá của Booking đã tạo không bị thay đổi.
+
+---
+
+## ADM-05 — Quản lý thực phẩm
+
+**Mục tiêu:** Admin quản lý món Bắp Nước và tồn kho.
+
+### AC-01 — Hiển thị món và tồn kho
+**Given** Admin đã đăng nhập  
+**When** Admin mở Quản lý thực phẩm  
+**Then** hệ thống hiển thị danh sách món và số lượng tồn kho.
+
+### AC-02 — Thêm món
+**Given** thông tin món hợp lệ  
+**When** Admin thêm món và xác nhận  
+**Then** hệ thống tạo món mới.
+
+### AC-03 — Sửa món
+**Given** món tồn tại và thông tin sửa hợp lệ  
+**When** Admin sửa món và xác nhận  
+**Then** hệ thống lưu thông tin mới.
+
+### AC-04 — Thay đổi trạng thái món
+**Given** món tồn tại  
+**When** Admin thay đổi trạng thái món và xác nhận  
+**Then** hệ thống lưu trạng thái mới; món ngừng bán không được chọn cho Booking mới.
+
+### AC-05 — Theo dõi/cập nhật tồn kho
+**Given** Admin có thông tin tồn kho cần theo dõi hoặc cập nhật  
+**When** Admin thực hiện thao tác tồn kho hợp lệ  
+**Then** hệ thống lưu số lượng tồn kho mới.
+
+### AC-06 — Từ chối dữ liệu thực phẩm không hợp lệ
+**Given** dữ liệu món hoặc tồn kho không hợp lệ  
+**When** Admin xác nhận thao tác  
+**Then** hệ thống thông báo lỗi và không lưu.
+
+### AC-07 — Đánh dấu hết hàng
+**Given** số lượng tồn kho của món bằng 0  
+**When** hệ thống cập nhật trạng thái tồn kho  
+**Then** hệ thống xác định món hết hàng và Customer không thể chọn món đó khi đặt vé.
+
+---
+
+## ADM-06 — Quản lý đơn hàng
+
+**Mục tiêu:** Admin xem và tra cứu toàn bộ Booking, đồng thời kiểm tra tình trạng thanh toán mà không thay đổi dữ liệu nghiệp vụ.
+
+### AC-01 — Xem toàn bộ Booking
+**Given** Admin đã đăng nhập  
+**When** Admin mở Quản lý đơn hàng  
+**Then** hệ thống hiển thị danh sách toàn bộ Booking.
+
+### AC-02 — Không có Booking
+**Given** hệ thống chưa có Booking  
+**When** Admin mở Quản lý đơn hàng  
+**Then** hệ thống hiển thị trạng thái không có dữ liệu.
+
+### AC-03 — Tìm kiếm/lọc Booking
+**Given** hệ thống có Booking phù hợp điều kiện tìm kiếm/lọc  
+**When** Admin tìm kiếm/lọc theo trạng thái, khách hàng, phim/suất chiếu, ngày đặt hoặc `ticketCode`  
+**Then** hệ thống hiển thị các Booking phù hợp.
+
+### AC-04 — Không tìm thấy Booking
+**Given** không có Booking phù hợp điều kiện tìm kiếm  
+**When** Admin thực hiện tìm kiếm/lọc  
+**Then** hệ thống thông báo không có kết quả.
+
+### AC-05 — Xem chi tiết Booking
+**Given** Admin chọn một Booking tồn tại  
+**When** Admin mở chi tiết  
+**Then** hệ thống hiển thị khách hàng, phim, suất chiếu, ghế, Bắp Nước, tổng tiền, trạng thái Booking, tình trạng thanh toán, Ticket và `ticketCode` nếu có.
+
+### AC-06 — Kiểm tra tình trạng thanh toán
+**Given** Admin đang xem một Booking  
+**When** Admin kiểm tra tình trạng thanh toán  
+**Then** hệ thống cung cấp tình trạng thanh toán tương ứng với Booking.
+
+### AC-07 — Không chỉnh sửa Booking
+**Given** Admin đang sử dụng ADM-06  
+**When** Admin thực hiện các thao tác trong phạm vi UC  
+**Then** hệ thống chỉ cho phép xem/tra cứu và kiểm tra tình trạng thanh toán, không thay đổi dữ liệu nghiệp vụ của Booking.
+
+---
+
+## ADM-07 — Quản lý tài khoản
+
+**Mục tiêu:** Admin quản lý tài khoản Customer và Employee trong cùng một UC.
+
+### AC-01 — Hiển thị danh sách tài khoản
+**Given** Admin đã đăng nhập và có quyền quản trị tài khoản  
+**When** Admin mở Quản lý tài khoản  
+**Then** hệ thống hiển thị danh sách tài khoản.
+
+### AC-02 — Tìm kiếm/lọc tài khoản
+**Given** hệ thống có tài khoản Customer hoặc Employee phù hợp  
+**When** Admin tìm kiếm/lọc theo loại tài khoản hoặc trạng thái  
+**Then** hệ thống hiển thị các tài khoản phù hợp.
+
+### AC-03 — Không tìm thấy tài khoản
+**Given** không có tài khoản phù hợp điều kiện tìm kiếm  
+**When** Admin tìm kiếm/lọc  
+**Then** hệ thống thông báo không tìm thấy tài khoản.
+
+### AC-04 — Thêm tài khoản
+**Given** Admin có quyền và nhập dữ liệu tài khoản hợp lệ  
+**When** Admin xác nhận thêm tài khoản  
+**Then** hệ thống tạo tài khoản Customer hoặc Employee tương ứng.
+
+### AC-05 — Xem chi tiết tài khoản
+**Given** tài khoản tồn tại  
+**When** Admin chọn xem chi tiết  
+**Then** hệ thống hiển thị thông tin chi tiết của tài khoản được chọn.
+
+### AC-06 — Chỉnh sửa thông tin tài khoản
+**Given** tài khoản tồn tại và dữ liệu chỉnh sửa hợp lệ  
+**When** Admin xác nhận cập nhật  
+**Then** hệ thống lưu thông tin mới.
+
+### AC-07 — Khóa/mở tài khoản
+**Given** tài khoản tồn tại và Admin có quyền thao tác  
+**When** Admin khóa hoặc mở tài khoản và xác nhận  
+**Then** hệ thống cập nhật trạng thái tài khoản; tài khoản bị khóa/vô hiệu hóa không thể đăng nhập.
+
+### AC-08 — Khởi tạo lại mật khẩu
+**Given** tài khoản tồn tại và Admin có quyền quản trị  
+**When** Admin yêu cầu khởi tạo lại mật khẩu  
+**Then** hệ thống thực hiện khởi tạo mật khẩu theo cơ chế của hệ thống và cập nhật thông tin tài khoản.
+
+### AC-09 — Chỉnh sửa chức vụ
+**Given** tài khoản Employee tồn tại và dữ liệu chức vụ hợp lệ  
+**When** Admin thay đổi chức vụ và xác nhận  
+**Then** hệ thống cập nhật chức vụ.
+
+### AC-10 — Từ chối dữ liệu tài khoản trùng/không hợp lệ
+**Given** thông tin tài khoản bị trùng hoặc không hợp lệ  
+**When** Admin xác nhận thao tác  
+**Then** hệ thống thông báo lỗi và không lưu thay đổi.
+
+### AC-11 — Từ chối thao tác khi không đủ quyền
+**Given** Admin không có đủ quyền đối với thao tác đang thực hiện  
+**When** Admin thực hiện thao tác  
+**Then** hệ thống từ chối thao tác và không thay đổi dữ liệu.
+
+### AC-12 — Không được làm mất Admin cuối cùng
+**Given** hệ thống chỉ còn một tài khoản Admin có quyền quản trị cuối cùng  
+**When** Admin cố khóa tài khoản đó hoặc đổi chức vụ làm mất Admin cuối cùng  
+**Then** hệ thống từ chối thao tác và giữ nguyên tài khoản Admin cuối cùng.
+
+---
+
+## ADM-08 — Quản lý báo cáo và thống kê
+
+**Mục tiêu:** Admin xem báo cáo doanh thu và mức độ quan tâm theo phim theo kỳ và bộ lọc.
+
+### AC-01 — Hiển thị tổng quan hiện tại
+**Given** Admin đã đăng nhập  
+**When** Admin mở Báo cáo và Thống kê  
+**Then** hệ thống hiển thị tổng quan nhanh của ngày hiện tại, gồm doanh thu và số vé bán.
+
+### AC-02 — Chọn báo cáo doanh thu
+**Given** Admin đang ở chức năng Báo cáo và Thống kê  
+**When** Admin chọn Báo cáo doanh thu  
+**Then** hệ thống cho phép Admin chọn kỳ thống kê và bộ lọc tương ứng.
+
+### AC-03 — Chọn báo cáo mức độ quan tâm theo phim
+**Given** Admin đang ở chức năng Báo cáo và Thống kê  
+**When** Admin chọn Báo cáo mức độ quan tâm theo phim  
+**Then** hệ thống cho phép Admin chọn kỳ thống kê và bộ lọc tương ứng.
+
+### AC-04 — Chọn kỳ thống kê
+**Given** Admin chọn loại báo cáo  
+**When** Admin chọn ngày, tuần, tháng hoặc khoảng thời gian tùy chọn  
+**Then** hệ thống nhận kỳ thống kê và mốc thời gian tương ứng.
+
+### AC-05 — Từ chối khoảng thời gian không hợp lệ
+**Given** khoảng thời gian được nhập không hợp lệ, ví dụ ngày bắt đầu sau ngày kết thúc  
+**When** Admin yêu cầu tạo báo cáo  
+**Then** hệ thống yêu cầu nhập lại khoảng thời gian và không tạo báo cáo theo dữ liệu không hợp lệ.
+
+### AC-06 — Tổng hợp dữ liệu báo cáo
+**Given** kỳ thống kê hợp lệ  
+**When** Admin yêu cầu xem báo cáo  
+**Then** hệ thống tổng hợp dữ liệu từ các Booking theo loại báo cáo, kỳ và bộ lọc đã chọn.
+
+### AC-07 — Chỉ tính Booking PAID vào doanh thu và số vé bán
+**Given** trong kỳ có Booking ở nhiều trạng thái  
+**When** hệ thống tổng hợp doanh thu và số vé bán  
+**Then** chỉ Booking `PAID` được tính vào doanh thu và số vé bán.
+
+### AC-08 — Doanh thu ghi nhận theo ngày thanh toán thành công
+**Given** Booking được thanh toán thành công  
+**When** hệ thống xác định kỳ doanh thu  
+**Then** doanh thu của Booking được ghi nhận theo ngày thanh toán thành công.
+
+### AC-09 — Báo cáo mức độ quan tâm theo phim
+**Given** kỳ thống kê hợp lệ và có dữ liệu  
+**When** Admin xem báo cáo mức độ quan tâm theo phim  
+**Then** hệ thống có thể cung cấp các chỉ số được đặc tả như số vé bán theo phim, số lượt đặt vé, tỷ lệ lấp đầy ghế, tỷ lệ hoàn tất đặt vé, xếp hạng phim và khung giờ/ngày cao điểm theo dữ liệu tương ứng.
+
+### AC-10 — Hiển thị báo cáo không có dữ liệu
+**Given** kỳ thống kê hợp lệ nhưng không có dữ liệu  
+**When** Admin yêu cầu xem báo cáo  
+**Then** hệ thống hiển thị báo cáo rỗng hoặc thông báo không có dữ liệu.
+
+### AC-11 — Hiển thị bảng/biểu đồ và so sánh kỳ trước
+**Given** kỳ thống kê có dữ liệu  
+**When** hệ thống hoàn tất tổng hợp  
+**Then** hệ thống hiển thị các chỉ số, bảng, biểu đồ và phần so sánh với kỳ trước theo phạm vi chức năng hỗ trợ.
+
+### AC-12 — Xem chi tiết từ báo cáo
+**Given** báo cáo có dữ liệu chi tiết  
+**When** Admin chọn xem chi tiết theo kỳ/ngày  
+**Then** hệ thống cho phép đi đến danh sách Booking tương ứng trong `ADM-06`.
+
+### AC-13 — Không thay đổi dữ liệu nghiệp vụ khi xem báo cáo
+**Given** Admin đang xem hoặc lọc báo cáo  
+**When** hệ thống tổng hợp và hiển thị báo cáo  
+**Then** dữ liệu Booking và các dữ liệu nghiệp vụ khác không bị thay đổi.
+
+---
 
 ## ADM-09 — Cài đặt hệ thống
 
-| ID | Tiêu chí nghiệm thu (AC) |
-|---|---|
-| AC-01 | Admin truy cập màn hình cấu hình tham số vận hành chung. |
-| AC-02 | Cập nhật được "Thời gian giữ ghế" (Mặc định 5 phút). Input phải là số nguyên dương > 0. |
-| AC-03 | Cập nhật "Thời gian dọn rạp/Buffer giữa 2 suất chiếu" (Dùng cho logic ADM-04 check conflict). |
-| AC-04 | Lưu thông số thành công -> Áp dụng ngay lập tức cho các giao dịch và logic tính toán mới sinh ra sau đó. |
+**Mục tiêu:** Admin chỉnh sửa thông số rạp phim hoặc thực hiện sao lưu dữ liệu.
+
+### AC-01 — Hiển thị thông số hệ thống
+**Given** Admin đã đăng nhập và có quyền cấu hình  
+**When** Admin mở Cài đặt hệ thống  
+**Then** hệ thống hiển thị các thông số rạp phim hiện tại và tùy chọn sao lưu.
+
+### AC-02 — Cập nhật thông số rạp phim hợp lệ
+**Given** Admin nhập thông số hợp lệ  
+**When** Admin xác nhận cập nhật  
+**Then** hệ thống lưu thông số mới và thông báo kết quả thành công.
+
+### AC-03 — Từ chối thông số không hợp lệ
+**Given** Admin nhập giá trị thông số không hợp lệ  
+**When** Admin xác nhận cập nhật  
+**Then** hệ thống từ chối lưu, thông báo lỗi và giữ giá trị cũ.
+
+### AC-04 — Sao lưu dữ liệu thành công
+**Given** Admin có quyền cấu hình và hệ thống sẵn sàng sao lưu  
+**When** Admin yêu cầu sao lưu dữ liệu  
+**Then** hệ thống thực hiện sao lưu và thông báo kết quả.
+
+### AC-05 — Xử lý sao lưu thất bại
+**Given** quá trình sao lưu không thể hoàn tất  
+**When** Admin yêu cầu sao lưu  
+**Then** hệ thống thông báo sao lưu thất bại.
 
 ---
 
-# E. SYSTEM (TÁC VỤ NỀN)
+# 3. ACCEPTANCE CRITERIA NGHIỆP VỤ TOÀN HỆ THỐNG
 
-## SYS-01 — Giải phóng Hold hết hạn
+Các AC dưới đây kiểm tra những quy tắc xuyên suốt nhiều UC được `USECASE.md` xác định.
 
-| ID | Tiêu chí nghiệm thu (AC) |
-|---|---|
-| AC-01 | Hàm chạy ngầm (Cronjob) quết DB định kỳ theo cấu hình hệ thống. |
-| AC-02 | Scan `ShowtimeSeat` đang có trạng thái `HOLD`. |
-| AC-03 | Nếu thời gian hiện tại > `holdExpiresAt` -> Xác định là hết hạn. |
-| AC-04 | Tự động update ghế đó: `HOLD` -> `AVAILABLE`. |
-| AC-05 | Ghế chưa hết hạn -> Bỏ qua. Ghế `AVAILABLE` hoặc `SOLD` -> Bỏ qua. |
-| AC-06 | Scheduler TUYỆT ĐỐI không tự set ghế thành `SOLD`. |
-| AC-07 | **Race condition:** Nếu cronjob đang nhả ghế A mà khách khác bấm mua ghế A, database phải lock transaction tốt để không hỏng data. |
+## SYS-AC-01 — Vòng đời ShowtimeSeat
+**Given** một ghế của một suất chiếu có trạng thái `AVAILABLE`  
+**When** Customer chọn ghế và đặt vé  
+**Then** ghế chuyển `AVAILABLE → HOLD`; khi thanh toán thành công chuyển `HOLD → SOLD`; khi Hold hết hạn mà chưa thanh toán thì chuyển `HOLD → AVAILABLE`.
+
+## SYS-AC-02 — Không tự ý thay đổi SOLD/AVAILABLE bởi tác vụ giải phóng Hold
+**Given** hệ thống có các `ShowtimeSeat` ở `AVAILABLE`, `HOLD` và `SOLD`  
+**When** tác vụ nền xử lý Hold hết hạn  
+**Then** chỉ `HOLD` đã hết hạn được giải phóng; `AVAILABLE` và `SOLD` không bị thay đổi bởi tác vụ này.
+
+## SYS-AC-03 — Ticket chỉ tồn tại sau PAID
+**Given** Booking đang `PENDING`, `CANCELLED` hoặc `EXPIRED`  
+**When** hệ thống xử lý Booking  
+**Then** không tạo Ticket cho Booking chưa `PAID`.
+
+## SYS-AC-04 — Ticket không có trạng thái
+**Given** Ticket được tạo từ Booking `PAID`  
+**When** hệ thống lưu và tra cứu Ticket  
+**Then** Ticket được định danh bằng `ticketCode` và không sử dụng trạng thái `VALID/USED`.
+
+## SYS-AC-05 — ticketCode duy nhất
+**Given** hệ thống tạo nhiều Ticket  
+**When** Ticket được tạo sau các Booking `PAID`  
+**Then** mỗi Ticket có một `ticketCode` duy nhất để tra cứu.
+
+## SYS-AC-06 — Không sử dụng QR
+**Given** Customer đã có Ticket điện tử  
+**When** Customer hoặc Admin tra cứu Ticket  
+**Then** hệ thống sử dụng `ticketCode` để định danh/tra cứu và không yêu cầu QR.
+
+## SYS-AC-07 — Không xóa dữ liệu danh mục
+**Given** Admin quản lý Phim, Suất chiếu, Phòng chiếu, Loại vé hoặc Bắp Nước  
+**When** Admin muốn ngừng sử dụng dữ liệu  
+**Then** hệ thống sử dụng thao tác ẩn/đổi trạng thái phù hợp thay vì xóa dữ liệu theo phạm vi BFD.
+
+## SYS-AC-08 — Danh mục không khả dụng không xuất hiện cho Booking mới
+**Given** phim/suất chiếu ngừng hiển thị, món Bắp Nước ngừng bán hoặc hết tồn kho  
+**When** Customer thực hiện Booking mới  
+**Then** Customer không thể chọn dữ liệu không khả dụng đó.
+
+## SYS-AC-09 — Employee không phải Actor nghiệp vụ
+**Given** Admin cần quản lý tài khoản Employee  
+**When** Admin thực hiện quản lý tài khoản  
+**Then** Employee được xử lý như một loại tài khoản trong `ADM-07`, không tạo Actor/Use Case riêng cho Employee.
+
+## SYS-AC-10 — Không tạo UC riêng cho tác vụ nội bộ
+**Given** hệ thống cần Hold ghế, tính tiền, tạo Ticket hoặc sinh `ticketCode`  
+**When** các xử lý này xảy ra trong quá trình nghiệp vụ  
+**Then** chúng được xử lý bên trong UC liên quan và không được coi là Use Case độc lập.
+
+## SYS-AC-11 — Không có Promotion/Membership/QR/soát vé điện tử
+**Given** hệ thống đang chạy theo baseline hiện tại  
+**When** xây dựng hoặc kiểm thử phạm vi Use Case  
+**Then** không yêu cầu các chức năng Promotion, Membership, QR hoặc soát vé điện tử.
+
+---
+
+# 4. TRACEABILITY — USE CASE → ACCEPTANCE CRITERIA
+
+| Use Case | Số AC | Nội dung bao phủ chính |
+|---|---:|---|
+| CUS-01 | 3 | Đăng ký thành công, dữ liệu sai, thông tin trùng |
+| CUS-02 | 3 | Đăng nhập thành công, sai thông tin, tài khoản bị khóa |
+| CUS-03 | 4 | Xem, cập nhật, dữ liệu sai, lỗi cập nhật |
+| CUS-04 | 6 | Xem/tìm phim, không có phim, xem/chọn suất chiếu |
+| CUS-05 | 13 | Ghế, Hold, Booking, Bắp Nước, thanh toán, Ticket, ticketCode, timeout, đồng thời |
+| CUS-06 | 6 | Lịch sử, phạm vi dữ liệu Customer, chi tiết Booking, vé điện tử |
+| ADM-01 | 7 | Danh sách, tìm kiếm, thêm, sửa, trạng thái, dữ liệu sai |
+| ADM-02 | 8 | Danh sách, tìm kiếm, thêm/sửa/trạng thái, xung đột lịch, ShowtimeSeat |
+| ADM-03 | 11 | Phòng chiếu, sơ đồ ghế, phân loại, trạng thái, toàn vẹn dữ liệu |
+| ADM-04 | 9 | Loại vé, giá vé, đối tượng áp dụng, lịch sử giá, không ảnh hưởng Booking |
+| ADM-05 | 7 | Món, trạng thái, tồn kho, hết hàng |
+| ADM-06 | 7 | Danh sách, tìm kiếm, chi tiết, thanh toán, chỉ đọc |
+| ADM-07 | 12 | Customer/Employee, CRUD nghiệp vụ, khóa/mở, mật khẩu, chức vụ, quyền, Admin cuối |
+| ADM-08 | 13 | Doanh thu, mức độ quan tâm, kỳ, bộ lọc, dữ liệu PAID, chi tiết, biểu đồ |
+| ADM-09 | 5 | Thông số hệ thống, cập nhật, validation, sao lưu |
+
+**Tổng: 15 Use Case · 114 Acceptance Criteria (103 AC theo UC + 11 AC nghiệp vụ xuyên hệ thống).**
+
+---
+
+# 5. PHẠM VI ĐÃ LOẠI BỎ
+
+Theo baseline `USECASE.md`, không tạo Acceptance Criteria cho các chức năng sau vì không còn thuộc phạm vi:
+
+- Promotion.
+- Membership.
+- QR Code.
+- Soát vé điện tử.
+- Actor Employee.
+- SystemScheduler như một Actor.
+- UC riêng cho In vé.
+- UC riêng cho Bán vé tại quầy.
+- UC riêng cho Thanh toán tại quầy.
+- UC riêng cho Giao Combo.
+- UC riêng cho Hủy vé.
+- UC riêng cho Tra cứu Booking của Employee.
+- Xóa dữ liệu danh mục.
+- Trạng thái `Ticket` như `VALID/USED`.
+
+---
