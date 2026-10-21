@@ -1,23 +1,5 @@
 # ĐẶC TẢ USE CASE — HỆ THỐNG QUẢN LÝ RẠP CHIẾU PHIM
 
-> **Baseline đã chốt**
->
-> - 01 System chính: **Hệ thống quản lý rạp chiếu phim**.
-> - Chỉ có **02 Actor nghiệp vụ: Customer và Admin**.
-> - Tài liệu **bám theo BFD (Sơ đồ phân rã chức năng)** gồm 10 chức năng chính; mục 1.3 có bảng ánh xạ BFD → Use Case.
-> - Hệ thống thiết kế theo hướng **online-first**.
-> - **Vé điện tử** = `Ticket` kèm `ticketCode`, được tạo sau khi thanh toán thành công. Không dùng QR. **Không quản lý trạng thái `Ticket`** (không có `VALID/USED`); `ticketCode` là mã định danh để tra cứu vé.
-> - `Booking.status` được quản lý để xác định trạng thái đặt vé và thanh toán.
-> - `ShowtimeSeat` quản lý trạng thái ghế theo từng suất chiếu: `AVAILABLE → HOLD → SOLD`. Hold mặc định **5 phút**.
-> - Việc giải phóng Hold hết hạn là xử lý nội bộ của hệ thống, không tạo Actor riêng (không có `SystemScheduler`).
-> - Admin quản lý tài khoản của **Customer và Employee** trong cùng UC `ADM-07`; Employee không phải Actor trong sơ đồ UC.
-> - BFD **không có chức năng xóa**: dữ liệu danh mục được thêm, sửa, ẩn hoặc đổi trạng thái.
-> - Không sử dụng Promotion, Membership, QR hoặc soát vé điện tử trong baseline hiện tại.
->
-> **Template UC Specific:** ID · Actor chính/liên quan · Quan hệ · Tóm tắt · Tiền điều kiện · Dòng sự kiện chính · Dòng sự kiện phụ · Hậu điều kiện · Sơ đồ Use Case (PlantUML).
-
----
-
 # 1. SYSTEM VÀ PHÂN HỆ
 
 ## 1.1. System chính
@@ -43,10 +25,6 @@ System cung cấp các nghiệp vụ chính:
 | Customer | Đăng ký, đăng nhập, quản lý thông tin cá nhân, tìm phim/suất chiếu, đặt vé online, quản lý vé điện tử và xem lịch sử đặt vé |
 | Admin | Đăng nhập; quản lý phim, suất chiếu, phòng chiếu, sơ đồ chỗ ngồi, loại vé, giá vé, Bắp Nước, vé bán ra, tài khoản Customer/Employee; xem báo cáo/thống kê; cài đặt hệ thống |
 
-### Tài khoản Employee
-
-Employee **không phải Actor trong sơ đồ UC**. Tài khoản Employee được Admin quản lý thông qua `ADM-07 — Quản lý tài khoản`.
-
 ## 1.3. Ánh xạ BFD → Phân hệ → Use Case
 
 | # | Chức năng BFD (phân hệ) | Chức năng con trong BFD | UC |
@@ -67,44 +45,60 @@ Employee **không phải Actor trong sơ đồ UC**. Tài khoản Employee đư�
 | 9 | Quản lý báo cáo và thống kê | Báo cáo doanh thu; báo cáo mức độ quan tâm theo phim | ADM-08 |
 | 10 | Cài đặt hệ thống | Chỉnh sửa thông số rạp phim; sao lưu dữ liệu | ADM-09 |
 
-### Nguyên tắc chia Phân hệ
-
-- Chia theo **domain nghiệp vụ** theo BFD, không chia theo Actor.
-- Chỉ có hai Actor nghiệp vụ là **Customer** và **Admin**; Employee chỉ là đối tượng tài khoản do Admin quản lý.
-- Các chức năng con dạng "thêm/sửa/đổi trạng thái/xem/tìm kiếm" của BFD được gộp thành **một UC quản lý** theo nhóm, không tách mỗi thao tác thành một UC; các thao tác này xuất hiện làm chức năng con trong sơ đồ Use Case của từng UC (mục 4.2).
-- Không tạo UC riêng cho các bước nội bộ như Chọn ghế, Hold ghế, Tính tiền, Sinh `ticketCode`; thanh toán online là một bước của `CUS-05`.
-- Không có UC Promotion, Membership, QR hoặc soát vé điện tử.
-
----
-
 # 2. DANH SÁCH 15 USE CASE
 
-## Customer
-
 | ID | Use Case |
 |---|---|
-| CUS-01 | Đăng ký tài khoản |
-| CUS-02 | Đăng nhập |
-| CUS-03 | Quản lý thông tin cá nhân |
-| CUS-04 | Xem phim và suất chiếu |
-| CUS-05 | Đặt vé online |
-| CUS-06 | Quản lý vé điện tử và lịch sử đặt vé |
-
-## Admin
-
-| ID | Use Case |
-|---|---|
-| ADM-01 | Quản lý phim |
-| ADM-02 | Quản lý suất chiếu |
-| ADM-03 | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
-| ADM-04 | Quản lý loại vé và giá vé |
-| ADM-05 | Quản lý thực phẩm |
-| ADM-06 | Quản lý đơn hàng |
-| ADM-07 | Quản lý tài khoản |
-| ADM-08 | Quản lý Báo cáo và Thống kê |
-| ADM-09 | Cài đặt hệ thống |
-
-**Tổng: 15 Use Case — 02 Actor.**
+| UC01 | Đăng ký tài khoản | t |
+| UC02 | Đăng nhập |
+| UC03 | Xem thông tin cá nhân |
+| UC04 | Cập nhật thông tin cá nhân |
+| UC05 | Xem phim và suất chiếu |
+| UC06 | Đặt vé trực tuyến |
+| UC07 | Thanh toán trực tuyến |
+| UC08 | Quản lý vé điện tử và lịch sử đặt vé |
+| 1 | Quản lý phim |
+| UC09 | Thêm phim |
+| UC10 | Sửa phim |
+| UC11 | Thay đổi trạng thái phim |
+| UC12 | Xem danh sách phim |
+| UC13 | Tìm kiếm phim |
+| 2 | Quản lý suất chiếu |
+| UC14 | Thêm suất chiếu |
+| UC15 | Sửa suất chiếu |
+| UC16 | Thay đổi trạng thái suất chiếu |
+| UC17 | Xem danh sách suất chiếu |
+| UC18 | Tìm kiếm suất chiếu |
+| 3 | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
+| UC19 | Thêm phòng chiếu |
+| UC20 | Sửa phòng chiếu |
+| UC21 | Thay đổi trạng thái phòng chiếu |
+| UC22 | Xem danh sách phòng chiếu |
+| UC23 | Tìm kiếm phòng chiếu |
+| UC24 | Thiết lập sơ đồ chỗ ngồi |
+| UC25 | Phân loại ghế |
+| UC26 | Xem danh sách phòng chiếu |
+| UC27 | Tìm kiếm phòng chiếu |
+| 4 | Quản lý loại vé và giá vé |
+| UC28 | Thiết lập giá vé |
+| UC29 | Sửa giá vé |
+| UC30 | Thay đổi trạng thái giá vé |
+| UC31 | Thêm loại vé |
+| UC32 | Sửa loại vé |
+| UC33 | Thay đổi trạng thái loại vé |
+| UC34 | Thiết lập đối tượng áp dụng |
+| 5 | Quản lý thực phẩm |
+| UC35 | Thêm món |
+| UC36 | Sửa món |
+| UC37 | Thay đổi trạng thái món |
+| UC38 | Theo dõi số lượng tồn kho |
+| 6 | Quản lý đơn hàng |
+| UC39 | Xem danh sách toàn bộ đơn|
+| UC40 | Kiểm tra tình trạng thanh toán của khách |
+| 7 | Quản lý tài khoản |
+| UC33 | Thêm tài khoản
+| 8 | Quản lý Báo cáo và Thống kê |
+| 9 | Cài đặt hệ thống |
 
 ---
 
