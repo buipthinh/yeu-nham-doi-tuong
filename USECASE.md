@@ -1,51 +1,38 @@
 # ĐẶC TẢ USE CASE — HỆ THỐNG QUẢN LÝ RẠP CHIẾU PHIM
 
-# 1. SYSTEM VÀ PHÂN HỆ
-
-## 1.1. System chính
-
-### Hệ thống quản lý rạp chiếu phim
-
-System cung cấp các nghiệp vụ chính:
-
-- Cho phép Customer đăng ký, đăng nhập, xem và cập nhật thông tin cá nhân.
-- Cho phép Customer tìm phim, tìm và chọn suất chiếu, chọn ghế, chọn dịch vụ đi kèm và thanh toán trực tuyến.
-- Cho phép Customer quản lý vé điện tử và xem lại các đơn đặt vé.
-- Cho phép Admin quản lý phim, suất chiếu, phòng chiếu, sơ đồ chỗ ngồi, loại vé, giá vé và Bắp Nước.
-- Cho phép Admin quản lý vé bán ra (Booking): xem danh sách toàn bộ đơn và kiểm tra tình trạng thanh toán.
-- Cho phép Admin quản lý tài khoản Customer và Employee.
-- Cho phép Admin xem báo cáo doanh thu, báo cáo mức độ quan tâm theo phim theo ngày, tuần, tháng.
-- Cho phép Admin chỉnh sửa thông số rạp phim và sao lưu dữ liệu.
-- Tự động xử lý các Hold ghế hết hạn ở phía hệ thống.
-
-## 1.2. Actor
+## 1. Actor
 
 | Actor | Vai trò |
 |---|---|
 | Customer | Đăng ký, đăng nhập, quản lý thông tin cá nhân, tìm phim/suất chiếu, đặt vé online, quản lý vé điện tử và xem lịch sử đặt vé |
 | Admin | Đăng nhập; quản lý phim, suất chiếu, phòng chiếu, sơ đồ chỗ ngồi, loại vé, giá vé, Bắp Nước, vé bán ra, tài khoản Customer/Employee; xem báo cáo/thống kê; cài đặt hệ thống |
 
-## 1.3. Ánh xạ BFD → Phân hệ → Use Case
+## 2. BFD
 
 | # | Chức năng BFD (phân hệ) | Chức năng con trong BFD | UC |
 |---|---|---|---|
-| 1 | Đăng nhập và đăng ký | Đăng nhập | CUS-02 |
-| | | Đăng ký tài khoản | CUS-01 |
-| 2 | Quản lý phim | Cập nhật phim (thêm, sửa, thay đổi trạng thái); xem danh sách; tìm kiếm | ADM-01 |
-| 3 | Quản lý suất chiếu | Cập nhật suất chiếu (thêm, sửa, thay đổi trạng thái); tìm kiếm; xem danh sách | ADM-02 |
-| 4 | Quản lý phòng chiếu và sơ đồ chỗ ngồi | Cập nhật phòng chiếu (thêm, sửa, ẩn); cập nhật sơ đồ (thiết lập, phân loại ghế, đổi trạng thái ghế, xem); tìm kiếm phòng | ADM-03 |
-| 5 | Quản lý loại vé và giá vé | Quản lý giá vé (thiết lập, sửa, tra cứu lịch sử); quản lý loại vé (thêm, sửa, đổi trạng thái, thiết lập đối tượng áp dụng) | ADM-04 |
-| 6 | Quản lý đặt vé và dịch vụ | Quản lý thực phẩm (thêm, sửa, đổi trạng thái món, theo dõi tồn kho) | ADM-05 |
-| | | Quản lý đơn hàng (xem danh sách toàn bộ đơn; kiểm tra tình trạng thanh toán của khách) | ADM-06 |
-| 7 | Chức năng khách hàng | Đặt vé trực tuyến: tìm kiếm và chọn phim; tìm kiếm và chọn suất chiếu | CUS-04 |
-| | | Đặt vé trực tuyến: chọn sơ đồ ghế; chọn dịch vụ đi kèm; thanh toán trực tuyến | CUS-05 |
-| | | Đặt vé trực tuyến: quản lý vé điện tử | CUS-06 |
-| | | Quản lý thông tin cá nhân (xem, cập nhật) | CUS-03 |
-| 8 | Quản lý tài khoản | Thêm tài khoản; khóa/mở; chỉnh sửa thông tin; xem chi tiết; khởi tạo mật khẩu; chỉnh sửa chức vụ; tìm kiếm | ADM-07 |
-| 9 | Quản lý báo cáo và thống kê | Báo cáo doanh thu; báo cáo mức độ quan tâm theo phim | ADM-08 |
-| 10 | Cài đặt hệ thống | Chỉnh sửa thông số rạp phim; sao lưu dữ liệu | ADM-09 |
+| 1 | Đăng nhập và đăng ký | Đăng nhập | UC02 |
+| | | Đăng ký tài khoản | UC01 |
+| 2 | Quản lý phim | Cập nhật phim (thêm, sửa, thay đổi trạng thái); xem danh sách; tìm kiếm | UC09, UC10, UC11, UC12, UC13 |
+| 3 | Quản lý suất chiếu | Cập nhật suất chiếu (thêm, sửa, thay đổi trạng thái); xem danh sách; tìm kiếm | UC14, UC15, UC16, UC17, UC18 |
+| 4 | Quản lý phòng chiếu và sơ đồ chỗ ngồi | Cập nhật phòng chiếu (thêm, sửa, thay đổi trạng thái); xem danh sách; tìm kiếm phòng | UC19, UC20, UC21, UC22, UC23 |
+| | | Cập nhật sơ đồ chỗ ngồi (thiết lập, phân loại ghế, thay đổi trạng thái ghế); xem sơ đồ | UC24, UC25, UC26, UC27 |
+| 5 | Quản lý loại vé và giá vé | Quản lý giá vé (thiết lập, sửa, tra cứu lịch sử thay đổi) | UC28, UC29, UC30 |
+| | | Quản lý loại vé (thêm, sửa, thay đổi trạng thái, thiết lập đối tượng áp dụng) | UC31, UC32, UC33, UC34 |
+| 6 | Quản lý đặt vé và dịch vụ | Quản lý thực phẩm (thêm, sửa, thay đổi trạng thái món, theo dõi tồn kho) | UC35, UC36, UC37, UC38 |
+| | | Quản lý đơn hàng (xem danh sách toàn bộ đơn; kiểm tra tình trạng thanh toán của khách) | UC39, UC40 |
+| 7 | Chức năng khách hàng | Đặt vé trực tuyến: tìm kiếm và chọn phim; tìm kiếm và chọn suất chiếu | UC05 |
+| | | Đặt vé trực tuyến: chọn sơ đồ ghế; chọn dịch vụ đi kèm | UC06 |
+| | | Đặt vé trực tuyến: thanh toán trực tuyến | UC07 |
+| | | Đặt vé trực tuyến: quản lý vé điện tử | UC08 |
+| | | Quản lý thông tin cá nhân (xem, cập nhật) | UC03, UC04 |
+| 8 | Quản lý tài khoản | Thêm tài khoản; khóa/mở; chỉnh sửa thông tin; xem chi tiết; khởi tạo mật khẩu; chỉnh sửa chức vụ; tìm kiếm | UC41, UC42, UC43, UC44, UC45, UC46, UC47 |
+| 9 | Quản lý báo cáo và thống kê | Báo cáo doanh thu; báo cáo mức độ quan tâm theo phim | UC48, UC49 |
+| 10 | Cài đặt hệ thống | Chỉnh sửa thông số rạp phim; sao lưu dữ liệu | UC50, UC51 |
 
-# 2. DANH SÁCH 15 USE CASE
+UC52 (Giải phóng Hold hết hạn) là tác vụ nền của SystemScheduler nên không nằm trong BFD.
+
+# 3. DANH SÁCH 52 USE CASE
 
 | # | Use Case | Actor | Nhóm |
 |---|---|---|---|
@@ -87,8 +74,8 @@ System cung cấp các nghiệp vụ chính:
 | UC36 | Sửa món | Admin | Quản lý thực phẩm |
 | UC37 | Thay đổi trạng thái món | Admin | Quản lý thực phẩm |
 | UC38 | Theo dõi số lượng tồn kho | Admin | Quản lý thực phẩm |
-| UC39 | Xem danh sách toàn bộ đơn | Admin | Quản lý đơn hàng |
-| UC40 | Kiểm tra tình trạng thanh toán của khách | Admin | Quản lý đơn hàng |
+| UC39 | Xem danh sách toàn bộ đơn | Admin, Employee | Quản lý đơn hàng |
+| UC40 | Kiểm tra tình trạng thanh toán của khách | Admin, Employee | Quản lý đơn hàng |
 | UC41 | Thêm tài khoản | Admin | Quản lý tài khoản |
 | UC42 | Khóa/ Mở tài khoản |  Admin | Quản lý tài khoản |
 | UC43 | Chỉnh sửa thông tin tài khoản | Admin | Quản lý tài khoản |
@@ -100,12 +87,11 @@ System cung cấp các nghiệp vụ chính:
 | UC49 | Báo cáo mức độ quan tâm theo phim | Admin | Quản lý Báo cáo và Thống kê |
 | UC50 | Chỉnh sửa thông số rạp phim | Admin | Quản lý hệ thống |
 | UC51 | Sao lưu dữ liệu | Admin | Quản lý hệ thống |
-| 10 | System schedule | Admin | Quản lý hệ thống |
 | UC52 | Giải phóng Hold hết hạn | # | # |
 
 ---
 
-# 3. ĐẶC TẢ USE CASE
+# 4. ĐẶC TẢ USE CASE
 
 # A. CUSTOMER
 
@@ -575,9 +561,9 @@ Phân tích theo: thời gian (ngày/tuần/tháng — biểu đồ xu hướng)
 
 Thông số rạp phim được cập nhật và/hoặc bản sao lưu dữ liệu được tạo.
 
-# 4. QUAN HỆ INCLUDE / EXTEND / GENERALIZATION
+# 5. QUAN HỆ INCLUDE / EXTEND / GENERALIZATION
 
-## 4.1. Sơ đồ tổng quan (mục 7)
+## 5.1. Sơ đồ tổng quan (mục 7)
 
 Chỉ vẽ 15 UC và một quan hệ giữa các UC:
 
@@ -585,7 +571,7 @@ Chỉ vẽ 15 UC và một quan hệ giữa các UC:
 |---|---|---|
 | CUS-05 Đặt vé trực tuyến | `<<include>>` | CUS-04 Xem phim và suất chiếu |
 
-## 4.2. Sơ đồ Use Case của từng UC (mục 3)
+## 5.2. Sơ đồ Use Case của từng UC (mục 3)
 
 Mỗi UC có một sơ đồ Use Case riêng, phân rã UC thành các **chức năng con theo BFD**:
 
@@ -605,9 +591,9 @@ Cú pháp PlantUML: include `UC ..> con : <<include>>`, extend `con ..> UC : <<e
 
 ---
 
-# 5. QUY TẮC NGHIỆP VỤ CỐT LÕI
+# 6. QUY TẮC NGHIỆP VỤ CỐT LÕI
 
-## 5.1. Đặt vé và ghế
+## 6.1. Đặt vé và ghế
 
 - Một Booking thuộc một suất chiếu và được giới hạn số vé theo thông số rạp phim (`ADM-09`).
 - `Booking` chỉ được xem là hoàn tất khi thanh toán thành công và chuyển sang `PAID`.
@@ -616,50 +602,50 @@ Cú pháp PlantUML: include `UC ..> con : <<include>>`, extend `con ..> UC : <<e
 - `HOLD` có thời hạn 5 phút.
 - `HOLD → SOLD` khi thanh toán thành công; `HOLD → AVAILABLE` khi hết hạn mà chưa thanh toán.
 
-## 5.2. Vé điện tử
+## 6.2. Vé điện tử
 
 - Một Booking có thể có nhiều Ticket; Ticket được tạo sau khi Booking `PAID`.
 - Mỗi Ticket có `ticketCode` duy nhất để tra cứu.
 - Không dùng trạng thái cho Ticket (không có `VALID/USED`); không sử dụng QR.
 
-## 5.3. Thanh toán
+## 6.3. Thanh toán
 
 - Thanh toán là một bước trong `CUS-05`; chỉ hỗ trợ thanh toán trực tuyến.
 - Booking chỉ chuyển `PAID` khi hệ thống xác nhận thanh toán thành công.
 
-## 5.4. Dữ liệu danh mục
+## 6.4. Dữ liệu danh mục
 
 - BFD không có chức năng xóa: Phim, Suất chiếu, Phòng chiếu, Loại vé, món Bắp Nước được thêm, sửa, ẩn hoặc đổi trạng thái.
 - Phim/suất chiếu ngừng hiển thị không xuất hiện cho Customer. Món ngừng bán hoặc hết tồn kho không được chọn cho Booking mới.
 - Thay đổi giá vé không ảnh hưởng Booking đã tạo; lịch sử thay đổi giá được lưu để tra cứu.
 
-## 5.5. Vé bán ra và Thống kê
+## 6.5. Vé bán ra và Thống kê
 
 - Admin chỉ xem/tra cứu Booking trong `ADM-06`, không chỉnh sửa.
 - Chỉ Booking `PAID` được tính vào doanh thu và số vé bán; doanh thu ghi nhận theo ngày thanh toán thành công.
 - Tỷ lệ lấp đầy ghế tính theo suất chiếu trong kỳ (theo ngày chiếu); Booking `EXPIRED/CANCELLED` chỉ dùng để tính tỷ lệ hoàn tất đặt vé.
 - Tuần thống kê tính từ thứ Hai đến Chủ nhật *(giả định, chỉnh theo nhóm)*.
 
-## 5.6. Tài khoản
+## 6.6. Tài khoản
 
 - Customer tự đăng ký; Admin thêm/quản lý tài khoản Customer và Employee trong `ADM-07`.
 - Tài khoản bị khóa/vô hiệu hóa không đăng nhập được. Employee không phải Actor trong sơ đồ UC.
 - Không được làm mất Admin cuối cùng của hệ thống.
 
-## 5.7. Tác vụ nền
+## 6.7. Tác vụ nền
 
 - Hệ thống xử lý nền để giải phóng `ShowtimeSeat` đang `HOLD` đã hết hạn; đây là hành vi nội bộ, không phải Actor/UC.
 - Tác vụ nền chỉ release `HOLD`, không thay đổi `SOLD` hoặc `AVAILABLE`.
 
-## 5.8. Ngoài phạm vi
+## 6.8. Ngoài phạm vi
 
 - Không có Promotion, Membership, QR hoặc soát vé điện tử.
 
 ---
 
-# 6. STATE LIÊN QUAN TRỰC TIẾP
+# 7. STATE LIÊN QUAN TRỰC TIẾP
 
-## 6.1. ShowtimeSeat
+## 7.1. ShowtimeSeat
 
 ```text
 AVAILABLE
@@ -673,7 +659,7 @@ AVAILABLE
 AVAILABLE  SOLD
 ```
 
-## 6.2. Booking *(đề xuất — chỉnh theo ERD của nhóm)*
+## 7.2. Booking *(đề xuất — chỉnh theo ERD của nhóm)*
 
 ```text
 PENDING ──paymentSuccess()──► PAID
@@ -686,13 +672,13 @@ PENDING ──paymentSuccess()──► PAID
 - `PAID`: đã thanh toán thành công — điều kiện để tạo Ticket, sinh `ticketCode` và tính vào báo cáo.
 - `EXPIRED`/`CANCELLED`: không tạo Ticket, không tính doanh thu.
 
-## 6.3. Ticket
+## 7.3. Ticket
 
 - Ticket **không có trạng thái**. Ticket được định danh và tra cứu bằng `ticketCode`.
 
 ---
 
-# 7. KẾT CẤU TÀI LIỆU CHÍNH THỨC
+# 8. KẾT CẤU TÀI LIỆU CHÍNH THỨC
 
 ```text
 SYSTEM
@@ -716,5 +702,3 @@ SYSTEM
     ├── ADM-08 Quản lý báo cáo và thống kê
     └── ADM-09 Cài đặt hệ thống
 ```
-
-**Tổng: 01 System → 02 Actor → 15 Use Case.**
