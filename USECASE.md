@@ -36,14 +36,16 @@ UC52 (Giải phóng Hold hết hạn) là tác vụ nền của SystemScheduler 
 
 | # | Use Case | Actor | Nhóm |
 |---|---|---|---|
-| UC01 | Đăng ký tài khoản | Customer | Tài khoản và đăng nhập |
-| UC02 | Đăng nhập | Customer, Admin, Employee | Tài khoản và đăng nhập |
-| UC03 | Xem thông tin cá nhân | Customer | Tài khoản và đăng nhập |
-| UC04 | Cập nhật thông tin cá nhân | Customer | Tài khoản và đăng nhập |
-| UC05 | Xem phim và suất chiếu | Customer | Đặt vé trực tuyến |
-| UC06 | Đặt vé trực tuyến | Customer | Đặt vé trực tuyến |
-| UC07 | Thanh toán trực tuyến | Customer | Đặt vé trực tuyến |
-| UC08 | Quản lý vé điện tử và lịch sử đặt vé | Customer | Đặt vé trực tuyến |
+| UC1.1 | Đăng ký tài khoản | Customer | Tài khoản và đăng nhập |
+| UC1.2 | Đăng nhập | Customer, Admin, Employee | Tài khoản và đăng nhập |
+| UC8.2.1 | Xem thông tin cá nhân | Customer | Tài khoản và đăng nhập |
+| UC8.2.2 | Cập nhật thông tin cá nhân | Customer | Tài khoản và đăng nhập |
+| UC8.1.1 | Tìm kiếm phim | Customer | Đặt vé trực tuyến |
+| UC8.1.2 | Tìm kiếm suất chiếu | Customer | Đặt vé trực tuyến |
+| UC8.1.3 | Chọn sơ đồ ghế ngồi trực tuyến | Customer | Đặt vé trực tuyến |
+| UC8.1.4 | Chọn dịch vụ đi kèm | Customer | Đặt vé trực tuyến |
+| UC8.1.5 | Thanh toán trực tuyến | Customer | Đặt vé trực tuyến |
+| UC8.1.6 | Quản lý vé điện tử và lịch sử đặt vé | Customer | Đặt vé trực tuyến |
 | UC09 | Thêm phim | Admin | Quản lý phim |
 | UC10 | Sửa phim | Admin | Quản lý phim |
 | UC11 | Thay đổi trạng thái phim | Admin | Quản lý phim |
