@@ -47,58 +47,61 @@ System cung cấp các nghiệp vụ chính:
 
 # 2. DANH SÁCH 15 USE CASE
 
-| ID | Use Case |
-|---|---|
-| UC01 | Đăng ký tài khoản | t |
-| UC02 | Đăng nhập |
-| UC03 | Xem thông tin cá nhân |
-| UC04 | Cập nhật thông tin cá nhân |
-| UC05 | Xem phim và suất chiếu |
-| UC06 | Đặt vé trực tuyến |
-| UC07 | Thanh toán trực tuyến |
-| UC08 | Quản lý vé điện tử và lịch sử đặt vé |
-| 1 | Quản lý phim |
-| UC09 | Thêm phim |
-| UC10 | Sửa phim |
-| UC11 | Thay đổi trạng thái phim |
-| UC12 | Xem danh sách phim |
-| UC13 | Tìm kiếm phim |
-| 2 | Quản lý suất chiếu |
-| UC14 | Thêm suất chiếu |
-| UC15 | Sửa suất chiếu |
-| UC16 | Thay đổi trạng thái suất chiếu |
-| UC17 | Xem danh sách suất chiếu |
-| UC18 | Tìm kiếm suất chiếu |
-| 3 | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
-| UC19 | Thêm phòng chiếu |
-| UC20 | Sửa phòng chiếu |
-| UC21 | Thay đổi trạng thái phòng chiếu |
-| UC22 | Xem danh sách phòng chiếu |
-| UC23 | Tìm kiếm phòng chiếu |
-| UC24 | Thiết lập sơ đồ chỗ ngồi |
-| UC25 | Phân loại ghế |
-| UC26 | Xem danh sách phòng chiếu |
-| UC27 | Tìm kiếm phòng chiếu |
-| 4 | Quản lý loại vé và giá vé |
-| UC28 | Thiết lập giá vé |
-| UC29 | Sửa giá vé |
-| UC30 | Thay đổi trạng thái giá vé |
-| UC31 | Thêm loại vé |
-| UC32 | Sửa loại vé |
-| UC33 | Thay đổi trạng thái loại vé |
-| UC34 | Thiết lập đối tượng áp dụng |
-| 5 | Quản lý thực phẩm |
-| UC35 | Thêm món |
-| UC36 | Sửa món |
-| UC37 | Thay đổi trạng thái món |
-| UC38 | Theo dõi số lượng tồn kho |
-| 6 | Quản lý đơn hàng |
-| UC39 | Xem danh sách toàn bộ đơn|
-| UC40 | Kiểm tra tình trạng thanh toán của khách |
-| 7 | Quản lý tài khoản |
-| UC33 | Thêm tài khoản
-| 8 | Quản lý Báo cáo và Thống kê |
-| 9 | Cài đặt hệ thống |
+| # | Use Case | Actor | Nhóm |
+|---|---|---|---|
+| UC01 | Đăng ký tài khoản | Customer | Tài khoản và đăng nhập |
+| UC02 | Đăng nhập | Customer, Admin, Employee | Tài khoản và đăng nhập |
+| UC03 | Xem thông tin cá nhân | Customer | Tài khoản và đăng nhập |
+| UC04 | Cập nhật thông tin cá nhân | Customer | Tài khoản và đăng nhập |
+| UC05 | Xem phim và suất chiếu | Customer | Đặt vé trực tuyến |
+| UC06 | Đặt vé trực tuyến | Customer | Đặt vé trực tuyến |
+| UC07 | Thanh toán trực tuyến | Customer | Đặt vé trực tuyến |
+| UC08 | Quản lý vé điện tử và lịch sử đặt vé | Customer | Đặt vé trực tuyến |
+| UC09 | Thêm phim | Admin | Quản lý phim |
+| UC10 | Sửa phim | Admin | Quản lý phim |
+| UC11 | Thay đổi trạng thái phim | Admin | Quản lý phim |
+| UC12 | Xem danh sách phim | Admin | Quản lý phim |
+| UC13 | Tìm kiếm phim | Admin | Quản lý phim |
+| UC14 | Thêm suất chiếu | Admin | Quản lý suất chiếu |
+| UC15 | Sửa suất chiếu | Admin | Quản lý suất chiếu |
+| UC16 | Thay đổi trạng thái suất chiếu | Admin | Quản lý suất chiếu |
+| UC17 | Xem danh sách suất chiếu | Admin | Quản lý suất chiếu |
+| UC18 | Tìm kiếm suất chiếu | Admin | Quản lý suất chiếu |
+| UC19 | Thêm phòng chiếu | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
+| UC20 | Sửa phòng chiếu | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
+| UC21 | Thay đổi trạng thái phòng chiếu | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
+| UC22 | Xem danh sách phòng chiếu | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
+| UC23 | Tìm kiếm phòng chiếu | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
+| UC24 | Thiết lập sơ đồ chỗ ngồi | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
+| UC25 | Phân loại ghế | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
+| UC26 | Xem danh sách phòng chiếu | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
+| UC27 | Tìm kiếm phòng chiếu | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
+| UC28 | Thiết lập giá vé | Admin | Quản lý loại vé và giá vé |
+| UC29 | Sửa giá vé | Admin | Quản lý loại vé và giá vé |
+| UC30 | Thay đổi trạng thái giá vé | Admin | Quản lý loại vé và giá vé |
+| UC31 | Thêm loại vé | Admin | Quản lý loại vé và giá vé |
+| UC32 | Sửa loại vé | Admin | Quản lý loại vé và giá vé |
+| UC33 | Thay đổi trạng thái loại vé | Admin | Quản lý loại vé và giá vé |
+| UC34 | Thiết lập đối tượng áp dụng | Admin | Quản lý loại vé và giá vé |
+| UC35 | Thêm món | Admin | Quản lý thực phẩm |
+| UC36 | Sửa món | Admin | Quản lý thực phẩm |
+| UC37 | Thay đổi trạng thái món | Admin | Quản lý thực phẩm |
+| UC38 | Theo dõi số lượng tồn kho | Admin | Quản lý thực phẩm |
+| UC39 | Xem danh sách toàn bộ đơn | Admin | Quản lý đơn hàng |
+| UC40 | Kiểm tra tình trạng thanh toán của khách | Admin | Quản lý đơn hàng |
+| UC41 | Thêm tài khoản | Admin | Quản lý tài khoản |
+| UC42 | Khóa/ Mở tài khoản |  Admin | Quản lý tài khoản |
+| UC43 | Chỉnh sửa thông tin tài khoản | Admin | Quản lý tài khoản |
+| UC44 | Xem chi tiết tài khoản | Admin | Quản lý tài khoản |
+| UC45 | Khởi tạo tài khoản | Admin | Quản lý tài khoản |
+| UC46 | Chỉnh sửa chức vụ | Admin | Quản lý tài khoản |
+| UC47 | Tìm kiếm tài khoản | Admin | Quản lý tài khoản |
+| UC48 | Báo cáo doanh thu | Admin | Quản lý Báo cáo và Thống kê |
+| UC49 | Báo cáo mức độ quan tâm theo phim | Admin | Quản lý Báo cáo và Thống kê |
+| UC50 | Chỉnh sửa thông số rạp phim | Admin | Quản lý hệ thống |
+| UC51 | Sao lưu dữ liệu | Admin | Quản lý hệ thống |
+| 10 | System schedule | Admin | Quản lý hệ thống |
+| UC52 | Giải phóng Hold hết hạn | # | # |
 
 ---
 
