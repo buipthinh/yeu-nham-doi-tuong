@@ -60,8 +60,6 @@ UC52 (Giải phóng Hold hết hạn) là tác vụ nền của SystemScheduler 
 | UC4.2 | Sửa phòng chiếu | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
 | UC4.3 | Thay đổi trạng thái phòng chiếu | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
 | UC4.4 | Quản lý sơ đồ chỗ ngồi |  Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi | 
-| UC4.5 | Xem danh sách phòng chiếu | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
-| UC4.6 | Tìm kiếm phòng chiếu | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
 | UC4.4.1 | Thiết lập sơ đồ chỗ ngồi | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
 | UC4.4.2 | Phân loại ghế | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
 | UC4.4.3 | Thay đổi trạng thái ghế | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
