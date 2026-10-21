@@ -51,44 +51,50 @@ UC52 (Giải phóng Hold hết hạn) là tác vụ nền của SystemScheduler 
 | UC2.3 | Thay đổi trạng thái phim | Admin | Quản lý phim |
 | UC2.4 | Xem danh sách phim | Admin | Quản lý phim |
 | UC2.5 | Tìm kiếm phim | Admin | Quản lý phim |
-| UC14 | Thêm suất chiếu | Admin | Quản lý suất chiếu |
-| UC15 | Sửa suất chiếu | Admin | Quản lý suất chiếu |
-| UC16 | Thay đổi trạng thái suất chiếu | Admin | Quản lý suất chiếu |
-| UC17 | Xem danh sách suất chiếu | Admin | Quản lý suất chiếu |
-| UC18 | Tìm kiếm suất chiếu | Admin | Quản lý suất chiếu |
-| UC19 | Thêm phòng chiếu | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
-| UC20 | Sửa phòng chiếu | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
-| UC21 | Thay đổi trạng thái phòng chiếu | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
-| UC22 | Xem danh sách phòng chiếu | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
-| UC23 | Tìm kiếm phòng chiếu | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
-| UC24 | Thiết lập sơ đồ chỗ ngồi | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
-| UC25 | Phân loại ghế | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
-| UC26 | Xem danh sách phòng chiếu | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
-| UC27 | Tìm kiếm phòng chiếu | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
-| UC28 | Thiết lập giá vé | Admin | Quản lý loại vé và giá vé |
-| UC29 | Sửa giá vé | Admin | Quản lý loại vé và giá vé |
-| UC30 | Thay đổi trạng thái giá vé | Admin | Quản lý loại vé và giá vé |
-| UC31 | Thêm loại vé | Admin | Quản lý loại vé và giá vé |
-| UC32 | Sửa loại vé | Admin | Quản lý loại vé và giá vé |
-| UC33 | Thay đổi trạng thái loại vé | Admin | Quản lý loại vé và giá vé |
-| UC34 | Thiết lập đối tượng áp dụng | Admin | Quản lý loại vé và giá vé |
-| UC35 | Thêm món | Admin | Quản lý thực phẩm |
-| UC36 | Sửa món | Admin | Quản lý thực phẩm |
-| UC37 | Thay đổi trạng thái món | Admin | Quản lý thực phẩm |
-| UC38 | Theo dõi số lượng tồn kho | Admin | Quản lý thực phẩm |
-| UC39 | Xem danh sách toàn bộ đơn | Admin, Employee | Quản lý đơn hàng |
-| UC40 | Kiểm tra tình trạng thanh toán của khách | Admin, Employee | Quản lý đơn hàng |
-| UC41 | Thêm tài khoản | Admin | Quản lý tài khoản |
-| UC42 | Khóa/ Mở tài khoản |  Admin | Quản lý tài khoản |
-| UC43 | Chỉnh sửa thông tin tài khoản | Admin | Quản lý tài khoản |
-| UC44 | Xem chi tiết tài khoản | Admin | Quản lý tài khoản |
-| UC45 | Khởi tạo tài khoản | Admin | Quản lý tài khoản |
-| UC46 | Chỉnh sửa chức vụ | Admin | Quản lý tài khoản |
-| UC47 | Tìm kiếm tài khoản | Admin | Quản lý tài khoản |
-| UC48 | Báo cáo doanh thu | Admin | Quản lý Báo cáo và Thống kê |
-| UC49 | Báo cáo mức độ quan tâm theo phim | Admin | Quản lý Báo cáo và Thống kê |
-| UC50 | Chỉnh sửa thông số rạp phim | Admin | Quản lý hệ thống |
-| UC51 | Sao lưu dữ liệu | Admin | Quản lý hệ thống |
+| UC3.1 | Thêm suất chiếu | Admin | Quản lý suất chiếu |
+| UC3.2 | Sửa suất chiếu | Admin | Quản lý suất chiếu |
+| UC3.3 | Thay đổi trạng thái suất chiếu | Admin | Quản lý suất chiếu |
+| UC3.4 | Xem danh sách suất chiếu | Admin | Quản lý suất chiếu |
+| UC3.5 | Tìm kiếm suất chiếu | Admin | Quản lý suất chiếu |
+| UC4.1 | Thêm phòng chiếu | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
+| UC4.2 | Sửa phòng chiếu | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
+| UC4.3 | Thay đổi trạng thái phòng chiếu | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
+| UC4.4 | Quản lý sơ đồ chỗ ngồi |  Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi | 
+| UC4.5 | Xem danh sách phòng chiếu | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
+| UC4.6 | Tìm kiếm phòng chiếu | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
+| UC4.4.1 | Thiết lập sơ đồ chỗ ngồi | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
+| UC4.4.2 | Phân loại ghế | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
+| UC4.4.3 | Xem danh sách sơ đồ chỗ ngồi | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
+| UC4.5 | Xem danh sách phòng chiếu | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
+| UC4.6 | Tìm kiếm phòng chiếu | Admin | Quản lý phòng chiếu và sơ đồ chỗ ngồi |
+| UC5.1 | Quản lý giá vé | Admin | Quản lý loại vé và giá vé |
+| UC5.1.1 | Thiết lập giá vé | Admin | Quản lý loại vé và giá vé |
+| UC5.1.2 | Sửa giá vé | Admin | Quản lý loại vé và giá vé |
+| UC5.1.3 | Thay đổi trạng thái giá vé | Admin | Quản lý loại vé và giá vé |
+| UC5.2 | Quản lý loại vé | Admin | Quản lý loại vé và giá vé |
+| UC5.2.1 | Thêm loại vé | Admin | Quản lý loại vé và giá vé |
+| UC5.2.2 | Sửa loại vé | Admin | Quản lý loại vé và giá vé |
+| UC5.2.3 | Thay đổi trạng thái loại vé | Admin | Quản lý loại vé và giá vé |
+| UC5.2.4 | Thiết lập đối tượng áp dụng | Admin | Quản lý loại vé và giá vé |
+| UC6.1 | Quản lý thực phẩm | Admin | Quản lý thực phẩm |
+| UC6.1.1 | Thêm món | Admin | Quản lý thực phẩm |
+| UC6.1.2 | Sửa món | Admin | Quản lý thực phẩm |
+| UC6.1.3 | Thay đổi trạng thái món | Admin | Quản lý thực phẩm |
+| UC6.1.4 | Theo dõi số lượng tồn kho | Admin | Quản lý thực phẩm |
+| UC6.2 | Quản lý đơn hàng | Admin | Quản lý đơn hàng |
+| UC6.2.1 | Xem danh sách toàn bộ đơn | Admin, Employee | Quản lý đơn hàng |
+| UC6.2.2 | Kiểm tra tình trạng thanh toán của khách | Admin, Employee | Quản lý đơn hàng |
+| UC7.1 | Thêm tài khoản | Admin | Quản lý tài khoản |
+| UC7.2 | Khóa/ Mở tài khoản |  Admin | Quản lý tài khoản |
+| UC7.3 | Chỉnh sửa thông tin tài khoản | Admin | Quản lý tài khoản |
+| UC7.4 | Xem chi tiết tài khoản | Admin | Quản lý tài khoản |
+| UC7.5 | Khởi tạo tài khoản | Admin | Quản lý tài khoản |
+| UC7.6 | Chỉnh sửa chức vụ | Admin | Quản lý tài khoản |
+| UC7.7 | Tìm kiếm tài khoản | Admin | Quản lý tài khoản |
+| UC8.1 | Báo cáo doanh thu | Admin | Quản lý Báo cáo và Thống kê |
+| UC8.2 | Báo cáo mức độ quan tâm theo phim | Admin | Quản lý Báo cáo và Thống kê |
+| UC9.1 | Chỉnh sửa thông số rạp phim | Admin | Quản lý hệ thống |
+| UC9.2 | Sao lưu dữ liệu | Admin | Quản lý hệ thống |
 | UC52 | Giải phóng Hold hết hạn | # | # |
 
 ---
