@@ -46,11 +46,11 @@ UC52 (Giải phóng Hold hết hạn) là tác vụ nền của SystemScheduler 
 | UC8.1.4 | Chọn dịch vụ đi kèm | Customer | Đặt vé trực tuyến |
 | UC8.1.5 | Thanh toán trực tuyến | Customer | Đặt vé trực tuyến |
 | UC8.1.6 | Quản lý vé điện tử và lịch sử đặt vé | Customer | Đặt vé trực tuyến |
-| UC09 | Thêm phim | Admin | Quản lý phim |
-| UC10 | Sửa phim | Admin | Quản lý phim |
-| UC11 | Thay đổi trạng thái phim | Admin | Quản lý phim |
-| UC12 | Xem danh sách phim | Admin | Quản lý phim |
-| UC13 | Tìm kiếm phim | Admin | Quản lý phim |
+| UC2.1 | Thêm phim | Admin | Quản lý phim |
+| UC2.2 | Sửa phim | Admin | Quản lý phim |
+| UC2.3 | Thay đổi trạng thái phim | Admin | Quản lý phim |
+| UC2.4 | Xem danh sách phim | Admin | Quản lý phim |
+| UC2.5 | Tìm kiếm phim | Admin | Quản lý phim |
 | UC14 | Thêm suất chiếu | Admin | Quản lý suất chiếu |
 | UC15 | Sửa suất chiếu | Admin | Quản lý suất chiếu |
 | UC16 | Thay đổi trạng thái suất chiếu | Admin | Quản lý suất chiếu |
