@@ -87,7 +87,7 @@ UC52 (Giải phóng Hold hết hạn) là tác vụ nền của SystemScheduler 
 | UC8.2 | Khóa/ Mở tài khoản |  Admin | Quản lý tài khoản |
 | UC8.3 | Chỉnh sửa thông tin tài khoản | Admin | Quản lý tài khoản |
 | UC8.4 | Xem chi tiết tài khoản | Admin | Quản lý tài khoản |
-| UC8.5 | Khởi tạo tài khoản | Admin | Quản lý tài khoản |
+| UC8.5 | Khởi tạo mật khẩu | Admin | Quản lý tài khoản |
 | UC8.6 | Chỉnh sửa chức vụ | Admin | Quản lý tài khoản |
 | UC8.7 | Tìm kiếm tài khoản | Admin | Quản lý tài khoản |
 | UC9.1 | Báo cáo doanh thu | Admin | Quản lý Báo cáo và Thống kê |
