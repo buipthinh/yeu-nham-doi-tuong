@@ -38,14 +38,14 @@ UC52 (Giải phóng Hold hết hạn) là tác vụ nền của SystemScheduler 
 |---|---|---|---|
 | UC1.1 | Đăng ký tài khoản | Customer | Tài khoản và đăng nhập |
 | UC1.2 | Đăng nhập | Customer, Admin, Employee | Tài khoản và đăng nhập |
-| UC8.2.1 | Xem thông tin cá nhân | Customer | Tài khoản và đăng nhập |
-| UC8.2.2 | Cập nhật thông tin cá nhân | Customer | Tài khoản và đăng nhập |
-| UC8.1.1 | Tìm kiếm phim | Customer | Đặt vé trực tuyến |
-| UC8.1.2 | Tìm kiếm suất chiếu | Customer | Đặt vé trực tuyến |
-| UC8.1.3 | Chọn sơ đồ ghế ngồi trực tuyến | Customer | Đặt vé trực tuyến |
-| UC8.1.4 | Chọn dịch vụ đi kèm | Customer | Đặt vé trực tuyến |
-| UC8.1.5 | Thanh toán trực tuyến | Customer | Đặt vé trực tuyến |
-| UC8.1.6 | Quản lý vé điện tử và lịch sử đặt vé | Customer | Đặt vé trực tuyến |
+| UC7.2.1 | Xem thông tin cá nhân | Customer | Tài khoản và đăng nhập |
+| UC7.2.2 | Cập nhật thông tin cá nhân | Customer | Tài khoản và đăng nhập |
+| UC7.1.1 | Tìm kiếm phim | Customer | Đặt vé trực tuyến |
+| UC7.1.2 | Tìm kiếm suất chiếu | Customer | Đặt vé trực tuyến |
+| UC7.1.3 | Chọn sơ đồ ghế ngồi trực tuyến | Customer | Đặt vé trực tuyến |
+| UC7.1.4 | Chọn dịch vụ đi kèm | Customer | Đặt vé trực tuyến |
+| UC7.1.5 | Thanh toán trực tuyến | Customer | Đặt vé trực tuyến |
+| UC7.1.6 | Quản lý vé điện tử và lịch sử đặt vé | Customer | Đặt vé trực tuyến |
 | UC2.1 | Thêm phim | Admin | Quản lý phim |
 | UC2.2 | Sửa phim | Admin | Quản lý phim |
 | UC2.3 | Thay đổi trạng thái phim | Admin | Quản lý phim |
@@ -84,17 +84,17 @@ UC52 (Giải phóng Hold hết hạn) là tác vụ nền của SystemScheduler 
 | UC6.2 | Quản lý đơn hàng | Admin | Quản lý đơn hàng |
 | UC6.2.1 | Xem danh sách toàn bộ đơn | Admin, Employee | Quản lý đơn hàng |
 | UC6.2.2 | Kiểm tra tình trạng thanh toán của khách | Admin, Employee | Quản lý đơn hàng |
-| UC7.1 | Thêm tài khoản | Admin | Quản lý tài khoản |
-| UC7.2 | Khóa/ Mở tài khoản |  Admin | Quản lý tài khoản |
-| UC7.3 | Chỉnh sửa thông tin tài khoản | Admin | Quản lý tài khoản |
-| UC7.4 | Xem chi tiết tài khoản | Admin | Quản lý tài khoản |
-| UC7.5 | Khởi tạo tài khoản | Admin | Quản lý tài khoản |
-| UC7.6 | Chỉnh sửa chức vụ | Admin | Quản lý tài khoản |
-| UC7.7 | Tìm kiếm tài khoản | Admin | Quản lý tài khoản |
-| UC8.1 | Báo cáo doanh thu | Admin | Quản lý Báo cáo và Thống kê |
-| UC8.2 | Báo cáo mức độ quan tâm theo phim | Admin | Quản lý Báo cáo và Thống kê |
-| UC9.1 | Chỉnh sửa thông số rạp phim | Admin | Quản lý hệ thống |
-| UC9.2 | Sao lưu dữ liệu | Admin | Quản lý hệ thống |
+| UC8.1 | Thêm tài khoản | Admin | Quản lý tài khoản |
+| UC8.2 | Khóa/ Mở tài khoản |  Admin | Quản lý tài khoản |
+| UC8.3 | Chỉnh sửa thông tin tài khoản | Admin | Quản lý tài khoản |
+| UC8.4 | Xem chi tiết tài khoản | Admin | Quản lý tài khoản |
+| UC8.5 | Khởi tạo tài khoản | Admin | Quản lý tài khoản |
+| UC8.6 | Chỉnh sửa chức vụ | Admin | Quản lý tài khoản |
+| UC8.7 | Tìm kiếm tài khoản | Admin | Quản lý tài khoản |
+| UC9.1 | Báo cáo doanh thu | Admin | Quản lý Báo cáo và Thống kê |
+| UC9.2 | Báo cáo mức độ quan tâm theo phim | Admin | Quản lý Báo cáo và Thống kê |
+| UC10.1 | Chỉnh sửa thông số rạp phim | Admin | Quản lý hệ thống |
+| UC10.2 | Sao lưu dữ liệu | Admin | Quản lý hệ thống |
 | UC52 | Giải phóng Hold hết hạn | # | # |
 
 ---
