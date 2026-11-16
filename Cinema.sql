@@ -8862,7 +8862,7 @@ SELECT 'GiaoDich', COUNT(*) FROM dbo.GiaoDich UNION ALL
 SELECT 'CaiDat', COUNT(*) FROM dbo.CaiDat UNION ALL
 SELECT 'NhatKySaoLuu', COUNT(*) FROM dbo.NhatKySaoLuu;
 
--- Ví dụ: 10 ngày doanh thu gần nhất
+-- Ví dụ: xem 10 ngày doanh thu gần nhất
 SELECT TOP 10 * FROM dbo.vw_DoanhThuNgay ORDER BY ngay DESC;
 -- Ví dụ: xếp hạng phim theo số vé bán
 SELECT * FROM dbo.vw_ThongKePhim WHERE soSuat > 0 ORDER BY soVeBan DESC;
