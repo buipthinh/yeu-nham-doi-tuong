@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import vn.rapphuongnam.entity.DoTuoi;
 import vn.rapphuongnam.entity.Phim;
 import vn.rapphuongnam.entity.TrangThaiPhim;
 
@@ -21,7 +22,8 @@ public interface PhimRepository extends JpaRepository<Phim, Integer> {
     String DIEU_KIEN_TIM = "where (:q is null or lower(p.tenPhim) like lower(concat('%', :q, '%')) "
             + "or lower(p.daoDien) like lower(concat('%', :q, '%')) or lower(p.dienVien) like lower(concat('%', :q, '%'))) "
             + "and (:theLoaiId is null or t.id = :theLoaiId) "
-            + "and (:trangThai is null or p.trangThai = :trangThai)";
+            + "and (:trangThai is null or p.trangThai = :trangThai) "
+            + "and (:doTuoi is null or p.doTuoi = :doTuoi)";
 
     //UC2.4 + UC2.5: xem danh sach va tim kiem phim (theo ten/dao dien/dien vien, the loai, trang thai)
     @Query(value = "select distinct p from Phim p left join p.theLoai t " + DIEU_KIEN_TIM,
@@ -29,7 +31,11 @@ public interface PhimRepository extends JpaRepository<Phim, Integer> {
     Page<Phim> timKiem(@Param("q") String q,
                        @Param("theLoaiId") Integer theLoaiId,
                        @Param("trangThai") TrangThaiPhim trangThai,
+                       @Param("doTuoi") DoTuoi doTuoi,
                        Pageable pageable);
+
+    //Phim de chon trong form suat chieu
+    List<Phim> findByTrangThaiInOrderByTenPhim(java.util.Collection<TrangThaiPhim> trangThai);
 
     //Trang khach hang: phim theo trang thai
     List<Phim> findByTrangThaiOrderByNgayKhoiChieuDesc(TrangThaiPhim trangThai);
