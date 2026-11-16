@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head(${phimForm.themMoi ? 'Thêm phim' : 'Sửa phim'})}"></head>
+<body>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+
+    <main class="content">
+        <a class="back" th:href="@{/admin/phim}">← Danh sách phim</a>
+        <div class="page-head">
+            <div>
+                <h1 th:text="${phimForm.themMoi} ? 'Thêm phim (UC2.1)' : 'Sửa phim (UC2.2)'">Thêm phim</h1>
+                <p class="muted" th:unless="${phimForm.themMoi}" th:text="'Mã phim P' + ${#numbers.formatInteger(phimForm.id, 4)}"></p>
+            </div>
+        </div>
+
+        <form class="card form" method="post" novalidate th:object="${phimForm}"
+              th:action="${phimForm.themMoi} ? @{/admin/phim/them} : @{/admin/phim/{id}/sua(id=${phimForm.id})}">
+
+            <div class="alert bad" th:if="${#fields.hasErrors('*')}">Thông tin chưa hợp lệ, xem các ô được đánh dấu bên dưới.</div>
+
+            <div class="grid">
+                <div class="field full">
+                    <label for="tenPhim">Tên phim *</label>
+                    <input class="input" th:field="*{tenPhim}" th:errorclass="has-err">
+                    <span class="err" th:errors="*{tenPhim}"></span>
+                </div>
+                <div class="field">
+                    <label for="daoDien">Đạo diễn</label>
+                    <input class="input" th:field="*{daoDien}" th:errorclass="has-err">
+                    <span class="err" th:errors="*{daoDien}"></span>
+                </div>
+                <div class="field">
+                    <label for="dienVien">Diễn viên</label>
+                    <input class="input" th:field="*{dienVien}" th:errorclass="has-err">
+                    <span class="err" th:errors="*{dienVien}"></span>
+                </div>
+
+                <div class="field full">
+                    <label>Thể loại *</label>
+                    <div class="checks">
+                        <label class="chk" th:each="tl : ${dsTheLoai}">
+                            <input type="checkbox" th:field="*{theLoaiIds}" th:value="${tl.id}">
+                            <span th:text="${tl.tenTheLoai}"></span>
+                        </label>
+                    </div>
+                    <span class="err" th:errors="*{theLoaiIds}"></span>
+                </div>
+
+                <div class="field">
+                    <label for="thoiLuong">Thời lượng (phút) *</label>
+                    <input class="input" type="number" min="30" max="300" th:field="*{thoiLuong}" th:errorclass="has-err">
+                    <span class="err" th:errors="*{thoiLuong}"></span>
+                </div>
+                <div class="field">
+                    <label for="doTuoi">Độ tuổi *</label>
+                    <select class="input" th:field="*{doTuoi}">
+                        <option th:each="dt : ${dsDoTuoi}" th:value="${dt}" th:text="${dt.nhan}"></option>
+                    </select>
+                    <span class="err" th:errors="*{doTuoi}"></span>
+                </div>
+                <div class="field">
+                    <label for="ngayKhoiChieu">Ngày khởi chiếu *</label>
+                    <input class="input" type="date" th:field="*{ngayKhoiChieu}" th:errorclass="has-err">
+                    <span class="err" th:errors="*{ngayKhoiChieu}"></span>
+                </div>
+                <div class="field">
+                    <label for="ngayKetThuc">Ngày kết thúc chiếu *</label>
+                    <input class="input" type="date" th:field="*{ngayKetThuc}" th:errorclass="has-err">
+                    <span class="err" th:errors="*{ngayKetThuc}"></span>
+                </div>
+                <div class="field">
+                    <label for="ngonNgu">Ngôn ngữ</label>
+                    <input class="input" th:field="*{ngonNgu}">
+                    <span class="err" th:errors="*{ngonNgu}"></span>
+                </div>
+                <div class="field">
+                    <label for="phuDe">Phụ đề</label>
+                    <input class="input" th:field="*{phuDe}">
+                    <span class="err" th:errors="*{phuDe}"></span>
+                </div>
+                <div class="field">
+                    <label for="poster">Đường dẫn poster</label>
+                    <input class="input" th:field="*{poster}" placeholder="/uploads/poster/ten-phim.jpg">
+                    <span class="err" th:errors="*{poster}"></span>
+                </div>
+                <div class="field">
+                    <label for="trailer">Link trailer</label>
+                    <input class="input" th:field="*{trailer}" placeholder="https://www.youtube.com/watch?v=…" th:errorclass="has-err">
+                    <span class="err" th:errors="*{trailer}"></span>
+                </div>
+                <div class="field full">
+                    <label for="moTa">Mô tả nội dung</label>
+                    <textarea class="input" rows="4" th:field="*{moTa}"></textarea>
+                </div>
+                <div class="field" th:if="*{themMoi}">
+                    <label for="trangThai">Trạng thái ban đầu</label>
+                    <select class="input" th:field="*{trangThai}">
+                        <option value="sapChieu">Sắp chiếu</option>
+                        <option value="dangChieu">Đang chiếu</option>
+                    </select>
+                </div>
+            </div>
+
+            <p class="muted small" th:unless="${phimForm.themMoi}">
+                Phim còn suất chiếu chưa kết thúc thì không đổi được thời lượng, và khoảng chiếu mới phải bao trọn các suất đó.
+                Đổi trạng thái phim ở trang chi tiết (UC2.3).
+            </p>
+
+            <div class="form-actions">
+                <button class="btn primary" type="submit" th:text="${phimForm.themMoi} ? 'Thêm phim' : 'Lưu thay đổi'">Lưu</button>
+                <a class="btn ghost" th:href="${phimForm.themMoi} ? @{/admin/phim} : @{/admin/phim/{id}(id=${phimForm.id})}">Hủy</a>
+            </div>
+        </form>
+    </main>
+</div>
+</body>
+</html>

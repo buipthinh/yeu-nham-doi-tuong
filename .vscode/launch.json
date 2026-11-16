@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-RapPhuongNamApplication<rap-phuong-nam>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "vn.rapphuongnam.RapPhuongNamApplication",
+            "projectName": "rap-phuong-nam",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

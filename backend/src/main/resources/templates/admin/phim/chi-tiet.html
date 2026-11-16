@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head(${phim.tenPhim})}"></head>
+<body>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+
+    <main class="content">
+        <a class="back" th:href="@{/admin/phim}">← Danh sách phim</a>
+        <div class="page-head">
+            <div>
+                <div class="row">
+                    <span class="age" th:classappend="'age-' + ${phim.doTuoi}" th:text="${phim.doTuoi}"></span>
+                    <span class="pill" th:classappend="${phim.trangThai.css}" th:text="${phim.trangThai.nhan}"></span>
+                    <span class="mono muted" th:text="${phim.maPhim}"></span>
+                </div>
+                <h1 th:text="${phim.tenPhim}">Tên phim</h1>
+            </div>
+            <a class="btn" th:href="@{/admin/phim/{id}/sua(id=${phim.id})}">Sửa thông tin</a>
+        </div>
+
+        <div th:replace="~{admin/fragments :: flash}"></div>
+
+        <div class="stats">
+            <div class="card stat"><span>Tổng số suất</span><b th:text="${thongKe.tongSuat}">0</b></div>
+            <div class="card stat"><span>Suất chưa kết thúc</span><b th:text="${thongKe.suatChuaKetThuc}">0</b></div>
+            <div class="card stat"><span>Vé đã bán</span><b th:text="${thongKe.veDaBan}">0</b></div>
+            <div class="card stat"><span>Doanh thu vé</span>
+                <b th:text="${#numbers.formatDecimal(thongKe.doanhThuVe, 1, 'POINT', 0, 'COMMA')} + ' đ'">0 đ</b></div>
+        </div>
+
+        <div class="detail">
+            <div class="card info">
+                <h2>Thông tin phim</h2>
+                <dl>
+                    <dt>Đạo diễn</dt><dd th:text="${phim.daoDien} ?: '—'"></dd>
+                    <dt>Diễn viên</dt><dd th:text="${phim.dienVien} ?: '—'"></dd>
+                    <dt>Thể loại</dt><dd th:text="${phim.tenCacTheLoai}"></dd>
+                    <dt>Thời lượng</dt><dd th:text="${phim.thoiLuong} + ' phút'"></dd>
+                    <dt>Độ tuổi</dt><dd th:text="${phim.doTuoi.nhan}"></dd>
+                    <dt>Ngôn ngữ</dt><dd th:text="(${phim.ngonNgu} ?: '—') + ' · Phụ đề: ' + (${phim.phuDe} ?: 'Không')"></dd>
+                    <dt>Thời gian chiếu</dt>
+                    <dd th:text="${#temporals.format(phim.ngayKhoiChieu, 'dd/MM/yyyy')} + ' – ' + ${#temporals.format(phim.ngayKetThuc, 'dd/MM/yyyy')}"></dd>
+                    <dt>Poster</dt><dd class="mono small" th:text="${phim.poster} ?: '—'"></dd>
+                    <dt>Trailer</dt>
+                    <dd><a class="link" th:if="${phim.trailer}" th:href="${phim.trailer}" target="_blank" rel="noopener">Xem trailer</a>
+                        <span th:unless="${phim.trailer}">—</span></dd>
+                </dl>
+                <h3>Mô tả</h3>
+                <p th:text="${phim.moTa} ?: 'Chưa có mô tả.'"></p>
+            </div>
+
+            <!-- UC2.3 Thay doi trang thai phim -->
+            <form class="card side" method="post" th:action="@{/admin/phim/{id}/trang-thai(id=${phim.id})}">
+                <h2>Trạng thái phim (UC2.3)</h2>
+                <label class="radio" th:each="tt : ${dsTrangThai}">
+                    <input type="radio" name="trangThai" th:value="${tt}" th:checked="${tt == phim.trangThai}">
+                    <span th:text="${tt.nhan}"></span>
+                </label>
+                <p class="muted small">Phim "Ẩn" không hiển thị với khách. Phim còn suất chiếu chưa kết thúc đã có khách đặt vé thì chưa ẩn được;
+                    các suất chưa có đơn sẽ tự chuyển sang Tạm ngưng.</p>
+                <button class="btn primary" type="submit">Cập nhật trạng thái</button>
+            </form>
+        </div>
+    </main>
+</div>
+</body>
+</html>

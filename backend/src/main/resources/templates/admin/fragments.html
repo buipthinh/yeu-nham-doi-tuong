@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Phan <head> dung chung: th:replace="~{admin/fragments :: head('Tieu de')}" -->
+<head th:fragment="head(tieuDe)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${tieuDe} + ' · Quản lý Rạp Phương Nam'">Quản lý</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/admin/admin.css}">
+</head>
+
+<!-- Thanh ben trai: menu = ma muc dang mo -->
+<aside th:fragment="sidebar(menu)" class="sidebar">
+    <a class="brand" th:href="@{/admin}">
+        <span class="logo">RP</span>
+        <span><b>Rạp Phương Nam</b><small>Trang quản lý</small></span>
+    </a>
+    <nav>
+        <div class="grp">Nội dung</div>
+        <a th:href="@{/admin/phim}" th:classappend="${menu == 'phim'} ? 'on'">Phim <small>UC2</small></a>
+        <a class="soon" title="Sẽ làm sau">Suất chiếu <small>UC3</small></a>
+        <a class="soon" title="Sẽ làm sau">Phòng &amp; sơ đồ ghế <small>UC4</small></a>
+        <div class="grp">Giá &amp; dịch vụ</div>
+        <a class="soon" title="Sẽ làm sau">Giá vé <small>UC5</small></a>
+        <a class="soon" title="Sẽ làm sau">Thực phẩm <small>UC6.1</small></a>
+        <a class="soon" title="Sẽ làm sau">Đơn hàng <small>UC6.2</small></a>
+        <div class="grp">Hệ thống</div>
+        <a class="soon" title="Sẽ làm sau">Tài khoản <small>UC8</small></a>
+        <a class="soon" title="Sẽ làm sau">Báo cáo <small>UC9</small></a>
+        <a class="soon" title="Sẽ làm sau">Cài đặt <small>UC10</small></a>
+    </nav>
+</aside>
+
+<!-- Thong bao sau khi luu / loi nghiep vu (flash attribute) -->
+<div th:fragment="flash">
+    <div class="alert ok" th:if="${thongBao}" th:text="${thongBao}"></div>
+    <div class="alert bad" th:if="${loi}" th:text="${loi}"></div>
+</div>
+
+</body>
+</html>
