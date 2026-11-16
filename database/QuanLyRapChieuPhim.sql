@@ -1,191 +1,183 @@
-﻿/* =====================================================================
-   CƠ SỞ DỮ LIỆU: HỆ THỐNG QUẢN LÝ RẠP CHIẾU PHIM (ĐẶT VÉ TRỰC TUYẾN)
-   Hệ quản trị: Microsoft SQL Server 2016 trở lên
-   Gồm 22 bảng, tương ứng các lớp thực thể của sơ đồ lớp và lược đồ 1.6.1
+﻿/*
+    CƠ SỞ DỮ LIỆU: HỆ THỐNG QUẢN LÝ RẠP CHIẾU PHIM
+    Gồm 22 bảng.
 
-   Tài khoản dùng thử (mật khẩu lưu dạng SHA-256 hex):
-     Admin     : NV0001 / admin123      (NV0002 cũng là Admin)
-     Nhân viên : NV0003 / nhanvien1     (NV0003 đến NV0008; NV0008 bị khóa)
-     Khách hàng: khach@demo.vn / khach123  (các khách khác: matkhau123)
-   Dữ liệu được dựng quanh mốc 16/11/2026: suất chiếu từ 02/11 đến 22/11/2026.
-   ===================================================================== */
-USE master;
+    Tài khoản dùng thử:
+    Admin: NV0001 / admin123 (NV0002 cũng là Admin)
+    Nhân viên: NV0003 / nhanvien1 (NV0003 đến NV0008; NV0008 bị khóa)
+    Khách hàng: khach@demo.vn / khach123 (các khách khác: matkhau123)
+    Suất chiếu từ 02/11 đến 22/11/2026.
+*/
+
+/** KHỞI TẠO DATABASE **/
+CREATE DATABASE Cinema;
 GO
-IF DB_ID(N'QuanLyRapChieuPhim') IS NOT NULL
-BEGIN
-    ALTER DATABASE QuanLyRapChieuPhim SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    DROP DATABASE QuanLyRapChieuPhim;
-END
+
+USE Cinema;
 GO
-CREATE DATABASE QuanLyRapChieuPhim;
-GO
-USE QuanLyRapChieuPhim;
-GO
+
 SET DATEFORMAT ymd;
 GO
 
-/* =====================================================================
-   PHẦN 1. TẠO BẢNG
-   ===================================================================== */
-
+/** TẠO BẢNG **/
 -- 1. Tài khoản (khách hàng, nhân viên, admin)
 CREATE TABLE dbo.TaiKhoan (
-    id               INT IDENTITY(1,1) CONSTRAINT PK_TaiKhoan PRIMARY KEY,
-    tenDangNhap      VARCHAR(100)  NOT NULL CONSTRAINT UQ_TaiKhoan_tenDangNhap UNIQUE,
-    matKhau          VARCHAR(255)  NOT NULL,
-    loaiTaiKhoan     VARCHAR(10)   NOT NULL CONSTRAINT CK_TaiKhoan_loai CHECK (loaiTaiKhoan IN ('khachHang','nhanVien','admin')),
-    hoTen            NVARCHAR(100) NOT NULL,
-    ngaySinh         DATE          NULL,
-    gioiTinh         VARCHAR(4)    NOT NULL CONSTRAINT DF_TaiKhoan_gioiTinh DEFAULT 'khac' CONSTRAINT CK_TaiKhoan_gioiTinh CHECK (gioiTinh IN ('nam','nu','khac')),
-    soDienThoai      CHAR(10)      NOT NULL CONSTRAINT UQ_TaiKhoan_sdt UNIQUE CONSTRAINT CK_TaiKhoan_sdt CHECK (soDienThoai LIKE '0[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
-    email            VARCHAR(100)  NOT NULL CONSTRAINT UQ_TaiKhoan_email UNIQUE CONSTRAINT CK_TaiKhoan_email CHECK (email LIKE '%_@_%._%'),
-    diaChi           NVARCHAR(255) NULL,
-    ngayTuyenDung    DATE          NULL,
-    trangThai        VARCHAR(10)   NOT NULL CONSTRAINT DF_TaiKhoan_trangThai DEFAULT 'hoatDong' CONSTRAINT CK_TaiKhoan_trangThai CHECK (trangThai IN ('hoatDong','biKhoa')),
-    soLanNhapSai     TINYINT       NOT NULL CONSTRAINT DF_TaiKhoan_sai DEFAULT 0 CONSTRAINT CK_TaiKhoan_sai CHECK (soLanNhapSai BETWEEN 0 AND 5),
-    khoaDen          DATETIME      NULL,
-    lanDangNhapCuoi  DATETIME      NULL,
-    ngayTao          DATETIME      NOT NULL CONSTRAINT DF_TaiKhoan_ngayTao DEFAULT GETDATE(),
+    id INT IDENTITY(1,1) CONSTRAINT PK_TaiKhoan PRIMARY KEY,
+    tenDangNhap VARCHAR(100) NOT NULL CONSTRAINT UQ_TaiKhoan_tenDangNhap UNIQUE,
+    matKhau VARCHAR(255) NOT NULL,
+    loaiTaiKhoan VARCHAR(10) NOT NULL CONSTRAINT CK_TaiKhoan_loai CHECK (loaiTaiKhoan IN ('khachHang','nhanVien','admin')),
+    hoTen NVARCHAR(100) NOT NULL,
+    ngaySinh DATE NULL,
+    gioiTinh VARCHAR(4) NOT NULL CONSTRAINT DF_TaiKhoan_gioiTinh DEFAULT 'khac' CONSTRAINT CK_TaiKhoan_gioiTinh CHECK (gioiTinh IN ('nam','nu','khac')),
+    soDienThoai CHAR(10) NOT NULL CONSTRAINT UQ_TaiKhoan_sdt UNIQUE CONSTRAINT CK_TaiKhoan_sdt CHECK (soDienThoai LIKE '0[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
+    email VARCHAR(100) NOT NULL CONSTRAINT UQ_TaiKhoan_email UNIQUE CONSTRAINT CK_TaiKhoan_email CHECK (email LIKE '%_@_%._%'),
+    diaChi NVARCHAR(255) NULL,
+    ngayTuyenDung DATE NULL,
+    trangThai VARCHAR(10) NOT NULL CONSTRAINT DF_TaiKhoan_trangThai DEFAULT 'hoatDong' CONSTRAINT CK_TaiKhoan_trangThai CHECK (trangThai IN ('hoatDong','biKhoa')),
+    soLanNhapSai TINYINT NOT NULL CONSTRAINT DF_TaiKhoan_sai DEFAULT 0 CONSTRAINT CK_TaiKhoan_sai CHECK (soLanNhapSai BETWEEN 0 AND 5),
+    khoaDen DATETIME NULL,
+    lanDangNhapCuoi DATETIME NULL,
+    ngayTao DATETIME NOT NULL CONSTRAINT DF_TaiKhoan_ngayTao DEFAULT GETDATE(),
     CONSTRAINT CK_TaiKhoan_ngayTuyenDung CHECK (loaiTaiKhoan <> 'khachHang' OR ngayTuyenDung IS NULL)
 );
 
 -- 2. Thể loại phim
 CREATE TABLE dbo.TheLoai (
-    id          INT IDENTITY(1,1) CONSTRAINT PK_TheLoai PRIMARY KEY,
-    tenTheLoai  NVARCHAR(50) NOT NULL CONSTRAINT UQ_TheLoai_ten UNIQUE
+    id INT IDENTITY(1,1) CONSTRAINT PK_TheLoai PRIMARY KEY,
+    tenTheLoai NVARCHAR(50) NOT NULL CONSTRAINT UQ_TheLoai_ten UNIQUE
 );
 
 -- 3. Phim
 CREATE TABLE dbo.Phim (
-    id             INT IDENTITY(1,1) CONSTRAINT PK_Phim PRIMARY KEY,
-    tenPhim        NVARCHAR(200) NOT NULL,
-    daoDien        NVARCHAR(100) NULL,
-    dienVien       NVARCHAR(255) NULL,
-    thoiLuong      INT           NOT NULL CONSTRAINT CK_Phim_thoiLuong CHECK (thoiLuong > 0),
-    ngonNgu        NVARCHAR(50)  NULL,
-    phuDe          NVARCHAR(50)  NULL,
-    ngayKhoiChieu  DATE          NOT NULL,
-    ngayKetThuc    DATE          NOT NULL,
-    doTuoi         VARCHAR(3)    NOT NULL CONSTRAINT CK_Phim_doTuoi CHECK (doTuoi IN ('P','C13','C16','C18')),
-    moTa           NVARCHAR(MAX) NULL,
-    poster         VARCHAR(255)  NULL,
-    trailer        VARCHAR(255)  NULL,
-    trangThai      VARCHAR(10)   NOT NULL CONSTRAINT DF_Phim_trangThai DEFAULT 'sapChieu' CONSTRAINT CK_Phim_trangThai CHECK (trangThai IN ('sapChieu','dangChieu','an')),
+    id INT IDENTITY(1,1) CONSTRAINT PK_Phim PRIMARY KEY,
+    tenPhim NVARCHAR(200) NOT NULL,
+    daoDien NVARCHAR(100) NULL,
+    dienVien NVARCHAR(255) NULL,
+    thoiLuong INT NOT NULL CONSTRAINT CK_Phim_thoiLuong CHECK (thoiLuong > 0),
+    ngonNgu NVARCHAR(50) NULL,
+    phuDe NVARCHAR(50) NULL,
+    ngayKhoiChieu DATE NOT NULL,
+    ngayKetThuc DATE NOT NULL,
+    doTuoi VARCHAR(3) NOT NULL CONSTRAINT CK_Phim_doTuoi CHECK (doTuoi IN ('P','C13','C16','C18')),
+    moTa NVARCHAR(MAX) NULL,
+    poster VARCHAR(255) NULL,
+    trailer VARCHAR(255) NULL,
+    trangThai VARCHAR(10) NOT NULL CONSTRAINT DF_Phim_trangThai DEFAULT 'sapChieu' CONSTRAINT CK_Phim_trangThai CHECK (trangThai IN ('sapChieu','dangChieu','an')),
     CONSTRAINT CK_Phim_ngay CHECK (ngayKetThuc >= ngayKhoiChieu),
     CONSTRAINT UQ_Phim_ten_ngay UNIQUE (tenPhim, ngayKhoiChieu)
 );
 
 -- 4. Phim – Thể loại (n-n)
 CREATE TABLE dbo.PhimTheLoai (
-    phimId     INT NOT NULL CONSTRAINT FK_PhimTheLoai_Phim REFERENCES dbo.Phim(id),
-    theLoaiId  INT NOT NULL CONSTRAINT FK_PhimTheLoai_TheLoai REFERENCES dbo.TheLoai(id),
+    phimId INT NOT NULL CONSTRAINT FK_PhimTheLoai_Phim REFERENCES dbo.Phim(id),
+    theLoaiId INT NOT NULL CONSTRAINT FK_PhimTheLoai_TheLoai REFERENCES dbo.TheLoai(id),
     CONSTRAINT PK_PhimTheLoai PRIMARY KEY (phimId, theLoaiId)
 );
 
 -- 5. Phòng chiếu
 CREATE TABLE dbo.PhongChieu (
-    id         INT IDENTITY(1,1) CONSTRAINT PK_PhongChieu PRIMARY KEY,
-    tenPhong   NVARCHAR(50)  NOT NULL CONSTRAINT UQ_PhongChieu_ten UNIQUE,
-    soHang     INT           NOT NULL CONSTRAINT DF_PhongChieu_soHang DEFAULT 0 CONSTRAINT CK_PhongChieu_soHang CHECK (soHang BETWEEN 0 AND 26),
-    soCot      INT           NOT NULL CONSTRAINT DF_PhongChieu_soCot DEFAULT 0 CONSTRAINT CK_PhongChieu_soCot CHECK (soCot BETWEEN 0 AND 30),
-    sucChua    INT           NOT NULL CONSTRAINT DF_PhongChieu_sucChua DEFAULT 0 CONSTRAINT CK_PhongChieu_sucChua CHECK (sucChua >= 0),
-    ghiChu     NVARCHAR(255) NULL,
-    trangThai  VARCHAR(10)   NOT NULL CONSTRAINT DF_PhongChieu_trangThai DEFAULT 'hoatDong' CONSTRAINT CK_PhongChieu_trangThai CHECK (trangThai IN ('hoatDong','baoTri','an'))
+    id INT IDENTITY(1,1) CONSTRAINT PK_PhongChieu PRIMARY KEY,
+    tenPhong NVARCHAR(50) NOT NULL CONSTRAINT UQ_PhongChieu_ten UNIQUE,
+    soHang INT NOT NULL CONSTRAINT DF_PhongChieu_soHang DEFAULT 0 CONSTRAINT CK_PhongChieu_soHang CHECK (soHang BETWEEN 0 AND 26),
+    soCot INT NOT NULL CONSTRAINT DF_PhongChieu_soCot DEFAULT 0 CONSTRAINT CK_PhongChieu_soCot CHECK (soCot BETWEEN 0 AND 30),
+    sucChua INT NOT NULL CONSTRAINT DF_PhongChieu_sucChua DEFAULT 0 CONSTRAINT CK_PhongChieu_sucChua CHECK (sucChua >= 0),
+    ghiChu NVARCHAR(255) NULL,
+    trangThai VARCHAR(10) NOT NULL CONSTRAINT DF_PhongChieu_trangThai DEFAULT 'hoatDong' CONSTRAINT CK_PhongChieu_trangThai CHECK (trangThai IN ('hoatDong','baoTri','an'))
 );
 
 -- 6. Loại vé (loại ghế)
 CREATE TABLE dbo.LoaiVe (
-    id          INT IDENTITY(1,1) CONSTRAINT PK_LoaiVe PRIMARY KEY,
-    tenLoaiVe   NVARCHAR(50)  NOT NULL CONSTRAINT UQ_LoaiVe_ten UNIQUE,
-    moTa        NVARCHAR(255) NULL,
-    soChoMoiVe  TINYINT       NOT NULL CONSTRAINT CK_LoaiVe_soCho CHECK (soChoMoiVe IN (1,2)),
-    trangThai   VARCHAR(12)   NOT NULL CONSTRAINT DF_LoaiVe_trangThai DEFAULT 'dangApDung' CONSTRAINT CK_LoaiVe_trangThai CHECK (trangThai IN ('dangApDung','ngungApDung'))
+    id INT IDENTITY(1,1) CONSTRAINT PK_LoaiVe PRIMARY KEY,
+    tenLoaiVe NVARCHAR(50) NOT NULL CONSTRAINT UQ_LoaiVe_ten UNIQUE,
+    moTa NVARCHAR(255) NULL,
+    soChoMoiVe TINYINT NOT NULL CONSTRAINT CK_LoaiVe_soCho CHECK (soChoMoiVe IN (1,2)),
+    trangThai VARCHAR(12) NOT NULL CONSTRAINT DF_LoaiVe_trangThai DEFAULT 'dangApDung' CONSTRAINT CK_LoaiVe_trangThai CHECK (trangThai IN ('dangApDung','ngungApDung'))
 );
 
 -- 7. Đối tượng áp dụng giá
 CREATE TABLE dbo.DoiTuong (
-    id           INT IDENTITY(1,1) CONSTRAINT PK_DoiTuong PRIMARY KEY,
-    tenDoiTuong  NVARCHAR(50) NOT NULL CONSTRAINT UQ_DoiTuong_ten UNIQUE
+    id INT IDENTITY(1,1) CONSTRAINT PK_DoiTuong PRIMARY KEY,
+    tenDoiTuong NVARCHAR(50) NOT NULL CONSTRAINT UQ_DoiTuong_ten UNIQUE
 );
 
 -- 8. Loại vé – Đối tượng (n-n)
 CREATE TABLE dbo.LoaiVeDoiTuong (
-    loaiVeId    INT NOT NULL CONSTRAINT FK_LoaiVeDoiTuong_LoaiVe REFERENCES dbo.LoaiVe(id),
-    doiTuongId  INT NOT NULL CONSTRAINT FK_LoaiVeDoiTuong_DoiTuong REFERENCES dbo.DoiTuong(id),
+    loaiVeId INT NOT NULL CONSTRAINT FK_LoaiVeDoiTuong_LoaiVe REFERENCES dbo.LoaiVe(id),
+    doiTuongId INT NOT NULL CONSTRAINT FK_LoaiVeDoiTuong_DoiTuong REFERENCES dbo.DoiTuong(id),
     CONSTRAINT PK_LoaiVeDoiTuong PRIMARY KEY (loaiVeId, doiTuongId)
 );
 
 -- 9. Ghế vật lý trong phòng (ghế đôi là 1 bản ghi có loại vé Đôi)
 CREATE TABLE dbo.Ghe (
-    id            INT IDENTITY(1,1) CONSTRAINT PK_Ghe PRIMARY KEY,
-    phongChieuId  INT        NOT NULL CONSTRAINT FK_Ghe_PhongChieu REFERENCES dbo.PhongChieu(id),
-    loaiVeId      INT        NOT NULL CONSTRAINT FK_Ghe_LoaiVe REFERENCES dbo.LoaiVe(id),
-    maGhe         VARCHAR(5) NOT NULL,
-    hang          CHAR(1)    NOT NULL CONSTRAINT CK_Ghe_hang CHECK (hang BETWEEN 'A' AND 'Z'),
-    cot           INT        NOT NULL CONSTRAINT CK_Ghe_cot CHECK (cot > 0),
-    trangThai     VARCHAR(10) NOT NULL CONSTRAINT DF_Ghe_trangThai DEFAULT 'hoatDong' CONSTRAINT CK_Ghe_trangThai CHECK (trangThai IN ('hoatDong','baoTri')),
+    id INT IDENTITY(1,1) CONSTRAINT PK_Ghe PRIMARY KEY,
+    phongChieuId INT NOT NULL CONSTRAINT FK_Ghe_PhongChieu REFERENCES dbo.PhongChieu(id),
+    loaiVeId INT NOT NULL CONSTRAINT FK_Ghe_LoaiVe REFERENCES dbo.LoaiVe(id),
+    maGhe VARCHAR(5) NOT NULL,
+    hang CHAR(1) NOT NULL CONSTRAINT CK_Ghe_hang CHECK (hang BETWEEN 'A' AND 'Z'),
+    cot INT NOT NULL CONSTRAINT CK_Ghe_cot CHECK (cot > 0),
+    trangThai VARCHAR(10) NOT NULL CONSTRAINT DF_Ghe_trangThai DEFAULT 'hoatDong' CONSTRAINT CK_Ghe_trangThai CHECK (trangThai IN ('hoatDong','baoTri')),
     CONSTRAINT UQ_Ghe_phong_ma UNIQUE (phongChieuId, maGhe),
     CONSTRAINT UQ_Ghe_phong_vitri UNIQUE (phongChieuId, hang, cot)
 );
 
 -- 10. Ngày lễ (dùng để xác định loại ngày khi tính giá)
 CREATE TABLE dbo.NgayLe (
-    id         INT IDENTITY(1,1) CONSTRAINT PK_NgayLe PRIMARY KEY,
-    ngay       DATE          NOT NULL CONSTRAINT UQ_NgayLe_ngay UNIQUE,
-    tenNgayLe  NVARCHAR(100) NOT NULL
+    id INT IDENTITY(1,1) CONSTRAINT PK_NgayLe PRIMARY KEY,
+    ngay DATE NOT NULL CONSTRAINT UQ_NgayLe_ngay UNIQUE,
+    tenNgayLe NVARCHAR(100) NOT NULL
 );
 
 -- 11. Quy tắc giá: loại vé × đối tượng × loại ngày × khung giờ, có thời gian hiệu lực
 CREATE TABLE dbo.QuyTacGia (
-    id           INT IDENTITY(1,1) CONSTRAINT PK_QuyTacGia PRIMARY KEY,
-    loaiVeId     INT           NOT NULL CONSTRAINT FK_QuyTacGia_LoaiVe REFERENCES dbo.LoaiVe(id),
-    doiTuongId   INT           NOT NULL CONSTRAINT FK_QuyTacGia_DoiTuong REFERENCES dbo.DoiTuong(id),
-    loaiNgay     VARCHAR(10)   NOT NULL CONSTRAINT CK_QuyTacGia_loaiNgay CHECK (loaiNgay IN ('ngayThuong','cuoiTuan','ngayLe')),
-    khungGio     VARCHAR(5)    NOT NULL CONSTRAINT CK_QuyTacGia_khungGio CHECK (khungGio IN ('sang','trua','chieu','toi')),
-    gia          DECIMAL(10,2) NOT NULL CONSTRAINT CK_QuyTacGia_gia CHECK (gia > 0),
-    ngayBatDau   DATE          NOT NULL,
-    ngayKetThuc  DATE          NULL,
-    trangThai    VARCHAR(12)   NOT NULL CONSTRAINT DF_QuyTacGia_trangThai DEFAULT 'dangApDung' CONSTRAINT CK_QuyTacGia_trangThai CHECK (trangThai IN ('dangApDung','ngungApDung')),
+    id INT IDENTITY(1,1) CONSTRAINT PK_QuyTacGia PRIMARY KEY,
+    loaiVeId INT NOT NULL CONSTRAINT FK_QuyTacGia_LoaiVe REFERENCES dbo.LoaiVe(id),
+    doiTuongId INT NOT NULL CONSTRAINT FK_QuyTacGia_DoiTuong REFERENCES dbo.DoiTuong(id),
+    loaiNgay VARCHAR(10) NOT NULL CONSTRAINT CK_QuyTacGia_loaiNgay CHECK (loaiNgay IN ('ngayThuong','cuoiTuan','ngayLe')),
+    khungGio VARCHAR(5) NOT NULL CONSTRAINT CK_QuyTacGia_khungGio CHECK (khungGio IN ('sang','trua','chieu','toi')),
+    gia DECIMAL(10,2) NOT NULL CONSTRAINT CK_QuyTacGia_gia CHECK (gia > 0),
+    ngayBatDau DATE NOT NULL,
+    ngayKetThuc DATE NULL,
+    trangThai VARCHAR(12) NOT NULL CONSTRAINT DF_QuyTacGia_trangThai DEFAULT 'dangApDung' CONSTRAINT CK_QuyTacGia_trangThai CHECK (trangThai IN ('dangApDung','ngungApDung')),
     CONSTRAINT CK_QuyTacGia_ngay CHECK (ngayKetThuc IS NULL OR ngayKetThuc >= ngayBatDau),
     CONSTRAINT FK_QuyTacGia_LoaiVeDoiTuong FOREIGN KEY (loaiVeId, doiTuongId) REFERENCES dbo.LoaiVeDoiTuong(loaiVeId, doiTuongId)
 );
 
 -- 12. Lịch sử giá
 CREATE TABLE dbo.LichSuGia (
-    id               INT IDENTITY(1,1) CONSTRAINT PK_LichSuGia PRIMARY KEY,
-    quyTacGiaId      INT           NOT NULL CONSTRAINT FK_LichSuGia_QuyTacGia REFERENCES dbo.QuyTacGia(id),
-    nguoiThucHienId  INT           NOT NULL CONSTRAINT FK_LichSuGia_TaiKhoan REFERENCES dbo.TaiKhoan(id),
-    thaoTac          VARCHAR(12)   NOT NULL CONSTRAINT CK_LichSuGia_thaoTac CHECK (thaoTac IN ('thietLap','sua','ngungApDung')),
-    giaCu            DECIMAL(10,2) NULL,
-    giaMoi           DECIMAL(10,2) NOT NULL,
-    thoiDiem         DATETIME      NOT NULL CONSTRAINT DF_LichSuGia_thoiDiem DEFAULT GETDATE()
+    id INT IDENTITY(1,1) CONSTRAINT PK_LichSuGia PRIMARY KEY,
+    quyTacGiaId INT NOT NULL CONSTRAINT FK_LichSuGia_QuyTacGia REFERENCES dbo.QuyTacGia(id),
+    nguoiThucHienId INT NOT NULL CONSTRAINT FK_LichSuGia_TaiKhoan REFERENCES dbo.TaiKhoan(id),
+    thaoTac VARCHAR(12) NOT NULL CONSTRAINT CK_LichSuGia_thaoTac CHECK (thaoTac IN ('thietLap','sua','ngungApDung')),
+    giaCu DECIMAL(10,2) NULL,
+    giaMoi DECIMAL(10,2) NOT NULL,
+    thoiDiem DATETIME NOT NULL CONSTRAINT DF_LichSuGia_thoiDiem DEFAULT GETDATE()
 );
 
 -- 13. Suất chiếu
 CREATE TABLE dbo.SuatChieu (
-    id            INT IDENTITY(1,1) CONSTRAINT PK_SuatChieu PRIMARY KEY,
-    phimId        INT        NOT NULL CONSTRAINT FK_SuatChieu_Phim REFERENCES dbo.Phim(id),
-    phongChieuId  INT        NOT NULL CONSTRAINT FK_SuatChieu_PhongChieu REFERENCES dbo.PhongChieu(id),
-    ngayChieu     DATE       NOT NULL,
-    gioBatDau     TIME(0)    NOT NULL,
-    gioKetThuc    TIME(0)    NOT NULL,
-    trangThai     VARCHAR(10) NOT NULL CONSTRAINT DF_SuatChieu_trangThai DEFAULT 'moBan' CONSTRAINT CK_SuatChieu_trangThai CHECK (trangThai IN ('moBan','tamNgung')),
+    id INT IDENTITY(1,1) CONSTRAINT PK_SuatChieu PRIMARY KEY,
+    phimId INT NOT NULL CONSTRAINT FK_SuatChieu_Phim REFERENCES dbo.Phim(id),
+    phongChieuId INT NOT NULL CONSTRAINT FK_SuatChieu_PhongChieu REFERENCES dbo.PhongChieu(id),
+    ngayChieu DATE NOT NULL,
+    gioBatDau TIME(0) NOT NULL,
+    gioKetThuc TIME(0) NOT NULL,
+    trangThai VARCHAR(10) NOT NULL CONSTRAINT DF_SuatChieu_trangThai DEFAULT 'moBan' CONSTRAINT CK_SuatChieu_trangThai CHECK (trangThai IN ('moBan','tamNgung')),
     CONSTRAINT CK_SuatChieu_gio CHECK (gioKetThuc > gioBatDau),
     CONSTRAINT UQ_SuatChieu_phong_gio UNIQUE (phongChieuId, ngayChieu, gioBatDau)
 );
 
 -- 14. Đơn hàng
 CREATE TABLE dbo.DonHang (
-    id                INT IDENTITY(1,1) CONSTRAINT PK_DonHang PRIMARY KEY,
-    taiKhoanId        INT           NOT NULL CONSTRAINT FK_DonHang_TaiKhoan REFERENCES dbo.TaiKhoan(id),
-    suatChieuId       INT           NOT NULL CONSTRAINT FK_DonHang_SuatChieu REFERENCES dbo.SuatChieu(id),
-    maVe              CHAR(8)       NULL,
-    tongTienVe        DECIMAL(12,2) NOT NULL CONSTRAINT DF_DonHang_tienVe DEFAULT 0 CONSTRAINT CK_DonHang_tienVe CHECK (tongTienVe >= 0),
-    tongTienThucPham  DECIMAL(12,2) NOT NULL CONSTRAINT DF_DonHang_tienTP DEFAULT 0 CONSTRAINT CK_DonHang_tienTP CHECK (tongTienThucPham >= 0),
-    tongTien          DECIMAL(12,2) NOT NULL CONSTRAINT DF_DonHang_tong DEFAULT 0,
-    trangThai         VARCHAR(12)   NOT NULL CONSTRAINT DF_DonHang_trangThai DEFAULT 'choThanhToan' CONSTRAINT CK_DonHang_trangThai CHECK (trangThai IN ('choThanhToan','daThanhToan','daHuy','hetHan')),
-    thoiGianDat       DATETIME      NOT NULL CONSTRAINT DF_DonHang_thoiGianDat DEFAULT GETDATE(),
-    hanGiuGhe         DATETIME      NOT NULL,
+    id INT IDENTITY(1,1) CONSTRAINT PK_DonHang PRIMARY KEY,
+    taiKhoanId INT NOT NULL CONSTRAINT FK_DonHang_TaiKhoan REFERENCES dbo.TaiKhoan(id),
+    suatChieuId INT NOT NULL CONSTRAINT FK_DonHang_SuatChieu REFERENCES dbo.SuatChieu(id),
+    maVe CHAR(8) NULL,
+    tongTienVe DECIMAL(12,2) NOT NULL CONSTRAINT DF_DonHang_tienVe DEFAULT 0 CONSTRAINT CK_DonHang_tienVe CHECK (tongTienVe >= 0),
+    tongTienThucPham DECIMAL(12,2) NOT NULL CONSTRAINT DF_DonHang_tienTP DEFAULT 0 CONSTRAINT CK_DonHang_tienTP CHECK (tongTienThucPham >= 0),
+    tongTien DECIMAL(12,2) NOT NULL CONSTRAINT DF_DonHang_tong DEFAULT 0,
+    trangThai VARCHAR(12) NOT NULL CONSTRAINT DF_DonHang_trangThai DEFAULT 'choThanhToan' CONSTRAINT CK_DonHang_trangThai CHECK (trangThai IN ('choThanhToan','daThanhToan','daHuy','hetHan')),
+    thoiGianDat DATETIME NOT NULL CONSTRAINT DF_DonHang_thoiGianDat DEFAULT GETDATE(),
+    hanGiuGhe DATETIME NOT NULL,
     CONSTRAINT CK_DonHang_tong CHECK (tongTien = tongTienVe + tongTienThucPham),
     CONSTRAINT CK_DonHang_maVe CHECK ((trangThai = 'daThanhToan' AND maVe IS NOT NULL) OR (trangThai <> 'daThanhToan' AND maVe IS NULL)),
     CONSTRAINT CK_DonHang_hanGiu CHECK (hanGiuGhe > thoiGianDat)
@@ -194,130 +186,124 @@ CREATE UNIQUE INDEX UX_DonHang_maVe ON dbo.DonHang(maVe) WHERE maVe IS NOT NULL;
 
 -- 15. Trạng thái ghế theo từng suất chiếu
 CREATE TABLE dbo.GheSuatChieu (
-    id           INT IDENTITY(1,1) CONSTRAINT PK_GheSuatChieu PRIMARY KEY,
-    suatChieuId  INT         NOT NULL CONSTRAINT FK_GheSuatChieu_SuatChieu REFERENCES dbo.SuatChieu(id),
-    gheId        INT         NOT NULL CONSTRAINT FK_GheSuatChieu_Ghe REFERENCES dbo.Ghe(id),
-    donHangId    INT         NULL CONSTRAINT FK_GheSuatChieu_DonHang REFERENCES dbo.DonHang(id),
-    trangThai    VARCHAR(8)  NOT NULL CONSTRAINT DF_GheSuatChieu_trangThai DEFAULT 'trong' CONSTRAINT CK_GheSuatChieu_trangThai CHECK (trangThai IN ('trong','dangGiu','daBan')),
-    hanGiu       DATETIME    NULL,
+    id INT IDENTITY(1,1) CONSTRAINT PK_GheSuatChieu PRIMARY KEY,
+    suatChieuId INT NOT NULL CONSTRAINT FK_GheSuatChieu_SuatChieu REFERENCES dbo.SuatChieu(id),
+    gheId INT NOT NULL CONSTRAINT FK_GheSuatChieu_Ghe REFERENCES dbo.Ghe(id),
+    donHangId INT NULL CONSTRAINT FK_GheSuatChieu_DonHang REFERENCES dbo.DonHang(id),
+    trangThai VARCHAR(8) NOT NULL CONSTRAINT DF_GheSuatChieu_trangThai DEFAULT 'trong' CONSTRAINT CK_GheSuatChieu_trangThai CHECK (trangThai IN ('trong','dangGiu','daBan')),
+    hanGiu DATETIME NULL,
     CONSTRAINT UQ_GheSuatChieu UNIQUE (suatChieuId, gheId),
     CONSTRAINT CK_GheSuatChieu_nhatQuan CHECK (
-        (trangThai = 'trong'   AND donHangId IS NULL     AND hanGiu IS NULL) OR
+        (trangThai = 'trong' AND donHangId IS NULL AND hanGiu IS NULL) OR
         (trangThai = 'dangGiu' AND donHangId IS NOT NULL AND hanGiu IS NOT NULL) OR
-        (trangThai = 'daBan'   AND donHangId IS NOT NULL AND hanGiu IS NULL))
+        (trangThai = 'daBan' AND donHangId IS NOT NULL AND hanGiu IS NULL))
 );
 
 -- 16. Vé trong đơn (mỗi ghế của một suất chỉ gắn với một vé)
 CREATE TABLE dbo.Ve (
-    id              INT IDENTITY(1,1) CONSTRAINT PK_Ve PRIMARY KEY,
-    donHangId       INT           NOT NULL CONSTRAINT FK_Ve_DonHang REFERENCES dbo.DonHang(id),
-    gheSuatChieuId  INT           NOT NULL CONSTRAINT FK_Ve_GheSuatChieu REFERENCES dbo.GheSuatChieu(id) CONSTRAINT UQ_Ve_gheSuatChieu UNIQUE,
-    loaiVeId        INT           NOT NULL CONSTRAINT FK_Ve_LoaiVe REFERENCES dbo.LoaiVe(id),
-    doiTuongId      INT           NOT NULL CONSTRAINT FK_Ve_DoiTuong REFERENCES dbo.DoiTuong(id),
-    giaVe           DECIMAL(10,2) NOT NULL CONSTRAINT CK_Ve_gia CHECK (giaVe > 0)
+    id INT IDENTITY(1,1) CONSTRAINT PK_Ve PRIMARY KEY,
+    donHangId INT NOT NULL CONSTRAINT FK_Ve_DonHang REFERENCES dbo.DonHang(id),
+    gheSuatChieuId INT NOT NULL CONSTRAINT FK_Ve_GheSuatChieu REFERENCES dbo.GheSuatChieu(id) CONSTRAINT UQ_Ve_gheSuatChieu UNIQUE,
+    loaiVeId INT NOT NULL CONSTRAINT FK_Ve_LoaiVe REFERENCES dbo.LoaiVe(id),
+    doiTuongId INT NOT NULL CONSTRAINT FK_Ve_DoiTuong REFERENCES dbo.DoiTuong(id),
+    giaVe DECIMAL(10,2) NOT NULL CONSTRAINT CK_Ve_gia CHECK (giaVe > 0)
 );
 
 -- 17. Thực phẩm (bắp, nước, combo)
 CREATE TABLE dbo.ThucPham (
-    id         INT IDENTITY(1,1) CONSTRAINT PK_ThucPham PRIMARY KEY,
-    tenMon     NVARCHAR(100) NOT NULL CONSTRAINT UQ_ThucPham_ten UNIQUE,
-    loai       VARCHAR(5)    NOT NULL CONSTRAINT CK_ThucPham_loai CHECK (loai IN ('bap','nuoc','combo')),
-    thanhPhan  NVARCHAR(255) NULL,
-    giaBan     DECIMAL(10,2) NOT NULL CONSTRAINT CK_ThucPham_gia CHECK (giaBan > 0),
-    hinhAnh    VARCHAR(255)  NULL,
-    tonKho     INT           NOT NULL CONSTRAINT DF_ThucPham_tonKho DEFAULT 0 CONSTRAINT CK_ThucPham_tonKho CHECK (tonKho >= 0),
-    trangThai  VARCHAR(8)    NOT NULL CONSTRAINT DF_ThucPham_trangThai DEFAULT 'dangBan' CONSTRAINT CK_ThucPham_trangThai CHECK (trangThai IN ('dangBan','ngungBan'))
+    id INT IDENTITY(1,1) CONSTRAINT PK_ThucPham PRIMARY KEY,
+    tenMon NVARCHAR(100) NOT NULL CONSTRAINT UQ_ThucPham_ten UNIQUE,
+    loai VARCHAR(5) NOT NULL CONSTRAINT CK_ThucPham_loai CHECK (loai IN ('bap','nuoc','combo')),
+    thanhPhan NVARCHAR(255) NULL,
+    giaBan DECIMAL(10,2) NOT NULL CONSTRAINT CK_ThucPham_gia CHECK (giaBan > 0),
+    hinhAnh VARCHAR(255) NULL,
+    tonKho INT NOT NULL CONSTRAINT DF_ThucPham_tonKho DEFAULT 0 CONSTRAINT CK_ThucPham_tonKho CHECK (tonKho >= 0),
+    trangThai VARCHAR(8) NOT NULL CONSTRAINT DF_ThucPham_trangThai DEFAULT 'dangBan' CONSTRAINT CK_ThucPham_trangThai CHECK (trangThai IN ('dangBan','ngungBan'))
 );
 
 -- 18. Chi tiết thực phẩm của đơn
 CREATE TABLE dbo.ChiTietThucPham (
-    donHangId   INT           NOT NULL CONSTRAINT FK_ChiTietThucPham_DonHang REFERENCES dbo.DonHang(id),
-    thucPhamId  INT           NOT NULL CONSTRAINT FK_ChiTietThucPham_ThucPham REFERENCES dbo.ThucPham(id),
-    soLuong     INT           NOT NULL CONSTRAINT CK_ChiTietThucPham_sl CHECK (soLuong > 0),
-    donGia      DECIMAL(10,2) NOT NULL CONSTRAINT CK_ChiTietThucPham_gia CHECK (donGia > 0),
+    donHangId INT NOT NULL CONSTRAINT FK_ChiTietThucPham_DonHang REFERENCES dbo.DonHang(id),
+    thucPhamId INT NOT NULL CONSTRAINT FK_ChiTietThucPham_ThucPham REFERENCES dbo.ThucPham(id),
+    soLuong INT NOT NULL CONSTRAINT CK_ChiTietThucPham_sl CHECK (soLuong > 0),
+    donGia DECIMAL(10,2) NOT NULL CONSTRAINT CK_ChiTietThucPham_gia CHECK (donGia > 0),
     CONSTRAINT PK_ChiTietThucPham PRIMARY KEY (donHangId, thucPhamId)
 );
 
 -- 19. Lịch sử tồn kho
 CREATE TABLE dbo.LichSuTonKho (
-    id               INT IDENTITY(1,1) CONSTRAINT PK_LichSuTonKho PRIMARY KEY,
-    thucPhamId       INT         NOT NULL CONSTRAINT FK_LichSuTonKho_ThucPham REFERENCES dbo.ThucPham(id),
-    donHangId        INT         NULL CONSTRAINT FK_LichSuTonKho_DonHang REFERENCES dbo.DonHang(id),
-    nguoiThucHienId  INT         NULL CONSTRAINT FK_LichSuTonKho_TaiKhoan REFERENCES dbo.TaiKhoan(id),
-    soLuongThayDoi   INT         NOT NULL CONSTRAINT CK_LichSuTonKho_thayDoi CHECK (soLuongThayDoi <> 0),
-    tonKhoSau        INT         NOT NULL CONSTRAINT CK_LichSuTonKho_tonSau CHECK (tonKhoSau >= 0),
-    lyDo             VARCHAR(10) NOT NULL CONSTRAINT CK_LichSuTonKho_lyDo CHECK (lyDo IN ('nhapHang','ban','dieuChinh')),
-    thoiDiem         DATETIME    NOT NULL CONSTRAINT DF_LichSuTonKho_thoiDiem DEFAULT GETDATE(),
+    id INT IDENTITY(1,1) CONSTRAINT PK_LichSuTonKho PRIMARY KEY,
+    thucPhamId INT NOT NULL CONSTRAINT FK_LichSuTonKho_ThucPham REFERENCES dbo.ThucPham(id),
+    donHangId INT NULL CONSTRAINT FK_LichSuTonKho_DonHang REFERENCES dbo.DonHang(id),
+    nguoiThucHienId INT NULL CONSTRAINT FK_LichSuTonKho_TaiKhoan REFERENCES dbo.TaiKhoan(id),
+    soLuongThayDoi INT NOT NULL CONSTRAINT CK_LichSuTonKho_thayDoi CHECK (soLuongThayDoi <> 0),
+    tonKhoSau INT NOT NULL CONSTRAINT CK_LichSuTonKho_tonSau CHECK (tonKhoSau >= 0),
+    lyDo VARCHAR(10) NOT NULL CONSTRAINT CK_LichSuTonKho_lyDo CHECK (lyDo IN ('nhapHang','ban','dieuChinh')),
+    thoiDiem DATETIME NOT NULL CONSTRAINT DF_LichSuTonKho_thoiDiem DEFAULT GETDATE(),
     CONSTRAINT CK_LichSuTonKho_nguon CHECK ((lyDo = 'ban' AND donHangId IS NOT NULL) OR (lyDo <> 'ban' AND nguoiThucHienId IS NOT NULL))
 );
 
 -- 20. Giao dịch thanh toán
 CREATE TABLE dbo.GiaoDich (
-    id              INT IDENTITY(1,1) CONSTRAINT PK_GiaoDich PRIMARY KEY,
-    donHangId       INT           NOT NULL CONSTRAINT FK_GiaoDich_DonHang REFERENCES dbo.DonHang(id),
-    phuongThuc      VARCHAR(10)   NOT NULL CONSTRAINT CK_GiaoDich_pt CHECK (phuongThuc IN ('momo','vnpay','theTinDung')),
-    maGiaoDichCong  VARCHAR(100)  NOT NULL CONSTRAINT UQ_GiaoDich_ma UNIQUE,
-    soTien          DECIMAL(12,2) NOT NULL CONSTRAINT CK_GiaoDich_soTien CHECK (soTien > 0),
-    trangThai       VARCHAR(10)   NOT NULL CONSTRAINT CK_GiaoDich_trangThai CHECK (trangThai IN ('thanhCong','thatBai')),
-    thoiGian        DATETIME      NOT NULL CONSTRAINT DF_GiaoDich_thoiGian DEFAULT GETDATE()
+    id INT IDENTITY(1,1) CONSTRAINT PK_GiaoDich PRIMARY KEY,
+    donHangId INT NOT NULL CONSTRAINT FK_GiaoDich_DonHang REFERENCES dbo.DonHang(id),
+    phuongThuc VARCHAR(10) NOT NULL CONSTRAINT CK_GiaoDich_pt CHECK (phuongThuc IN ('momo','vnpay','theTinDung')),
+    maGiaoDichCong VARCHAR(100) NOT NULL CONSTRAINT UQ_GiaoDich_ma UNIQUE,
+    soTien DECIMAL(12,2) NOT NULL CONSTRAINT CK_GiaoDich_soTien CHECK (soTien > 0),
+    trangThai VARCHAR(10) NOT NULL CONSTRAINT CK_GiaoDich_trangThai CHECK (trangThai IN ('thanhCong','thatBai')),
+    thoiGian DATETIME NOT NULL CONSTRAINT DF_GiaoDich_thoiGian DEFAULT GETDATE()
 );
 -- mỗi đơn chỉ có tối đa một giao dịch thành công
 CREATE UNIQUE INDEX UX_GiaoDich_thanhCong ON dbo.GiaoDich(donHangId) WHERE trangThai = 'thanhCong';
 
 -- 21. Cài đặt hệ thống (một dòng)
 CREATE TABLE dbo.CaiDat (
-    id                   INT IDENTITY(1,1) CONSTRAINT PK_CaiDat PRIMARY KEY,
-    tenRap               NVARCHAR(100) NOT NULL,
-    diaChiRap            NVARCHAR(255) NOT NULL,
-    hotline              CHAR(10)      NOT NULL,
-    emailRap             VARCHAR(100)  NOT NULL,
-    thoiGianGiuGhe       INT NOT NULL CONSTRAINT DF_CaiDat_giuGhe DEFAULT 5  CONSTRAINT CK_CaiDat_giuGhe CHECK (thoiGianGiuGhe BETWEEN 1 AND 30),
-    soVeToiDaMoiDon      INT NOT NULL CONSTRAINT DF_CaiDat_soVe DEFAULT 8    CONSTRAINT CK_CaiDat_soVe CHECK (soVeToiDaMoiDon BETWEEN 1 AND 10),
-    thoiGianDonPhong     INT NOT NULL CONSTRAINT DF_CaiDat_donPhong DEFAULT 15 CONSTRAINT CK_CaiDat_donPhong CHECK (thoiGianDonPhong BETWEEN 0 AND 60),
-    nguongCanhBaoTonKho  INT NOT NULL CONSTRAINT DF_CaiDat_nguong DEFAULT 20 CONSTRAINT CK_CaiDat_nguong CHECK (nguongCanhBaoTonKho >= 0),
-    nguoiCapNhatId       INT      NULL CONSTRAINT FK_CaiDat_TaiKhoan REFERENCES dbo.TaiKhoan(id),
-    ngayCapNhat          DATETIME NOT NULL CONSTRAINT DF_CaiDat_ngayCapNhat DEFAULT GETDATE()
+    id INT IDENTITY(1,1) CONSTRAINT PK_CaiDat PRIMARY KEY,
+    tenRap NVARCHAR(100) NOT NULL,
+    diaChiRap NVARCHAR(255) NOT NULL,
+    hotline CHAR(10) NOT NULL,
+    emailRap VARCHAR(100) NOT NULL,
+    thoiGianGiuGhe INT NOT NULL CONSTRAINT DF_CaiDat_giuGhe DEFAULT 5 CONSTRAINT CK_CaiDat_giuGhe CHECK (thoiGianGiuGhe BETWEEN 1 AND 30),
+    soVeToiDaMoiDon INT NOT NULL CONSTRAINT DF_CaiDat_soVe DEFAULT 8 CONSTRAINT CK_CaiDat_soVe CHECK (soVeToiDaMoiDon BETWEEN 1 AND 10),
+    thoiGianDonPhong INT NOT NULL CONSTRAINT DF_CaiDat_donPhong DEFAULT 15 CONSTRAINT CK_CaiDat_donPhong CHECK (thoiGianDonPhong BETWEEN 0 AND 60),
+    nguongCanhBaoTonKho INT NOT NULL CONSTRAINT DF_CaiDat_nguong DEFAULT 20 CONSTRAINT CK_CaiDat_nguong CHECK (nguongCanhBaoTonKho >= 0),
+    nguoiCapNhatId INT NULL CONSTRAINT FK_CaiDat_TaiKhoan REFERENCES dbo.TaiKhoan(id),
+    ngayCapNhat DATETIME NOT NULL CONSTRAINT DF_CaiDat_ngayCapNhat DEFAULT GETDATE()
 );
 
 -- 22. Nhật ký sao lưu
 CREATE TABLE dbo.NhatKySaoLuu (
-    id               INT IDENTITY(1,1) CONSTRAINT PK_NhatKySaoLuu PRIMARY KEY,
-    nguoiThucHienId  INT          NOT NULL CONSTRAINT FK_NhatKySaoLuu_TaiKhoan REFERENCES dbo.TaiKhoan(id),
-    thoiDiem         DATETIME     NOT NULL CONSTRAINT DF_NhatKySaoLuu_thoiDiem DEFAULT GETDATE(),
-    tenTep           VARCHAR(255) NOT NULL,
-    dungLuong        BIGINT       NOT NULL CONSTRAINT CK_NhatKySaoLuu_dungLuong CHECK (dungLuong >= 0),
-    trangThai        VARCHAR(10)  NOT NULL CONSTRAINT CK_NhatKySaoLuu_trangThai CHECK (trangThai IN ('thanhCong','thatBai'))
+    id INT IDENTITY(1,1) CONSTRAINT PK_NhatKySaoLuu PRIMARY KEY,
+    nguoiThucHienId INT NOT NULL CONSTRAINT FK_NhatKySaoLuu_TaiKhoan REFERENCES dbo.TaiKhoan(id),
+    thoiDiem DATETIME NOT NULL CONSTRAINT DF_NhatKySaoLuu_thoiDiem DEFAULT GETDATE(),
+    tenTep VARCHAR(255) NOT NULL,
+    dungLuong BIGINT NOT NULL CONSTRAINT CK_NhatKySaoLuu_dungLuong CHECK (dungLuong >= 0),
+    trangThai VARCHAR(10) NOT NULL CONSTRAINT CK_NhatKySaoLuu_trangThai CHECK (trangThai IN ('thanhCong','thatBai'))
 );
 
 -- Chỉ mục phục vụ tra cứu thường dùng
-CREATE INDEX IX_SuatChieu_ngay        ON dbo.SuatChieu(ngayChieu, phongChieuId);
-CREATE INDEX IX_SuatChieu_phim        ON dbo.SuatChieu(phimId, ngayChieu);
-CREATE INDEX IX_DonHang_taiKhoan      ON dbo.DonHang(taiKhoanId, thoiGianDat);
-CREATE INDEX IX_DonHang_trangThai     ON dbo.DonHang(trangThai, hanGiuGhe);
-CREATE INDEX IX_GheSuatChieu_giu      ON dbo.GheSuatChieu(trangThai, hanGiu);
-CREATE INDEX IX_Ve_donHang            ON dbo.Ve(donHangId);
-CREATE INDEX IX_GiaoDich_donHang      ON dbo.GiaoDich(donHangId);
+CREATE INDEX IX_SuatChieu_ngay ON dbo.SuatChieu(ngayChieu, phongChieuId);
+CREATE INDEX IX_SuatChieu_phim ON dbo.SuatChieu(phimId, ngayChieu);
+CREATE INDEX IX_DonHang_taiKhoan ON dbo.DonHang(taiKhoanId, thoiGianDat);
+CREATE INDEX IX_DonHang_trangThai ON dbo.DonHang(trangThai, hanGiuGhe);
+CREATE INDEX IX_GheSuatChieu_giu ON dbo.GheSuatChieu(trangThai, hanGiu);
+CREATE INDEX IX_Ve_donHang ON dbo.Ve(donHangId);
+CREATE INDEX IX_GiaoDich_donHang ON dbo.GiaoDich(donHangId);
 CREATE INDEX IX_LichSuTonKho_thucPham ON dbo.LichSuTonKho(thucPhamId, thoiDiem);
 GO
 
-
-/* =====================================================================
-   PHẦN 2. DỮ LIỆU MẪU (sinh tự động, đã kiểm tra khóa ngoại, ràng buộc duy nhất,
-   tổng tiền đơn, tồn kho không âm, suất chiếu không trùng phòng)
-   ===================================================================== */
-
-
+/** DỮ LIỆU MẪU **/
 -- TaiKhoan: 38 dòng
 SET IDENTITY_INSERT dbo.TaiKhoan ON;
 INSERT INTO dbo.TaiKhoan (id, tenDangNhap, matKhau, loaiTaiKhoan, hoTen, ngaySinh, gioiTinh, soDienThoai, email, diaChi, ngayTuyenDung, trangThai, soLanNhapSai, khoaDen, lanDangNhapCuoi, ngayTao) VALUES
-(1, N'NV0001', N'240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', N'admin', N'Trần Quốc Bảo', '1990-05-12', N'nam', N'0983658590', N'bao.nv0001@rapphuongnam.vn', N'269 đường Nguyễn Trãi, Tân Phú, TP.HCM', '2022-03-01', N'hoatDong', 0, NULL, '2026-11-10 01:54:39', '2022-03-01 08:00:00'),
-(2, N'NV0002', N'240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', N'admin', N'Nguyễn Thị Mai Phương', '1988-11-02', N'nu', N'0818958398', N'phuong.nv0002@rapphuongnam.vn', N'233 đường Cách Mạng Tháng 8, Bình Thạnh, TP.HCM', '2021-08-15', N'hoatDong', 0, NULL, '2026-11-16 18:25:54', '2021-08-15 08:00:00'),
-(3, N'NV0003', N'b01ba614e7ae08379c7fd1e568349c88e7657d1df1ad85f7180a995278006fd5', N'nhanVien', N'Lê Thị Thu', '1998-09-20', N'nu', N'0330396671', N'thu.nv0003@rapphuongnam.vn', N'248 đường Nguyễn Trãi, Quận 5, TP.HCM', '2024-07-15', N'hoatDong', 0, NULL, '2026-11-12 18:21:41', '2024-07-15 08:00:00'),
-(4, N'NV0004', N'b01ba614e7ae08379c7fd1e568349c88e7657d1df1ad85f7180a995278006fd5', N'nhanVien', N'Phạm Minh Khoa', '2000-02-14', N'nam', N'0850036723', N'khoa.nv0004@rapphuongnam.vn', N'381 đường Nguyễn Trãi, Quận 7, TP.HCM', '2024-09-01', N'hoatDong', 0, NULL, '2026-11-16 11:26:48', '2024-09-01 08:00:00'),
-(5, N'NV0005', N'b01ba614e7ae08379c7fd1e568349c88e7657d1df1ad85f7180a995278006fd5', N'nhanVien', N'Võ Ngọc Hân', '2001-06-30', N'nu', N'0833612913', N'han.nv0005@rapphuongnam.vn', N'240 đường Nguyễn Trãi, Gò Vấp, TP.HCM', '2025-01-10', N'hoatDong', 0, NULL, '2026-11-10 00:58:59', '2025-01-10 08:00:00'),
-(6, N'NV0006', N'b01ba614e7ae08379c7fd1e568349c88e7657d1df1ad85f7180a995278006fd5', N'nhanVien', N'Đặng Hoàng Long', '1999-12-05', N'nam', N'0761295463', N'long.nv0006@rapphuongnam.vn', N'209 đường Lý Thường Kiệt, Quận 3, TP.HCM', '2025-03-20', N'hoatDong', 0, NULL, '2026-11-15 15:12:06', '2025-03-20 08:00:00'),
-(7, N'NV0007', N'b01ba614e7ae08379c7fd1e568349c88e7657d1df1ad85f7180a995278006fd5', N'nhanVien', N'Huỳnh Thanh Tâm', '2002-04-18', N'nam', N'0831466983', N'tam.nv0007@rapphuongnam.vn', N'260 đường Nguyễn Trãi, Quận 1, TP.HCM', '2025-06-01', N'hoatDong', 0, NULL, '2026-11-10 03:24:04', '2025-06-01 08:00:00'),
-(8, N'NV0008', N'b01ba614e7ae08379c7fd1e568349c88e7657d1df1ad85f7180a995278006fd5', N'nhanVien', N'Bùi Khánh Linh', '2003-01-27', N'nu', N'0936302093', N'linh.nv0008@rapphuongnam.vn', N'170 đường Trần Hưng Đạo, Tân Phú, TP.HCM', '2025-09-12', N'biKhoa', 0, NULL, '2026-11-12 11:48:04', '2025-09-12 08:00:00'),
+(1, N'NV001', N'240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', N'admin', N'Trần Quốc Bảo', '1990-05-12', N'nam', N'0983658590', N'bao.nv0001@rapphuongnam.vn', N'269 đường Nguyễn Trãi, Tân Phú, TP.HCM', '2022-03-01', N'hoatDong', 0, NULL, '2026-11-10 01:54:39', '2022-03-01 08:00:00'),
+(2, N'NV002', N'240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', N'admin', N'Nguyễn Thị Mai Phương', '1988-11-02', N'nu', N'0818958398', N'phuong.nv0002@rapphuongnam.vn', N'233 đường Cách Mạng Tháng 8, Bình Thạnh, TP.HCM', '2021-08-15', N'hoatDong', 0, NULL, '2026-11-16 18:25:54', '2021-08-15 08:00:00'),
+(3, N'NV003', N'b01ba614e7ae08379c7fd1e568349c88e7657d1df1ad85f7180a995278006fd5', N'nhanVien', N'Lê Thị Thu', '1998-09-20', N'nu', N'0330396671', N'thu.nv0003@rapphuongnam.vn', N'248 đường Nguyễn Trãi, Quận 5, TP.HCM', '2024-07-15', N'hoatDong', 0, NULL, '2026-11-12 18:21:41', '2024-07-15 08:00:00'),
+(4, N'NV004', N'b01ba614e7ae08379c7fd1e568349c88e7657d1df1ad85f7180a995278006fd5', N'nhanVien', N'Phạm Minh Khoa', '2000-02-14', N'nam', N'0850036723', N'khoa.nv0004@rapphuongnam.vn', N'381 đường Nguyễn Trãi, Quận 7, TP.HCM', '2024-09-01', N'hoatDong', 0, NULL, '2026-11-16 11:26:48', '2024-09-01 08:00:00'),
+(5, N'NV005', N'b01ba614e7ae08379c7fd1e568349c88e7657d1df1ad85f7180a995278006fd5', N'nhanVien', N'Võ Ngọc Hân', '2001-06-30', N'nu', N'0833612913', N'han.nv0005@rapphuongnam.vn', N'240 đường Nguyễn Trãi, Gò Vấp, TP.HCM', '2025-01-10', N'hoatDong', 0, NULL, '2026-11-10 00:58:59', '2025-01-10 08:00:00'),
+(6, N'NV006', N'b01ba614e7ae08379c7fd1e568349c88e7657d1df1ad85f7180a995278006fd5', N'nhanVien', N'Đặng Hoàng Long', '1999-12-05', N'nam', N'0761295463', N'long.nv0006@rapphuongnam.vn', N'209 đường Lý Thường Kiệt, Quận 3, TP.HCM', '2025-03-20', N'hoatDong', 0, NULL, '2026-11-15 15:12:06', '2025-03-20 08:00:00'),
+(7, N'NV007', N'b01ba614e7ae08379c7fd1e568349c88e7657d1df1ad85f7180a995278006fd5', N'nhanVien', N'Huỳnh Thanh Tâm', '2002-04-18', N'nam', N'0831466983', N'tam.nv0007@rapphuongnam.vn', N'260 đường Nguyễn Trãi, Quận 1, TP.HCM', '2025-06-01', N'hoatDong', 0, NULL, '2026-11-10 03:24:04', '2025-06-01 08:00:00'),
+(8, N'NV008', N'b01ba614e7ae08379c7fd1e568349c88e7657d1df1ad85f7180a995278006fd5', N'nhanVien', N'Bùi Khánh Linh', '2003-01-27', N'nu', N'0936302093', N'linh.nv0008@rapphuongnam.vn', N'170 đường Trần Hưng Đạo, Tân Phú, TP.HCM', '2025-09-12', N'biKhoa', 0, NULL, '2026-11-12 11:48:04', '2025-09-12 08:00:00'),
 (9, N'khach@demo.vn', N'79c4de8c8577ebfbebe7ecf1951d0b51e66f80cf7b7255d20798917f4886de87', N'khachHang', N'Nguyễn Minh Anh', '1999-07-24', N'nu', N'0940940801', N'khach@demo.vn', NULL, NULL, N'hoatDong', 0, NULL, '2026-11-06 00:26:12', '2026-08-30 01:33:01'),
 (10, N'mai.le10@gmail.com', N'fc8d5c17ee6bd893ac3d47583df509da68ada40070b9c9e1890cae52bc62de28', N'khachHang', N'Lê Hồng Mai', '1975-02-19', N'nu', N'0767385150', N'mai.le10@gmail.com', NULL, NULL, N'hoatDong', 1, NULL, '2026-10-30 18:54:17', '2026-04-26 00:50:33'),
 (11, N'loc.phan11@gmail.com', N'fc8d5c17ee6bd893ac3d47583df509da68ada40070b9c9e1890cae52bc62de28', N'khachHang', N'Phan Minh Lộc', '1997-03-02', N'nam', N'0813734918', N'loc.phan11@gmail.com', N'258/23 Phan Xích Long, Quận 3, TP.HCM', NULL, N'hoatDong', 2, NULL, NULL, '2025-11-22 11:16:46'),
@@ -8797,9 +8783,7 @@ INSERT INTO dbo.NhatKySaoLuu (id, nguoiThucHienId, thoiDiem, tenTep, dungLuong, 
 SET IDENTITY_INSERT dbo.NhatKySaoLuu OFF;
 GO
 
-/* =====================================================================
-   PHẦN 3. KHUNG NHÌN VÀ THỦ TỤC HỖ TRỢ
-   ===================================================================== */
+/* KHUNG NHÌN VÀ THỦ TỤC HỖ TRỢ */
 
 -- Loại ngày và khung giờ của một suất chiếu (dùng để tìm quy tắc giá)
 CREATE OR ALTER VIEW dbo.vw_SuatChieuGia AS
@@ -8817,7 +8801,7 @@ GO
 -- Doanh thu theo ngày thanh toán (UC9.1)
 CREATE OR ALTER VIEW dbo.vw_DoanhThuNgay AS
 SELECT CAST(gd.thoiGian AS DATE) AS ngay, COUNT(*) AS soDon,
-       SUM(dh.tongTienVe) AS doanhThuVe, SUM(dh.tongTienThucPham) AS doanhThuThucPham, SUM(dh.tongTien) AS tongDoanhThu
+        SUM(dh.tongTienVe) AS doanhThuVe, SUM(dh.tongTienThucPham) AS doanhThuThucPham, SUM(dh.tongTien) AS tongDoanhThu
 FROM dbo.GiaoDich gd JOIN dbo.DonHang dh ON dh.id = gd.donHangId
 WHERE gd.trangThai = 'thanhCong'
 GROUP BY CAST(gd.thoiGian AS DATE);
@@ -8827,9 +8811,9 @@ GO
 CREATE OR ALTER VIEW dbo.vw_ThongKePhim AS
 SELECT p.id AS phimId, p.tenPhim,
        COUNT(DISTINCT sc.id) AS soSuat,
-       (SELECT COUNT(*) FROM dbo.Ve v JOIN dbo.DonHang d ON d.id = v.donHangId JOIN dbo.SuatChieu s ON s.id = d.suatChieuId
+        (SELECT COUNT(*) FROM dbo.Ve v JOIN dbo.DonHang d ON d.id = v.donHangId JOIN dbo.SuatChieu s ON s.id = d.suatChieuId
          WHERE s.phimId = p.id AND d.trangThai = 'daThanhToan') AS soVeBan,
-       (SELECT ISNULL(SUM(d.tongTienVe), 0) FROM dbo.DonHang d JOIN dbo.SuatChieu s ON s.id = d.suatChieuId
+        (SELECT ISNULL(SUM(d.tongTienVe), 0) FROM dbo.DonHang d JOIN dbo.SuatChieu s ON s.id = d.suatChieuId
          WHERE s.phimId = p.id AND d.trangThai = 'daThanhToan') AS doanhThuVe
 FROM dbo.Phim p LEFT JOIN dbo.SuatChieu sc ON sc.phimId = p.id
 GROUP BY p.id, p.tenPhim;
@@ -8854,9 +8838,7 @@ BEGIN
 END
 GO
 
-/* =====================================================================
-   PHẦN 4. KIỂM TRA NHANH
-   ===================================================================== */
+/** PHẦN KIỂM TRA NHANH **/
 SELECT 'TaiKhoan' AS bang, COUNT(*) AS soDong FROM dbo.TaiKhoan UNION ALL
 SELECT 'TheLoai', COUNT(*) FROM dbo.TheLoai UNION ALL
 SELECT 'Phim', COUNT(*) FROM dbo.Phim UNION ALL
@@ -8880,8 +8862,9 @@ SELECT 'GiaoDich', COUNT(*) FROM dbo.GiaoDich UNION ALL
 SELECT 'CaiDat', COUNT(*) FROM dbo.CaiDat UNION ALL
 SELECT 'NhatKySaoLuu', COUNT(*) FROM dbo.NhatKySaoLuu;
 
--- Ví dụ: 10 ngày doanh thu gần nhất
+-- Ví dụ: xem 10 ngày doanh thu gần nhất
 SELECT TOP 10 * FROM dbo.vw_DoanhThuNgay ORDER BY ngay DESC;
 -- Ví dụ: xếp hạng phim theo số vé bán
 SELECT * FROM dbo.vw_ThongKePhim WHERE soSuat > 0 ORDER BY soVeBan DESC;
 GO
+
