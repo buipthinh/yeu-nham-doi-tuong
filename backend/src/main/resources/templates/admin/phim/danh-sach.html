@@ -29,6 +29,15 @@
                 <option th:each="tt : ${dsTrangThai}" th:value="${tt}" th:text="${tt.nhan}"
                         th:selected="${tt == trangThai}"></option>
             </select>
+            <select class="input" name="doTuoi" aria-label="Độ tuổi">
+                <option value="">Mọi độ tuổi</option>
+                <option th:each="dt : ${dsDoTuoi}" th:value="${dt}" th:text="${dt.nhan}" th:selected="${dt == doTuoi}"></option>
+            </select>
+            <select class="input" name="sapXep" aria-label="Sắp xếp">
+                <option value="moiNhat" th:selected="${sapXep == 'moiNhat'}">Mới thêm nhất</option>
+                <option value="ten" th:selected="${sapXep == 'ten'}">Tên A → Z</option>
+                <option value="ngayKhoiChieu" th:selected="${sapXep == 'ngayKhoiChieu'}">Ngày khởi chiếu mới nhất</option>
+            </select>
             <button class="btn" type="submit">Tìm</button>
             <a class="btn ghost" th:href="@{/admin/phim}">Xóa lọc</a>
         </form>
@@ -39,13 +48,14 @@
             <table class="table">
                 <thead>
                 <tr>
-                    <th>Mã</th><th>Tên phim</th><th>Thể loại</th><th class="r">Thời lượng</th>
+                    <th>Mã</th><th></th><th>Tên phim</th><th>Thể loại</th><th class="r">Thời lượng</th>
                     <th>Thời gian chiếu</th><th>Tuổi</th><th>Trạng thái</th><th></th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="p : ${ketQua.content}">
                     <td class="mono" th:text="${p.maPhim}">P0001</td>
+                    <td><img class="thumb" th:if="${p.poster}" th:src="${p.poster}" alt="" onerror="this.style.visibility='hidden'"></td>
                     <td><a class="link" th:href="@{/admin/phim/{id}(id=${p.id})}" th:text="${p.tenPhim}">Tên phim</a>
                         <div class="muted small" th:text="${p.daoDien}"></div></td>
                     <td class="small" th:text="${p.tenCacTheLoai}"></td>
@@ -63,12 +73,14 @@
             </table>
         </div>
 
-        <div class="empty" th:if="${ketQua.empty}">Không tìm thấy phim phù hợp.</div>
+        <div class="empty" th:if="${ketQua.empty and tongPhim == 0}">Chưa có phim nào.
+            <p><a class="btn primary" th:href="@{/admin/phim/them}">+ Thêm phim</a></p></div>
+        <div class="empty" th:if="${ketQua.empty and tongPhim != 0}">Không tìm thấy phim phù hợp.</div>
 
         <!-- Phan trang -->
         <nav class="pager" th:if="${ketQua.totalPages > 1}">
             <a th:each="i : ${#numbers.sequence(0, ketQua.totalPages - 1)}"
-               th:href="@{/admin/phim(q=${q}, theLoaiId=${theLoaiId}, trangThai=${trangThai}, trang=${i})}"
+               th:href="@{/admin/phim(q=${q}, theLoaiId=${theLoaiId}, trangThai=${trangThai}, doTuoi=${doTuoi}, sapXep=${sapXep}, trang=${i})}"
                th:text="${i + 1}" th:classappend="${i == ketQua.number} ? 'on'"></a>
         </nav>
     </main>

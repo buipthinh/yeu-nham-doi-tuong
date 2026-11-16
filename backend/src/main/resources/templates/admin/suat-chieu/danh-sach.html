@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head('Quản lý suất chiếu')}"></head>
+<body>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+
+    <main class="content wide">
+        <div class="page-head">
+            <div>
+                <h1>Quản lý suất chiếu</h1>
+                <p class="muted">UC3.4 xem lịch chiếu · UC3.5 tìm kiếm · UC3.1 thêm · UC3.2 sửa · UC3.3 đổi trạng thái</p>
+            </div>
+            <a class="btn primary" th:href="@{/admin/suat-chieu/them(ngay=${ngay})}">+ Thêm suất chiếu</a>
+        </div>
+
+        <div th:replace="~{admin/fragments :: flash}"></div>
+
+        <!-- Tab che do xem -->
+        <div class="tabs">
+            <a th:href="@{/admin/suat-chieu(cheDo='ngay', ngay=${ngay})}" th:classappend="${cheDo == 'ngay'} ? 'on'">Theo ngày</a>
+            <a th:href="@{/admin/suat-chieu(cheDo='tuan', ngay=${ngay})}" th:classappend="${cheDo == 'tuan'} ? 'on'">Theo tuần</a>
+            <a th:href="@{/admin/suat-chieu(cheDo='phong', ngay=${ngay})}" th:classappend="${cheDo == 'phong'} ? 'on'">Theo phòng</a>
+            <a th:href="@{/admin/suat-chieu/tim-kiem}" th:classappend="${cheDo == 'timKiem'} ? 'on'">Tìm kiếm nâng cao</a>
+        </div>
+
+        <!-- ===== Che do lich: dieu huong ngay ===== -->
+        <th:block th:if="${cheDo != 'timKiem'}">
+            <form class="filters lich" method="get" th:action="@{/admin/suat-chieu}">
+                <input type="hidden" name="cheDo" th:value="${cheDo}">
+                <a class="btn" th:href="@{/admin/suat-chieu(cheDo=${cheDo}, ngay=${ngayTruoc}, phongId=${phongId})}"
+                   th:text="${cheDo == 'tuan'} ? '‹ Tuần trước' : '‹ Hôm trước'">‹</a>
+                <a class="btn" th:href="@{/admin/suat-chieu(cheDo=${cheDo}, ngay=${homNay}, phongId=${phongId})}">Hôm nay</a>
+                <a class="btn" th:href="@{/admin/suat-chieu(cheDo=${cheDo}, ngay=${ngaySau}, phongId=${phongId})}"
+                   th:text="${cheDo == 'tuan'} ? 'Tuần sau ›' : 'Hôm sau ›'">›</a>
+                <input class="input" type="date" name="ngay" th:value="${ngay}" aria-label="Ngày">
+                <select class="input" name="phongId" aria-label="Phòng">
+                    <option value="">Mọi phòng</option>
+                    <option th:each="p : ${dsPhong}" th:value="${p.id}" th:text="${p.tenPhong}" th:selected="${p.id == phongId}"></option>
+                </select>
+                <button class="btn" type="submit">Xem</button>
+            </form>
+            <p class="muted small">
+                <th:block th:if="${cheDo == 'tuan'}"
+                          th:text="'Tuần ' + ${#temporals.format(tuNgay, 'dd/MM/yyyy')} + ' – ' + ${#temporals.format(denNgay, 'dd/MM/yyyy')}"></th:block>
+                <th:block th:unless="${cheDo == 'tuan'}" th:text="'Ngày ' + ${#temporals.format(ngay, 'dd/MM/yyyy')}"></th:block>
+                · <span th:text="${dsSuat.size()} + ' suất chiếu'"></span>
+            </p>
+
+            <div class="empty" th:if="${dsSuat.isEmpty()}">Không có suất chiếu trong khoảng đã chọn.
+                <p><a class="btn primary" th:href="@{/admin/suat-chieu/them(ngay=${ngay}, phongId=${phongId})}">+ Thêm suất chiếu</a></p></div>
+
+            <!-- Theo ngay -->
+            <div class="card table-wrap" th:if="${cheDo == 'ngay' and !dsSuat.isEmpty()}">
+                <table class="table">
+                    <thead th:replace="~{admin/suat-chieu/bang :: tieuDeBang}"></thead>
+                    <tbody>
+                    <th:block th:each="d : ${dsSuat}"><tr th:replace="~{admin/suat-chieu/bang :: dongSuat(${d})}"></tr></th:block>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Theo tuan -->
+            <div class="week-scroll" th:if="${cheDo == 'tuan' and !dsSuat.isEmpty()}">
+                <div class="week-grid">
+                    <div class="day" th:each="e : ${tuan}">
+                        <div class="day-head" th:classappend="${e.key == homNay} ? 'today'">
+                            <b th:text="${#temporals.format(e.key, 'EEE')}">T2</b>
+                            <span th:text="${#temporals.format(e.key, 'dd/MM')}">01/01</span>
+                        </div>
+                        <a class="slot" th:each="d : ${e.value}" th:href="@{/admin/suat-chieu/{id}(id=${d.suat.id})}">
+                            <b th:text="${#temporals.format(d.suat.gioBatDau, 'HH:mm')} + '–' + ${#temporals.format(d.suat.gioKetThuc, 'HH:mm')}"></b>
+                            <span class="t" th:text="${d.suat.phim.tenPhim}"></span>
+                            <span class="muted small" th:text="${d.suat.phongChieu.tenPhong}"></span>
+                            <span class="pill" th:classappend="${d.tinhTrang.css}" th:text="${d.tinhTrang.nhan}"></span>
+                        </a>
+                        <div class="muted small day-empty" th:if="${e.value.isEmpty()}">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theo phong -->
+            <div class="rooms" th:if="${cheDo == 'phong' and !dsSuat.isEmpty()}">
+                <div class="card room" th:each="e : ${theoPhong}">
+                    <h2 th:text="${e.key}">Phòng</h2>
+                    <th:block th:each="d : ${e.value}">
+                        <div class="gap" th:if="${d.khoangTrong != null and d.khoangTrong > 0}"
+                             th:text="'Trống ' + ${d.khoangTrong} + ' phút'"></div>
+                        <a class="slot row-slot" th:href="@{/admin/suat-chieu/{id}(id=${d.suat.id})}">
+                            <b th:text="${#temporals.format(d.suat.gioBatDau, 'HH:mm')} + '–' + ${#temporals.format(d.suat.gioKetThuc, 'HH:mm')}"></b>
+                            <span class="t" th:text="${d.suat.phim.tenPhim}"></span>
+                            <span class="muted small" th:text="'Trống ' + ${d.soGheTrong} + ' · Đã đặt ' + ${d.soGheDaDat}"></span>
+                            <span class="pill" th:classappend="${d.tinhTrang.css}" th:text="${d.tinhTrang.nhan}"></span>
+                        </a>
+                    </th:block>
+                </div>
+            </div>
+        </th:block>
+
+        <!-- ===== Tim kiem ===== -->
+        <th:block th:if="${cheDo == 'timKiem'}">
+            <form class="filters tk" method="get" th:action="@{/admin/suat-chieu/tim-kiem}">
+                <input class="input" type="search" name="q" th:value="${q}" placeholder="Tên phim…" aria-label="Tên phim">
+                <select class="input" name="phimId" aria-label="Phim">
+                    <option value="">Mọi phim</option>
+                    <option th:each="p : ${dsPhim}" th:value="${p.id}" th:text="${p.tenPhim}" th:selected="${p.id == phimId}"></option>
+                </select>
+                <select class="input" name="phongId" aria-label="Phòng">
+                    <option value="">Mọi phòng</option>
+                    <option th:each="p : ${dsPhong}" th:value="${p.id}" th:text="${p.tenPhong}" th:selected="${p.id == phongId}"></option>
+                </select>
+                <input class="input" type="date" name="tuNgay" th:value="${tuNgay}" aria-label="Từ ngày">
+                <input class="input" type="date" name="denNgay" th:value="${denNgay}" aria-label="Đến ngày">
+                <select class="input" name="trangThai" aria-label="Trạng thái">
+                    <option value="">Mọi trạng thái</option>
+                    <option th:each="tt : ${dsTrangThai}" th:value="${tt}" th:text="${tt.nhan}" th:selected="${tt == trangThai}"></option>
+                </select>
+                <label class="chk"><input type="checkbox" name="anDaKetThuc" value="true" th:checked="${anDaKetThuc}"> Ẩn suất đã kết thúc</label>
+                <button class="btn" type="submit">Tìm</button>
+                <a class="btn ghost" th:href="@{/admin/suat-chieu/tim-kiem}">Xóa lọc</a>
+            </form>
+
+            <p class="muted small" th:text="'Tìm thấy ' + ${ketQua.totalElements} + ' suất chiếu'"></p>
+
+            <div class="card table-wrap" th:if="${!ketQua.empty}">
+                <table class="table">
+                    <thead th:replace="~{admin/suat-chieu/bang :: tieuDeBang}"></thead>
+                    <tbody>
+                    <th:block th:each="d : ${ketQua.content}"><tr th:replace="~{admin/suat-chieu/bang :: dongSuat(${d})}"></tr></th:block>
+                    </tbody>
+                </table>
+            </div>
+            <div class="empty" th:if="${ketQua.empty}">Không tìm thấy suất chiếu phù hợp.</div>
+
+            <nav class="pager" th:if="${ketQua.totalPages > 1}">
+                <a th:each="i : ${#numbers.sequence(0, ketQua.totalPages - 1)}"
+                   th:href="@{/admin/suat-chieu/tim-kiem(q=${q}, phimId=${phimId}, phongId=${phongId}, tuNgay=${tuNgay}, denNgay=${denNgay}, trangThai=${trangThai}, anDaKetThuc=${anDaKetThuc}, trang=${i})}"
+                   th:text="${i + 1}" th:classappend="${i == ketQua.number} ? 'on'"></a>
+            </nav>
+        </th:block>
+    </main>
+</div>
+
+</body>
+</html>

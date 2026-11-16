@@ -56,13 +56,14 @@ textarea.input { resize: vertical; }
 .pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
 .pill.ok { background: var(--ok-soft); color: var(--ok); }
 .pill.info { background: var(--info-soft); color: var(--info); }
+.pill.warn { background: #fdf0d5; color: #9a6700; }
 .pill.mute { background: var(--mute-soft); color: var(--muted); }
 .age { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 11px; font-weight: 700; color: #fff; background: #4b8b3b; }
 .age-C13 { background: #c9a227; } .age-C16 { background: #d9731f; } .age-C18 { background: #b42318; }
 .empty { padding: 40px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: var(--radius); }
 
 /* Tim kiem + bang */
-.filters { display: grid; grid-template-columns: minmax(200px, 2fr) minmax(150px, 1fr) minmax(150px, 1fr) auto auto; gap: 8px; margin-bottom: 10px; }
+.filters { display: grid; grid-template-columns: minmax(200px, 2fr) repeat(4, minmax(130px, 1fr)) auto auto; gap: 8px; margin-bottom: 10px; }
 .table-wrap { overflow-x: auto; }
 .table { width: 100%; border-collapse: collapse; }
 .table th, .table td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
@@ -100,9 +101,40 @@ textarea.input { resize: vertical; }
 .info dt { color: var(--muted); }
 .info dd { margin: 0; }
 
+.content.wide { max-width: 1400px; }
+.btn.disabled { opacity: .45; cursor: not-allowed; }
+.filters.lich { grid-template-columns: auto auto auto minmax(150px, 1fr) minmax(150px, 1fr) auto; }
+.filters.tk { grid-template-columns: repeat(3, minmax(140px, 1fr)); }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 14px; flex-wrap: wrap; }
+.tabs a { padding: 8px 14px; text-decoration: none; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tabs a.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+.week-scroll { overflow-x: auto; }
+.week-grid { display: grid; grid-template-columns: repeat(7, minmax(150px, 1fr)); gap: 8px; min-width: 1100px; }
+.day { display: flex; flex-direction: column; gap: 6px; }
+.day-head { display: flex; justify-content: space-between; padding: 6px 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+.day-head.today { border-color: var(--accent); color: var(--accent); }
+.day-empty { text-align: center; }
+.slot { display: flex; flex-direction: column; gap: 2px; padding: 8px; background: var(--surface); border: 1px solid var(--line);
+        border-radius: 8px; text-decoration: none; }
+.slot:hover { border-color: var(--accent); }
+.slot .t { font-weight: 500; }
+.slot.row-slot { flex-direction: row; align-items: center; gap: 12px; flex-wrap: wrap; }
+.slot.row-slot .t { flex: 1; min-width: 140px; }
+.rooms { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; }
+.room { padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.gap { text-align: center; font-size: 12px; color: var(--muted); border: 1px dashed var(--line); border-radius: 6px; padding: 3px; }
+.confirm-box { padding: 18px 20px; max-width: 900px; margin-bottom: 16px; border-color: var(--accent); background: var(--accent-soft); }
+.confirm-box dl { display: grid; grid-template-columns: 180px 1fr; gap: 6px 12px; margin: 0; }
+.confirm-box dt { color: var(--muted); }
+.confirm-box dd { margin: 0; font-weight: 500; }
+
 @media (max-width: 900px) {
+    .filters.lich, .filters.tk { grid-template-columns: 1fr; }
     .layout { grid-template-columns: 1fr; }
     .sidebar { position: static; height: auto; }
     .content { padding: 16px; }
     .filters, .grid, .detail { grid-template-columns: 1fr; }
 }
+
+.thumb { width: 40px; height: 60px; object-fit: cover; border-radius: 4px; background: var(--mute-soft); display: block; }
+.poster-preview { margin-top: 6px; max-width: 120px; max-height: 180px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); }

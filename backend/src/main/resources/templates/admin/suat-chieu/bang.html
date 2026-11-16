@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Tieu de bang + dong suat dung chung (che do ngay va tim kiem) -->
+<table>
+    <thead th:fragment="tieuDeBang">
+    <tr>
+        <th>Mã suất</th><th>Phim</th><th>Phòng</th><th>Ngày</th><th>Bắt đầu</th><th>Kết thúc</th>
+        <th class="r">Giá áp dụng</th><th class="r">Ghế trống</th><th class="r">Đã đặt</th><th>Trạng thái</th><th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:fragment="dongSuat(d)">
+        <td class="mono" th:text="${d.suat.maSuat}">S0001</td>
+        <td><a class="link" th:href="@{/admin/phim/{id}(id=${d.suat.phim.id})}" th:text="${d.suat.phim.tenPhim}">Phim</a>
+            <span class="age" th:classappend="'age-' + ${d.suat.phim.doTuoi}" th:text="${d.suat.phim.doTuoi}"></span></td>
+        <td th:text="${d.suat.phongChieu.tenPhong}">Phòng 1</td>
+        <td class="nowrap" th:text="${#temporals.format(d.suat.ngayChieu, 'dd/MM/yyyy')}"></td>
+        <td th:text="${#temporals.format(d.suat.gioBatDau, 'HH:mm')}"></td>
+        <td th:text="${#temporals.format(d.suat.gioKetThuc, 'HH:mm')}"></td>
+        <td class="r nowrap" th:text="${d.giaTu != null} ? 'từ ' + ${#numbers.formatDecimal(d.giaTu, 1, 'POINT', 0, 'COMMA')} + ' đ' : '—'"></td>
+        <td class="r" th:text="${d.soGheTrong}">0</td>
+        <td class="r" th:text="${d.soGheDaDat}">0</td>
+        <td><span class="pill" th:classappend="${d.tinhTrang.css}" th:text="${d.tinhTrang.nhan}"></span></td>
+        <td class="actions"><a class="btn sm ghost" th:href="@{/admin/suat-chieu/{id}(id=${d.suat.id})}">Chi tiết</a></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

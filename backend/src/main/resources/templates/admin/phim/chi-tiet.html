@@ -51,7 +51,8 @@
             </div>
 
             <!-- UC2.3 Thay doi trang thai phim -->
-            <form class="card side" method="post" th:action="@{/admin/phim/{id}/trang-thai(id=${phim.id})}">
+            <form class="card side" method="post" th:action="@{/admin/phim/{id}/trang-thai(id=${phim.id})}"
+                  th:attr="data-suat=${thongKe.suatChuaKetThuc}" onsubmit="return xacNhanTrangThai(this)">
                 <h2>Trạng thái phim (UC2.3)</h2>
                 <label class="radio" th:each="tt : ${dsTrangThai}">
                     <input type="radio" name="trangThai" th:value="${tt}" th:checked="${tt == phim.trangThai}">
@@ -60,9 +61,20 @@
                 <p class="muted small">Phim "Ẩn" không hiển thị với khách. Phim còn suất chiếu chưa kết thúc đã có khách đặt vé thì chưa ẩn được;
                     các suất chưa có đơn sẽ tự chuyển sang Tạm ngưng.</p>
                 <button class="btn primary" type="submit">Cập nhật trạng thái</button>
+                <p class="small"><a class="link" th:href="@{/admin/suat-chieu/tim-kiem(phimId=${phim.id})}">Xem suất chiếu của phim →</a></p>
             </form>
         </div>
     </main>
 </div>
+<script>
+    function xacNhanTrangThai(f) {
+        var chon = f.querySelector('input[name=trangThai]:checked');
+        var n = parseInt(f.getAttribute('data-suat') || '0', 10);
+        if (chon && chon.value === 'an' && n > 0) {
+            return confirm('Ẩn phim sẽ tạm ngưng ' + n + ' suất chiếu chưa diễn ra. Tiếp tục?');
+        }
+        return confirm('Xác nhận đổi trạng thái?');
+    }
+</script>
 </body>
 </html>

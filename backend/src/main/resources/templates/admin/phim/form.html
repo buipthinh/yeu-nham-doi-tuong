@@ -14,7 +14,7 @@
             </div>
         </div>
 
-        <form class="card form" method="post" novalidate th:object="${phimForm}"
+        <form class="card form" method="post" novalidate onsubmit="return confirm('Xác nhận lưu thông tin phim?')" th:object="${phimForm}"
               th:action="${phimForm.themMoi} ? @{/admin/phim/them} : @{/admin/phim/{id}/sua(id=${phimForm.id})}">
 
             <div class="alert bad" th:if="${#fields.hasErrors('*')}">Thông tin chưa hợp lệ, xem các ô được đánh dấu bên dưới.</div>
@@ -83,6 +83,7 @@
                     <label for="poster">Đường dẫn poster</label>
                     <input class="input" th:field="*{poster}" placeholder="/uploads/poster/ten-phim.jpg">
                     <span class="err" th:errors="*{poster}"></span>
+                    <img id="posterPreview" class="poster-preview" alt="Xem trước poster" th:src="*{poster}" style="display:none">
                 </div>
                 <div class="field">
                     <label for="trailer">Link trailer</label>
@@ -92,13 +93,6 @@
                 <div class="field full">
                     <label for="moTa">Mô tả nội dung</label>
                     <textarea class="input" rows="4" th:field="*{moTa}"></textarea>
-                </div>
-                <div class="field" th:if="*{themMoi}">
-                    <label for="trangThai">Trạng thái ban đầu</label>
-                    <select class="input" th:field="*{trangThai}">
-                        <option value="sapChieu">Sắp chiếu</option>
-                        <option value="dangChieu">Đang chiếu</option>
-                    </select>
                 </div>
             </div>
 
@@ -114,5 +108,20 @@
         </form>
     </main>
 </div>
+<script>
+    (function () {
+        var inp = document.getElementById('poster'), img = document.getElementById('posterPreview');
+        function capNhat() {
+            var v = inp.value.trim();
+            if (!v) { img.style.display = 'none'; return; }
+            img.onload = function () { img.style.display = 'block'; };
+            img.onerror = function () { img.style.display = 'none'; };
+            img.src = v;
+        }
+        inp.addEventListener('change', capNhat);
+        inp.addEventListener('input', capNhat);
+        capNhat();
+    })();
+</script>
 </body>
 </html>
