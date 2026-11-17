@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head(${loaiVeForm.themMoi ? 'Thêm loại vé' : 'Sửa loại vé'})}"></head>
+<body>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+
+    <main class="content">
+        <a class="back" th:href="${loaiVeForm.themMoi} ? @{/admin/loai-ve} : @{/admin/loai-ve/{id}(id=${loaiVeForm.id})}">← Quay lại</a>
+        <div class="page-head">
+            <div>
+                <h1 th:text="${loaiVeForm.themMoi} ? 'Thêm loại vé' : 'Sửa loại vé'">Thêm loại vé</h1>
+            </div>
+        </div>
+
+        <form class="card form" method="post" novalidate th:object="${loaiVeForm}"
+              th:action="${loaiVeForm.themMoi} ? @{/admin/loai-ve/them} : @{/admin/loai-ve/{id}/sua(id=${loaiVeForm.id})}">
+
+            <div class="alert bad" th:if="${#fields.hasErrors('*')}">Thông tin chưa hợp lệ, xem các ô được đánh dấu bên dưới.</div>
+
+            <div class="grid">
+                <div class="field">
+                    <label for="tenLoaiVe">Tên loại vé *</label>
+                    <input class="input" th:field="*{tenLoaiVe}" th:errorclass="has-err" placeholder="Ví dụ: VIP">
+                    <span class="err" th:errors="*{tenLoaiVe}"></span>
+                </div>
+                <div class="field">
+                    <label>Số chỗ mỗi vé *</label>
+                    <div class="checks">
+                        <label class="radio"><input type="radio" th:field="*{soChoMoiVe}" value="1"> 1 chỗ (ghế đơn)</label>
+                        <label class="radio"><input type="radio" th:field="*{soChoMoiVe}" value="2"> 2 chỗ (ghế đôi)</label>
+                    </div>
+                    <span class="err" th:errors="*{soChoMoiVe}"></span>
+                </div>
+                <div class="field full">
+                    <label for="moTa">Mô tả</label>
+                    <textarea class="input" rows="3" th:field="*{moTa}" th:errorclass="has-err"></textarea>
+                    <span class="err" th:errors="*{moTa}"></span>
+                </div>
+            </div>
+
+            <p class="muted small" th:if="${loaiVeForm.themMoi}">Loại vé mới ở trạng thái Đang áp dụng và mặc định áp dụng cho đối tượng Người lớn.
+                Sau khi thêm, vào trang chi tiết để gán thêm đối tượng và thiết lập giá.</p>
+            <p class="muted small" th:unless="${loaiVeForm.themMoi}">Loại vé đã gán cho ghế trong phòng chiếu thì không đổi được số chỗ mỗi vé.</p>
+
+            <div class="form-actions">
+                <button class="btn primary" type="submit" th:text="${loaiVeForm.themMoi} ? 'Thêm loại vé' : 'Lưu thay đổi'">Lưu</button>
+                <a class="btn ghost" th:href="${loaiVeForm.themMoi} ? @{/admin/loai-ve} : @{/admin/loai-ve/{id}(id=${loaiVeForm.id})}">Hủy</a>
+            </div>
+        </form>
+    </main>
+</div>
+</body>
+</html>

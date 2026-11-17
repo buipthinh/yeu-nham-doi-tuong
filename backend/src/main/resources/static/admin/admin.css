@@ -138,3 +138,68 @@ textarea.input { resize: vertical; }
 
 .thumb { width: 40px; height: 60px; object-fit: cover; border-radius: 4px; background: var(--mute-soft); display: block; }
 .poster-preview { margin-top: 6px; max-width: 120px; max-height: 180px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); }
+
+/* UC8 Tai khoan, UC9 Bao cao (Tin) */
+.pill.bad { background: var(--bad-soft); color: var(--bad); }
+.btn.danger { background: var(--bad); border-color: var(--bad); color: #fff; }
+.side-stack { display: flex; flex-direction: column; gap: 12px; }
+.side-stack .side p { margin: 0 0 12px; }
+.section-title { margin: 24px 0 10px; }
+.matkhau { display: flex; gap: 32px; align-items: center; flex-wrap: wrap; padding: 14px 18px; margin-bottom: 16px;
+           border-color: var(--accent); background: var(--accent-soft); }
+.matkhau b { font-size: 18px; }
+.matkhau p { margin: 0; flex-basis: 100%; }
+.report-filters { grid-template-columns: repeat(auto-fit, minmax(160px, auto)); justify-content: start; }
+.report-title { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 6px 0 12px; flex-wrap: wrap; }
+.stats .stat b { white-space: nowrap; }
+.table tr.total td { font-weight: 700; background: #faf9f7; }
+.chart-card { padding: 16px 18px; margin-bottom: 16px; }
+.chart { display: flex; align-items: stretch; gap: 3px; height: 220px; padding-top: 8px; }
+.bar-col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
+.bar { width: 72%; min-height: 1px; background: var(--accent); border-radius: 3px 3px 0 0; }
+.bar-col:hover .bar { filter: brightness(1.15); }
+.bar-label { font-size: 10.5px; color: var(--muted); margin-top: 4px; white-space: nowrap; height: 14px; }
+.chart:has(.bar-col:nth-child(16)) .bar-col:nth-child(even) .bar-label { visibility: hidden; }
+.hbar { display: grid; grid-template-columns: minmax(120px, 220px) 1fr 48px; gap: 10px; align-items: center; padding: 4px 0; }
+.hbar-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hbar-track { height: 14px; background: var(--mute-soft); border-radius: 4px; overflow: hidden; }
+.hbar-fill { height: 100%; background: var(--accent); border-radius: 4px; }
+.hbar-val { text-align: right; font-weight: 600; }
+
+/* In / luu PDF: an menu va bo loc */
+@media print {
+    .sidebar, .no-print, .alert { display: none !important; }
+    .layout { display: block; }
+    .content { padding: 0; max-width: none; }
+    .card { break-inside: avoid; }
+    .bar, .hbar-fill { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* UC5, UC6: tab con, bang gia, ton kho, tra cuu */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 16px; flex-wrap: wrap; }
+.tabs a { padding: 8px 14px; text-decoration: none; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; font-weight: 500; }
+.tabs a:hover { color: var(--text); }
+.tabs a.on { color: var(--accent); border-bottom-color: var(--accent); }
+.filters.wide { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.alert.info { background: var(--info-soft); color: var(--info); }
+.pad { padding: 18px 20px; }
+.mb { margin-bottom: 16px; }
+.bang-gia th, .bang-gia td { padding: 7px 8px; text-align: center; font-size: 12.5px; white-space: nowrap; }
+.bang-gia th.l, .bang-gia td.l { text-align: left; }
+.bang-gia .sep { border-left: 1px solid var(--line); }
+.bang-gia td.trong { color: var(--muted); }
+.ton-thap { color: var(--bad); font-weight: 700; }
+.tang { color: var(--ok); font-weight: 600; }
+.giam { color: var(--bad); font-weight: 600; }
+.chk.khoa { opacity: .75; cursor: default; }
+.xac-nhan { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.tra-cuu { display: grid; grid-template-columns: auto minmax(200px, 1fr) auto; gap: 10px; align-items: center; margin-bottom: 16px; }
+.tra-cuu .checks { flex-wrap: nowrap; }
+.dem-nguoc { font-weight: 700; font-variant-numeric: tabular-nums; }
+@media (max-width: 900px) {
+    .tra-cuu { grid-template-columns: 1fr; }
+}
+.side dl { display: grid; grid-template-columns: 110px 1fr; gap: 6px 10px; margin: 0 0 12px; }
+.side dd { margin: 0; word-break: break-all; }
+/* .info (khung chi tiet) dat padding lon, tranh de len nhan .pill.info */
+.pill.info { padding: 2px 10px; }

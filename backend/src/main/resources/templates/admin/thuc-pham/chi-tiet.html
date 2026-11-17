@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head(${mon.tenMon})}"></head>
+<body>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+
+    <main class="content">
+        <a class="back" th:href="@{/admin/thuc-pham}">← Danh sách món</a>
+        <div class="page-head">
+            <div>
+                <div class="row">
+                    <span class="pill" th:classappend="${mon.loai.css}" th:text="${mon.loai.nhan}"></span>
+                    <span class="pill" th:classappend="${mon.trangThai.css}" th:text="${mon.trangThai.nhan}"></span>
+                    <span class="mono muted" th:text="${mon.maMon}"></span>
+                </div>
+                <h1 th:text="${mon.tenMon}">Tên món</h1>
+            </div>
+            <a class="btn" th:href="@{/admin/thuc-pham/{id}/sua(id=${mon.id})}">Sửa thông tin, giá</a>
+        </div>
+
+        <div th:replace="~{admin/fragments :: flash}"></div>
+
+        <div class="stats">
+            <div class="card stat"><span>Tồn kho</span><b th:classappend="${mon.tonKho <= nguong} ? 'ton-thap'" th:text="${mon.tonKho}">0</b></div>
+            <div class="card stat"><span>Giá bán</span><b th:text="${#numbers.formatDecimal(mon.giaBan, 1, 'POINT', 0, 'COMMA')} + ' đ'">0</b></div>
+            <div class="card stat"><span>Đã bán (đơn đã thanh toán)</span><b th:text="${daBan}">0</b></div>
+            <div class="card stat"><span>Đơn chờ thanh toán có món này</span><b th:text="${donDangCho}">0</b></div>
+        </div>
+        <div class="alert bad" th:if="${mon.tonKho <= nguong and mon.trangThai.name() == 'dangBan'}"
+             th:text="'Món sắp hết hàng: tồn kho ' + ${mon.tonKho} + ', ngưỡng cảnh báo ' + ${nguong} + '. Nên nhập thêm hàng.'"></div>
+
+        <div class="detail">
+            <div class="card info">
+                <h2>Thông tin món</h2>
+                <dl>
+                    <dt>Tên món</dt><dd th:text="${mon.tenMon}"></dd>
+                    <dt>Loại</dt><dd th:text="${mon.loai.nhan}"></dd>
+                    <dt>Thành phần</dt><dd th:text="${mon.thanhPhan} ?: '—'"></dd>
+                    <dt>Giá bán</dt><dd th:text="${#numbers.formatDecimal(mon.giaBan, 1, 'POINT', 0, 'COMMA')} + ' đ'"></dd>
+                    <dt>Hình ảnh</dt><dd class="mono small" th:text="${mon.hinhAnh} ?: '—'"></dd>
+                </dl>
+            </div>
+
+            <div class="side-stack">
+                <!-- Nhap hang / dieu chinh ton kho -->
+                <form class="card side" method="post" th:action="@{/admin/thuc-pham/{id}/ton-kho(id=${mon.id})}">
+                    <h2>Cập nhật tồn kho</h2>
+                    <label class="radio"><input type="radio" name="lyDo" value="nhapHang" checked> Nhập hàng (số dương)</label>
+                    <label class="radio"><input type="radio" name="lyDo" value="dieuChinh"> Điều chỉnh sau kiểm kho (âm để giảm)</label>
+                    <div class="field">
+                        <label for="soLuong">Số lượng thay đổi</label>
+                        <input class="input" type="number" id="soLuong" name="soLuong" required placeholder="Ví dụ: 50 hoặc -3">
+                    </div>
+                    <p class="muted small">Mỗi lần cập nhật được ghi vào lịch sử tồn kho kèm người thực hiện.</p>
+                    <button class="btn primary" type="submit">Lưu tồn kho</button>
+                </form>
+
+                <!-- UC6.1.4 Ngung ban / ban lai -->
+                <form class="card side" method="post" th:action="@{/admin/thuc-pham/{id}/trang-thai(id=${mon.id})}">
+                    <h2>Trạng thái bán</h2>
+                    <p class="muted small" th:if="${mon.trangThai.name() == 'dangBan'}">Ngừng bán thì món không còn hiện khi khách đặt vé. Đơn đã đặt không bị ảnh hưởng.</p>
+                    <p class="muted small" th:unless="${mon.trangThai.name() == 'dangBan'}">Mở bán lại để khách chọn được món này.</p>
+                    <button class="btn" type="submit" th:classappend="${mon.trangThai.name() == 'dangBan'} ? 'danger' : 'primary'"
+                            th:text="${mon.trangThai.name() == 'dangBan'} ? 'Ngừng bán' : 'Bán lại'"></button>
+                </form>
+            </div>
+        </div>
+
+        <h2 class="section-title">Lịch sử tồn kho</h2>
+        <div class="card table-wrap" th:if="${!lichSu.empty}">
+            <table class="table">
+                <thead><tr><th>Thời điểm</th><th>Lý do</th><th class="r">Thay đổi</th><th class="r">Tồn sau</th><th>Người thực hiện / đơn hàng</th></tr></thead>
+                <tbody>
+                <tr th:each="l : ${lichSu.content}">
+                    <td class="nowrap" th:text="${#temporals.format(l.thoiDiem, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td><span class="pill" th:classappend="${l.lyDo.css}" th:text="${l.lyDo.nhan}"></span></td>
+                    <td class="r" th:classappend="${l.soLuongThayDoi > 0} ? 'tang' : 'giam'"
+                        th:text="(${l.soLuongThayDoi > 0} ? '+' : '') + ${l.soLuongThayDoi}"></td>
+                    <td class="r" th:text="${l.tonKhoSau}"></td>
+                    <td>
+                        <a class="link" th:if="${l.donHangId != null}" th:href="@{/admin/don-hang/{id}(id=${l.donHangId})}"
+                           th:text="'Đơn hàng ' + ${l.donHangId}"></a>
+                        <span th:if="${l.nguoiThucHien != null}" th:text="${l.nguoiThucHien.hoTen} + ' (' + ${l.nguoiThucHien.maTaiKhoan} + ')'"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="empty" th:if="${lichSu.empty}">Chưa có thay đổi tồn kho.</div>
+        <nav class="pager" th:if="${lichSu.totalPages > 1}">
+            <a th:each="i : ${#numbers.sequence(0, lichSu.totalPages - 1)}"
+               th:href="@{/admin/thuc-pham/{id}(id=${mon.id}, trang=${i})}"
+               th:text="${i + 1}" th:classappend="${i == lichSu.number} ? 'on'"></a>
+        </nav>
+    </main>
+</div>
+</body>
+</html>

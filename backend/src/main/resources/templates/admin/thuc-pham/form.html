@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head(${thucPhamForm.themMoi ? 'Thêm món' : 'Sửa món'})}"></head>
+<body>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+
+    <main class="content">
+        <a class="back" th:href="${thucPhamForm.themMoi} ? @{/admin/thuc-pham} : @{/admin/thuc-pham/{id}(id=${thucPhamForm.id})}">← Quay lại</a>
+        <div class="page-head">
+            <div>
+                <h1 th:text="${thucPhamForm.themMoi} ? 'Thêm món' : 'Sửa món'">Thêm món</h1>
+                <p class="muted" th:unless="${thucPhamForm.themMoi}" th:text="'Mã món TP' + ${#numbers.formatInteger(thucPhamForm.id, 3)}"></p>
+            </div>
+        </div>
+
+        <form class="card form" method="post" novalidate th:object="${thucPhamForm}"
+              th:action="${thucPhamForm.themMoi} ? @{/admin/thuc-pham/them} : @{/admin/thuc-pham/{id}/sua(id=${thucPhamForm.id})}">
+
+            <div class="alert bad" th:if="${#fields.hasErrors('*')}">Thông tin chưa hợp lệ, xem các ô được đánh dấu bên dưới.</div>
+
+            <div class="grid">
+                <div class="field full">
+                    <label for="tenMon">Tên món *</label>
+                    <input class="input" th:field="*{tenMon}" th:errorclass="has-err" placeholder="Ví dụ: Combo bắp nước đôi">
+                    <span class="err" th:errors="*{tenMon}"></span>
+                </div>
+                <div class="field">
+                    <label for="loai">Loại *</label>
+                    <select class="input" th:field="*{loai}" th:errorclass="has-err">
+                        <option th:each="l : ${dsLoai}" th:value="${l}" th:text="${l.nhan}"></option>
+                    </select>
+                    <span class="err" th:errors="*{loai}"></span>
+                </div>
+                <div class="field">
+                    <label for="giaBan">Giá bán (đồng) *</label>
+                    <input class="input" type="number" min="1000" step="1000" th:field="*{giaBan}" th:errorclass="has-err" placeholder="45000">
+                    <span class="err" th:errors="*{giaBan}"></span>
+                    <span class="muted small" th:unless="*{themMoi}">Đổi giá chỉ áp dụng cho đơn đặt sau khi lưu.</span>
+                </div>
+                <div class="field full">
+                    <label for="thanhPhan">Thành phần</label>
+                    <input class="input" th:field="*{thanhPhan}" th:errorclass="has-err" placeholder="Ví dụ: 1 bắp lớn + 2 nước ngọt">
+                    <span class="err" th:errors="*{thanhPhan}"></span>
+                </div>
+                <div class="field">
+                    <label for="hinhAnh">Đường dẫn hình ảnh</label>
+                    <input class="input" th:field="*{hinhAnh}" th:errorclass="has-err" placeholder="/uploads/thucpham/ten-mon.jpg">
+                    <span class="err" th:errors="*{hinhAnh}"></span>
+                </div>
+                <div class="field" th:if="*{themMoi}">
+                    <label for="tonKho">Tồn kho ban đầu *</label>
+                    <input class="input" type="number" min="0" th:field="*{tonKho}" th:errorclass="has-err">
+                    <span class="err" th:errors="*{tonKho}"></span>
+                </div>
+                <div class="field" th:unless="*{themMoi}">
+                    <label>Tồn kho</label>
+                    <input class="input" th:value="*{tonKho}" disabled>
+                    <span class="muted small">Đổi tồn kho bằng Nhập hàng / Điều chỉnh ở trang chi tiết món.</span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn primary" type="submit" th:text="${thucPhamForm.themMoi} ? 'Thêm món' : 'Lưu thay đổi'">Lưu</button>
+                <a class="btn ghost" th:href="${thucPhamForm.themMoi} ? @{/admin/thuc-pham} : @{/admin/thuc-pham/{id}(id=${thucPhamForm.id})}">Hủy</a>
+            </div>
+        </form>
+    </main>
+</div>
+</body>
+</html>

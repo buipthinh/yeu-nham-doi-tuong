@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head('Giá vé')}"></head>
+<body>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+
+    <main class="content">
+        <div class="page-head">
+            <div>
+                <h1>Quản lý giá vé</h1>
+                <p class="muted">Thiết lập giá · Sửa giá · Lịch sử giá</p>
+            </div>
+            <a class="btn primary" th:href="@{/admin/gia-ve/them}">+ Thiết lập giá</a>
+        </div>
+
+        <nav th:replace="~{admin/fragments :: tabsGiaVe(${tab})}"></nav>
+        <div th:replace="~{admin/fragments :: flash}"></div>
+
+        <!-- Bang gia co hieu luc hom nay -->
+        <h2 th:text="'Bảng giá áp dụng hôm nay, ' + ${#temporals.format(homNay, 'dd/MM/yyyy')}">Bảng giá</h2>
+        <div class="card table-wrap mb" th:if="${!#lists.isEmpty(bangGia)}">
+            <table class="table bang-gia">
+                <thead>
+                <tr>
+                    <th class="l" rowspan="2">Loại vé</th>
+                    <th class="l" rowspan="2">Đối tượng</th>
+                    <th class="sep" th:each="ln : ${dsLoaiNgay}" colspan="4" th:text="${ln.nhan}"></th>
+                </tr>
+                <tr>
+                    <th:block th:each="ln : ${dsLoaiNgay}">
+                        <th th:each="kg, st : ${dsKhungGio}" th:classappend="${st.first} ? 'sep'" th:text="${kg.nhan}"
+                            th:title="${kg.moTa}"></th>
+                    </th:block>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="d : ${bangGia}">
+                    <td class="l"><b th:text="${d.tenLoaiVe}"></b></td>
+                    <td class="l" th:text="${d.tenDoiTuong}"></td>
+                    <th:block th:each="ln : ${dsLoaiNgay}">
+                        <td th:each="kg, st : ${dsKhungGio}" th:with="g=${d.gia(ln, kg)}"
+                            th:classappend="${(st.first ? 'sep ' : '') + (g == null ? 'trong' : '')}"
+                            th:text="${g == null} ? '—' : ${#numbers.formatDecimal(g / 1000, 1, 'POINT', 0, 'COMMA')} + 'k'"></td>
+                    </th:block>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="muted small">Giá tính theo nghìn đồng. Khung giờ theo giờ bắt đầu suất chiếu: Sáng trước 11:00, Trưa 11:00 – 13:59,
+            Chiều 14:00 – 17:59, Tối từ 18:00. Ô "—" là chưa có giá, khách sẽ không đặt được vé ở tổ hợp đó.</p>
+
+        <!-- Danh sach quy tac gia -->
+        <h2 class="section-title">Quy tắc giá</h2>
+        <form class="filters wide" method="get" th:action="@{/admin/gia-ve}">
+            <select class="input" name="loaiVeId" aria-label="Loại vé">
+                <option value="">Mọi loại vé</option>
+                <option th:each="lv : ${dsLoaiVe}" th:value="${lv.id}" th:text="${lv.tenLoaiVe}" th:selected="${lv.id == loaiVeId}"></option>
+            </select>
+            <select class="input" name="doiTuongId" aria-label="Đối tượng">
+                <option value="">Mọi đối tượng</option>
+                <option th:each="dt : ${dsDoiTuong}" th:value="${dt.id}" th:text="${dt.tenDoiTuong}" th:selected="${dt.id == doiTuongId}"></option>
+            </select>
+            <select class="input" name="loaiNgay" aria-label="Loại ngày">
+                <option value="">Mọi loại ngày</option>
+                <option th:each="ln : ${dsLoaiNgay}" th:value="${ln}" th:text="${ln.nhan}" th:selected="${ln == loaiNgay}"></option>
+            </select>
+            <select class="input" name="khungGio" aria-label="Khung giờ">
+                <option value="">Mọi khung giờ</option>
+                <option th:each="kg : ${dsKhungGio}" th:value="${kg}" th:text="${kg.nhan + ' (' + kg.moTa + ')'}" th:selected="${kg == khungGio}"></option>
+            </select>
+            <select class="input" name="trangThai" aria-label="Trạng thái">
+                <option value="">Mọi trạng thái</option>
+                <option th:each="tt : ${dsTrangThai}" th:value="${tt}" th:text="${tt.nhan}" th:selected="${tt == trangThai}"></option>
+            </select>
+            <div class="row">
+                <button class="btn" type="submit">Lọc</button>
+                <a class="btn ghost" th:href="@{/admin/gia-ve}">Xóa lọc</a>
+            </div>
+        </form>
+
+        <p class="muted small" th:text="'Có ' + ${ketQua.totalElements} + ' quy tắc giá'"></p>
+
+        <div class="card table-wrap" th:if="${!ketQua.empty}">
+            <table class="table">
+                <thead>
+                <tr><th>Mã</th><th>Loại vé</th><th>Đối tượng</th><th>Loại ngày</th><th>Khung giờ</th>
+                    <th class="r">Giá</th><th>Thời gian áp dụng</th><th>Trạng thái</th><th></th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="q : ${ketQua.content}">
+                    <td class="mono" th:text="${q.maQuyTac}"></td>
+                    <td th:text="${q.loaiVe.tenLoaiVe}"></td>
+                    <td th:text="${q.doiTuong.tenDoiTuong}"></td>
+                    <td><span class="pill" th:classappend="${q.loaiNgay.css}" th:text="${q.loaiNgay.nhan}"></span></td>
+                    <td><span th:text="${q.khungGio.nhan}"></span> <span class="muted small" th:text="${q.khungGio.moTa}"></span></td>
+                    <td class="r nowrap"><b th:text="${#numbers.formatDecimal(q.gia, 1, 'POINT', 0, 'COMMA')} + ' đ'"></b></td>
+                    <td class="nowrap" th:text="${#temporals.format(q.ngayBatDau, 'dd/MM/yyyy')} + ' – ' + (${q.ngayKetThuc} == null ? 'không thời hạn' : ${#temporals.format(q.ngayKetThuc, 'dd/MM/yyyy')})"></td>
+                    <td><span class="pill" th:classappend="${q.trangThai.css}" th:text="${q.trangThai.nhan}"></span></td>
+                    <td class="actions"><a class="btn sm" th:href="@{/admin/gia-ve/{id}(id=${q.id})}">Sửa</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="empty" th:if="${ketQua.empty}">Chưa có quy tắc giá phù hợp.</div>
+
+        <nav class="pager" th:if="${ketQua.totalPages > 1}">
+            <a th:each="i : ${#numbers.sequence(0, ketQua.totalPages - 1)}"
+               th:href="@{/admin/gia-ve(loaiVeId=${loaiVeId}, doiTuongId=${doiTuongId}, loaiNgay=${loaiNgay}, khungGio=${khungGio}, trangThai=${trangThai}, trang=${i})}"
+               th:text="${i + 1}" th:classappend="${i == ketQua.number} ? 'on'"></a>
+        </nav>
+    </main>
+</div>
+</body>
+</html>

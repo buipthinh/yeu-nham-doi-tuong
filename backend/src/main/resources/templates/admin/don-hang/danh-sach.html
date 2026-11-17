@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head('Đơn hàng')}"></head>
+<body>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+
+    <main class="content">
+        <div class="page-head">
+            <div>
+                <h1>Quản lý đặt vé</h1>
+                <p class="muted">Xem danh sách đơn hàng · Tra cứu vé</p>
+            </div>
+        </div>
+
+        <nav th:replace="~{admin/fragments :: tabsDonHang(${tab})}"></nav>
+        <div th:replace="~{admin/fragments :: flash}"></div>
+
+        <div class="stats">
+            <div class="card stat"><span>Đơn đặt hôm nay</span><b th:text="${donHomNay}">0</b></div>
+            <div class="card stat"><span>Chờ thanh toán</span><b th:text="${soChoThanhToan}">0</b></div>
+            <div class="card stat"><span>Đã thanh toán</span><b th:text="${soDaThanhToan}">0</b></div>
+            <div class="card stat"><span>Hết hạn / đã hủy</span>
+                <b th:text="${soHetHanHuy}">0</b></div>
+        </div>
+
+        <form class="filters wide" method="get" th:action="@{/admin/don-hang}" th:object="${loc}">
+            <input class="input" type="search" th:field="*{q}" placeholder="Mã đơn, mã vé, tên hoặc SĐT khách" aria-label="Từ khóa">
+            <select class="input" th:field="*{trangThai}" aria-label="Trạng thái">
+                <option value="">Mọi trạng thái</option>
+                <option th:each="tt : ${dsTrangThai}" th:value="${tt}" th:text="${tt.nhan}"></option>
+            </select>
+            <select class="input" th:field="*{phimId}" aria-label="Phim">
+                <option value="">Mọi phim</option>
+                <option th:each="p : ${dsPhim}" th:value="${p.id}" th:text="${p.tenPhim}"></option>
+            </select>
+            <input class="input" type="date" th:field="*{tuNgay}" aria-label="Đặt từ ngày" title="Đặt từ ngày">
+            <input class="input" type="date" th:field="*{denNgay}" aria-label="Đặt đến ngày" title="Đặt đến ngày">
+            <div class="row">
+                <button class="btn" type="submit">Tìm</button>
+                <a class="btn ghost" th:href="@{/admin/don-hang}">Xóa lọc</a>
+            </div>
+        </form>
+
+        <p class="muted small" th:text="'Tìm thấy ' + ${ketQua.totalElements} + ' đơn hàng'"></p>
+
+        <div class="card table-wrap" th:if="${!ketQua.empty}">
+            <table class="table">
+                <thead>
+                <tr><th>Mã đơn</th><th>Mã vé</th><th>Khách hàng</th><th>Phim</th><th>Suất chiếu</th>
+                    <th class="r">Số vé</th><th class="r">Tổng tiền</th><th>Thời gian đặt</th><th>Trạng thái</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="d : ${ketQua.content}">
+                    <td class="mono"><a class="link" th:href="@{/admin/don-hang/{id}(id=${d.id})}" th:text="${d.id}"></a></td>
+                    <td class="mono" th:text="${d.maVe} ?: '—'"></td>
+                    <td><span th:text="${d.hoTen}"></span><div class="muted small mono" th:text="${d.soDienThoai}"></div></td>
+                    <td th:text="${d.tenPhim}"></td>
+                    <td class="nowrap"><span th:text="${#temporals.format(d.ngayChieu, 'dd/MM/yyyy')} + ' ' + ${#temporals.format(d.gioBatDau, 'HH:mm')}"></span>
+                        <div class="muted small" th:text="${d.tenPhong}"></div></td>
+                    <td class="r" th:text="${d.soVe}"></td>
+                    <td class="r nowrap" th:text="${#numbers.formatDecimal(d.tongTien, 1, 'POINT', 0, 'COMMA')} + ' đ'"></td>
+                    <td class="nowrap" th:text="${#temporals.format(d.thoiGianDat, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td><span class="pill" th:classappend="${d.trangThai.css}" th:text="${d.trangThai.nhan}"></span>
+                        <div class="muted small" th:if="${d.phuongThuc != null and d.giaoDichThanhCong}" th:text="${d.tenPhuongThuc}"></div></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="empty" th:if="${ketQua.empty}">Không có đơn hàng phù hợp.</div>
+
+        <nav class="pager" th:if="${ketQua.totalPages > 1}">
+            <a th:each="i : ${#numbers.sequence(0, ketQua.totalPages - 1)}"
+               th:href="@{/admin/don-hang(q=${loc.q}, trangThai=${loc.trangThai}, phimId=${loc.phimId}, tuNgay=${loc.tuNgay}, denNgay=${loc.denNgay}, trang=${i})}"
+               th:text="${i + 1}" th:classappend="${i == ketQua.number} ? 'on'"></a>
+        </nav>
+    </main>
+</div>
+</body>
+</html>

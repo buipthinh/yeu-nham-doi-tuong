@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head(${tk.hoTen})}"></head>
+<body>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+
+    <main class="content">
+        <a class="back" th:href="@{/admin/tai-khoan}">← Danh sách tài khoản</a>
+        <div class="page-head">
+            <div>
+                <div class="row">
+                    <span class="pill" th:classappend="${tk.loaiTaiKhoan.css}" th:text="${tk.loaiTaiKhoan.nhan}"></span>
+                    <span class="pill" th:classappend="${tk.trangThai.css}" th:text="${tk.trangThai.nhan}"></span>
+                    <span class="mono muted" th:text="${tk.maTaiKhoan}"></span>
+                    <span class="muted small" th:if="${chinhMinh}">(tài khoản đang đăng nhập)</span>
+                </div>
+                <h1 th:text="${tk.hoTen}">Họ tên</h1>
+            </div>
+            <a class="btn" th:href="@{/admin/tai-khoan/{id}/sua(id=${tk.id})}">Sửa thông tin</a>
+        </div>
+
+        <div th:replace="~{admin/fragments :: flash}"></div>
+
+        <!-- Mat khau vua tao (UC8.1, UC8.5): chi hien 1 lan qua flash attribute -->
+        <div class="card matkhau" th:if="${matKhauMoi}">
+            <div>
+                <div class="muted small">Tên đăng nhập</div>
+                <b class="mono" th:text="${tk.tenDangNhap}"></b>
+            </div>
+            <div>
+                <div class="muted small">Mật khẩu khởi tạo</div>
+                <b class="mono" th:text="${matKhauMoi}"></b>
+            </div>
+            <p class="muted small">Mật khẩu chỉ hiển thị một lần. Hãy gửi cho người dùng ngay, tải lại trang sẽ không xem lại được.</p>
+        </div>
+
+        <div class="detail">
+            <div class="card info">
+                <h2>Thông tin tài khoản</h2>
+                <dl>
+                    <dt>Mã tài khoản</dt><dd class="mono" th:text="${tk.maTaiKhoan}"></dd>
+                    <dt>Tên đăng nhập</dt><dd class="mono" th:text="${tk.tenDangNhap}"></dd>
+                    <dt>Loại tài khoản</dt><dd th:text="${tk.loaiTaiKhoan.nhan}"></dd>
+                    <dt>Ngày sinh</dt><dd th:text="${tk.ngaySinh} ? ${#temporals.format(tk.ngaySinh, 'dd/MM/yyyy')} : '—'"></dd>
+                    <dt>Giới tính</dt><dd th:text="${tk.gioiTinh.nhan}"></dd>
+                    <dt>Số điện thoại</dt><dd class="mono" th:text="${tk.soDienThoai}"></dd>
+                    <dt>Email</dt><dd th:text="${tk.email}"></dd>
+                    <dt>Địa chỉ</dt><dd th:text="${tk.diaChi} ?: '—'"></dd>
+                    <th:block th:if="${tk.noiBo}">
+                        <dt>Ngày tuyển dụng</dt>
+                        <dd th:text="${tk.ngayTuyenDung} ? ${#temporals.format(tk.ngayTuyenDung, 'dd/MM/yyyy')} : '—'"></dd>
+                    </th:block>
+                    <dt>Ngày tạo</dt><dd th:text="${#temporals.format(tk.ngayTao, 'dd/MM/yyyy HH:mm')}"></dd>
+                    <dt>Đăng nhập gần nhất</dt>
+                    <dd th:text="${tk.lanDangNhapCuoi} ? ${#temporals.format(tk.lanDangNhapCuoi, 'dd/MM/yyyy HH:mm')} : 'Chưa đăng nhập'"></dd>
+                    <dt>Trạng thái</dt><dd th:text="${tk.trangThai.nhan}"></dd>
+                </dl>
+            </div>
+
+            <div class="side-stack">
+                <!-- UC8.2 Khoa / mo khoa -->
+                <form class="card side" method="post" th:action="@{/admin/tai-khoan/{id}/khoa(id=${tk.id})}"
+                      onsubmit="return confirm('Xác nhận thay đổi trạng thái tài khoản?')">
+                    <h2>Khóa / mở tài khoản (UC8.2)</h2>
+                    <p class="muted small" th:if="${tk.hoatDong}">Tài khoản bị khóa sẽ không đăng nhập được. Không khóa được chính mình
+                        và Admin hoạt động cuối cùng.</p>
+                    <p class="muted small" th:unless="${tk.hoatDong}">Mở khóa sẽ xóa luôn số lần nhập sai mật khẩu.</p>
+                    <button class="btn" th:classappend="${tk.hoatDong} ? 'danger' : 'primary'" type="submit"
+                            th:text="${tk.hoatDong} ? 'Khóa tài khoản' : 'Mở khóa tài khoản'">Khóa</button>
+                </form>
+
+                <!-- UC8.5 Khoi tao mat khau -->
+                <form class="card side" method="post" th:action="@{/admin/tai-khoan/{id}/mat-khau(id=${tk.id})}"
+                      onsubmit="return confirm('Đặt lại mật khẩu? Mật khẩu cũ sẽ không dùng được nữa.')">
+                    <h2>Khởi tạo mật khẩu</h2>
+                    <p class="muted small">Hệ thống sinh mật khẩu tạm mới và hiển thị một lần để gửi cho người dùng.</p>
+                    <button class="btn" type="submit">Khởi tạo mật khẩu</button>
+                </form>
+
+                <!-- UC8.6 Doi chuc vu (chi tai khoan noi bo) -->
+                <form class="card side" method="post" th:if="${tk.noiBo}"
+                      th:action="@{/admin/tai-khoan/{id}/chuc-vu(id=${tk.id})}"
+                      onsubmit="return confirm('Xác nhận đổi chức vụ?')">
+                    <h2>Chức vụ</h2>
+                    <label class="radio">
+                        <input type="radio" name="loai" value="nhanVien" th:checked="${tk.loaiTaiKhoan.name() == 'nhanVien'}">
+                        <span>Nhân viên</span>
+                    </label>
+                    <label class="radio">
+                        <input type="radio" name="loai" value="admin" th:checked="${tk.loaiTaiKhoan.name() == 'admin'}">
+                        <span>Admin</span>
+                    </label>
+                    <p class="muted small">Quyền mới có hiệu lực từ lần đăng nhập kế tiếp. Không tự đổi chức vụ của mình được.</p>
+                    <button class="btn primary" type="submit" th:disabled="${chinhMinh}">Cập nhật chức vụ</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- UC8.4 buoc 3: don da dat cua khach hang -->
+        <div th:unless="${tk.noiBo}">
+            <h2 class="section-title">Đơn đã đặt</h2>
+            <div class="card table-wrap" th:if="${!#lists.isEmpty(dsDon)}">
+                <table class="table">
+                    <thead>
+                    <tr><th>Mã đơn</th><th>Mã vé</th><th>Phim</th><th>Suất chiếu</th><th class="r">Số vé</th>
+                        <th class="r">Tổng tiền</th><th>Trạng thái</th><th>Thời gian đặt</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="d : ${dsDon}">
+                        <td class="mono" th:text="${d.id}"></td>
+                        <td class="mono" th:text="${d.maVe} ?: '—'"></td>
+                        <td th:text="${d.tenPhim}"></td>
+                        <td class="nowrap" th:text="${#temporals.format(d.ngayChieu, 'dd/MM/yyyy')} + ' ' + ${#temporals.format(d.gioBatDau, 'HH:mm')}"></td>
+                        <td class="r" th:text="${d.soVe}"></td>
+                        <td class="r nowrap" th:text="${#numbers.formatDecimal(d.tongTien, 1, 'POINT', 0, 'COMMA')} + ' đ'"></td>
+                        <td><span class="pill" th:classappend="${d.css}" th:text="${d.tenTrangThai}"></span></td>
+                        <td class="nowrap" th:text="${#temporals.format(d.thoiGianDat, 'dd/MM/yyyy HH:mm')}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="empty" th:if="${#lists.isEmpty(dsDon)}">Khách hàng chưa có đơn nào.</div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head('Lịch sử giá')}"></head>
+<body>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+
+    <main class="content">
+        <div class="page-head">
+            <div>
+                <h1>Quản lý giá vé</h1>
+                <p class="muted">Xem lịch sử giá: mỗi lần thiết lập, sửa, ngừng áp dụng đều được ghi lại</p>
+            </div>
+        </div>
+
+        <nav th:replace="~{admin/fragments :: tabsGiaVe(${tab})}"></nav>
+        <div th:replace="~{admin/fragments :: flash}"></div>
+
+        <form class="filters wide" method="get" th:action="@{/admin/gia-ve/lich-su}">
+            <select class="input" name="loaiVeId" aria-label="Loại vé" onchange="this.form.quyTacGiaId.value=''; this.form.submit()">
+                <option value="">Mọi loại vé</option>
+                <option th:each="lv : ${dsLoaiVe}" th:value="${lv.id}" th:text="${lv.tenLoaiVe}" th:selected="${lv.id == loaiVeId}"></option>
+            </select>
+            <select class="input" name="quyTacGiaId" aria-label="Quy tắc giá" th:disabled="${loaiVeId == null}">
+                <option value="" th:text="${loaiVeId == null} ? 'Chọn loại vé để lọc theo quy tắc' : 'Mọi quy tắc của loại vé'"></option>
+                <option th:each="q : ${dsQuyTac}" th:value="${q.id}" th:selected="${q.id == quyTacGiaId}"
+                        th:text="${q.maQuyTac + ' · ' + q.doiTuong.tenDoiTuong + ' · ' + q.loaiNgay.nhan + ' · ' + q.khungGio.nhan + (q.trangThai.name() == 'ngungApDung' ? ' (ngừng)' : '')}"></option>
+            </select>
+            <input class="input" type="date" name="tuNgay" th:value="${tuNgay}" aria-label="Từ ngày" title="Từ ngày">
+            <input class="input" type="date" name="denNgay" th:value="${denNgay}" aria-label="Đến ngày" title="Đến ngày">
+            <div class="row">
+                <button class="btn" type="submit">Xem</button>
+                <a class="btn ghost" th:href="@{/admin/gia-ve/lich-su}">Xóa lọc</a>
+            </div>
+        </form>
+
+        <p class="muted small" th:text="'Có ' + ${ketQua.totalElements} + ' lần thay đổi'"></p>
+
+        <div class="card table-wrap" th:if="${!ketQua.empty}">
+            <table class="table">
+                <thead>
+                <tr><th>Thời điểm</th><th>Quy tắc giá</th><th>Người thực hiện</th><th>Thao tác</th><th class="r">Giá cũ</th><th class="r">Giá mới</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="l : ${ketQua.content}">
+                    <td class="nowrap" th:text="${#temporals.format(l.thoiDiem, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td><a class="link mono" th:href="@{/admin/gia-ve/{id}(id=${l.quyTacGia.id})}" th:text="${l.quyTacGia.maQuyTac}"></a>
+                        <div class="muted small" th:text="${l.quyTacGia.moTaNgan}"></div></td>
+                    <td th:text="${l.nguoiThucHien.hoTen} + ' (' + ${l.nguoiThucHien.maTaiKhoan} + ')'"></td>
+                    <td><span class="pill" th:classappend="${l.thaoTac.css}" th:text="${l.thaoTac.nhan}"></span></td>
+                    <td class="r nowrap" th:text="${l.giaCu} == null ? '—' : ${#numbers.formatDecimal(l.giaCu, 1, 'POINT', 0, 'COMMA')} + ' đ'"></td>
+                    <td class="r nowrap"><b th:text="${#numbers.formatDecimal(l.giaMoi, 1, 'POINT', 0, 'COMMA')} + ' đ'"></b></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="empty" th:if="${ketQua.empty}">Chưa có lịch sử thay đổi giá.</div>
+
+        <nav class="pager" th:if="${ketQua.totalPages > 1}">
+            <a th:each="i : ${#numbers.sequence(0, ketQua.totalPages - 1)}"
+               th:href="@{/admin/gia-ve/lich-su(loaiVeId=${loaiVeId}, quyTacGiaId=${quyTacGiaId}, tuNgay=${tuNgay}, denNgay=${denNgay}, trang=${i})}"
+               th:text="${i + 1}" th:classappend="${i == ketQua.number} ? 'on'"></a>
+        </nav>
+    </main>
+</div>
+</body>
+</html>

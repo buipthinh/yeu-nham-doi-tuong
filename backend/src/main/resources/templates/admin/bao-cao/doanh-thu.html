@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head('Báo cáo doanh thu')}"></head>
+<body>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+
+    <main class="content">
+        <div class="page-head">
+            <div>
+                <h1>Báo cáo doanh thu</h1>
+                <p class="muted">Tính theo thời điểm thanh toán thành công</p>
+            </div>
+            <div class="row no-print">
+                <a class="btn" th:href="@{/admin/bao-cao/phim}">Mức độ quan tâm theo phim →</a>
+            </div>
+        </div>
+
+        <!-- Bo loc ky bao cao -->
+        <form class="filters report-filters no-print" method="get" th:action="@{/admin/bao-cao}">
+            <select class="input" name="ky" aria-label="Kỳ báo cáo" onchange="this.form.submit()">
+                <option th:each="k : ${dsKy}" th:value="${k}" th:text="${k.nhan}" th:selected="${k == ky}"></option>
+            </select>
+            <th:block th:if="${ky.name() != 'khoang'}">
+                <input class="input" type="date" name="ngay" th:value="${ngay}" aria-label="Ngày"
+                       th:title="${ky.name() == 'ngay'} ? 'Ngày báo cáo' : 'Chọn một ngày bất kỳ trong kỳ'">
+            </th:block>
+            <th:block th:if="${ky.name() == 'khoang'}">
+                <input class="input" type="date" name="tuNgay" th:value="${tuNgay}" aria-label="Từ ngày">
+                <input class="input" type="date" name="denNgay" th:value="${denNgay}" aria-label="Đến ngày">
+            </th:block>
+            <select class="input" name="phimId" aria-label="Phim">
+                <option value="">Tất cả phim</option>
+                <option th:each="p : ${dsPhim}" th:value="${p.id}" th:text="${p.tenPhim}" th:selected="${p.id == phimId}"></option>
+            </select>
+            <button class="btn primary" type="submit">Xem báo cáo</button>
+        </form>
+
+        <div class="alert bad" th:if="${loi}" th:text="${loi}"></div>
+
+        <th:block th:if="${bc}">
+            <div class="report-title">
+                <b th:text="'Từ ' + ${#temporals.format(bc.tuNgay, 'dd/MM/yyyy')} + ' đến ' + ${#temporals.format(bc.denNgay, 'dd/MM/yyyy')}"></b>
+                <div class="row no-print">
+                    <a class="btn sm"
+                       th:href="@{/admin/bao-cao/xuat(ky=${ky}, ngay=${ngay}, tuNgay=${tuNgay}, denNgay=${denNgay}, phimId=${phimId})}">Xuất Excel (.csv)</a>
+                    <button class="btn sm" type="button" onclick="window.print()">In / Lưu PDF</button>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="card stat"><span>Doanh thu vé</span>
+                    <b th:text="${#numbers.formatDecimal(bc.tong.doanhThuVe, 1, 'POINT', 0, 'COMMA')} + ' đ'">0 đ</b></div>
+                <div class="card stat"><span>Doanh thu thực phẩm</span>
+                    <b th:text="${#numbers.formatDecimal(bc.tong.doanhThuThucPham, 1, 'POINT', 0, 'COMMA')} + ' đ'">0 đ</b></div>
+                <div class="card stat"><span>Tổng doanh thu</span>
+                    <b th:text="${#numbers.formatDecimal(bc.tong.tongDoanhThu, 1, 'POINT', 0, 'COMMA')} + ' đ'">0 đ</b></div>
+                <div class="card stat"><span>Số đơn</span><b th:text="${bc.tong.soDon}">0</b></div>
+                <div class="card stat"><span>Số vé bán ra</span><b th:text="${bc.tong.soVe}">0</b></div>
+            </div>
+
+            <div class="empty" th:unless="${bc.coDuLieu}">Không có giao dịch nào trong kỳ đã chọn.</div>
+
+            <th:block th:if="${bc.coDuLieu}">
+                <!-- Bieu do cot tong doanh thu theo moc thoi gian -->
+                <div class="card chart-card">
+                    <h2>Tổng doanh thu theo thời gian</h2>
+                    <div class="chart">
+                        <div class="bar-col" th:each="m : ${bc.cacMoc}"
+                             th:title="${m.nhan} + ': ' + ${#numbers.formatDecimal(m.tongDoanhThu, 1, 'POINT', 0, 'COMMA')} + ' đ'">
+                            <div class="bar" th:style="'height:' + ${m.phanTram} + '%'"></div>
+                            <span class="bar-label" th:text="${m.nhan}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card table-wrap">
+                    <table class="table">
+                        <thead>
+                        <tr><th>Thời gian</th><th class="r">Doanh thu vé</th><th class="r">Doanh thu thực phẩm</th>
+                            <th class="r">Tổng doanh thu</th><th class="r">Số đơn</th><th class="r">Số vé</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="m : ${bc.mocCoDon}">
+                            <td th:text="${m.nhan}"></td>
+                            <td class="r" th:text="${#numbers.formatDecimal(m.doanhThuVe, 1, 'POINT', 0, 'COMMA')}"></td>
+                            <td class="r" th:text="${#numbers.formatDecimal(m.doanhThuThucPham, 1, 'POINT', 0, 'COMMA')}"></td>
+                            <td class="r" th:text="${#numbers.formatDecimal(m.tongDoanhThu, 1, 'POINT', 0, 'COMMA')}"></td>
+                            <td class="r" th:text="${m.soDon}"></td>
+                            <td class="r" th:text="${m.soVe}"></td>
+                        </tr>
+                        <tr class="total">
+                            <td>Tổng</td>
+                            <td class="r" th:text="${#numbers.formatDecimal(bc.tong.doanhThuVe, 1, 'POINT', 0, 'COMMA')}"></td>
+                            <td class="r" th:text="${#numbers.formatDecimal(bc.tong.doanhThuThucPham, 1, 'POINT', 0, 'COMMA')}"></td>
+                            <td class="r" th:text="${#numbers.formatDecimal(bc.tong.tongDoanhThu, 1, 'POINT', 0, 'COMMA')}"></td>
+                            <td class="r" th:text="${bc.tong.soDon}"></td>
+                            <td class="r" th:text="${bc.tong.soVe}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </th:block>
+        </th:block>
+    </main>
+</div>
+</body>
+</html>

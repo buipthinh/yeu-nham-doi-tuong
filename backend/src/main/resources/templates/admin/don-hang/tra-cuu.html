@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head('Tra cứu vé')}"></head>
+<body>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+
+    <main class="content">
+        <div class="page-head">
+            <div>
+                <h1>Quản lý đặt vé</h1>
+                <p class="muted">Tra cứu vé theo mã vé, mã đơn hoặc số điện thoại khách</p>
+            </div>
+        </div>
+
+        <nav th:replace="~{admin/fragments :: tabsDonHang(${tab})}"></nav>
+
+        <form class="card pad tra-cuu" method="get" th:action="@{/admin/don-hang/tra-cuu}">
+            <div class="checks">
+                <label class="chk"><input type="radio" name="kieu" value="maVe" th:checked="${kieu == 'maVe'}"> Mã vé</label>
+                <label class="chk"><input type="radio" name="kieu" value="maDon" th:checked="${kieu == 'maDon'}"> Mã đơn</label>
+                <label class="chk"><input type="radio" name="kieu" value="sdt" th:checked="${kieu == 'sdt'}"> Số điện thoại</label>
+            </div>
+            <input class="input mono" type="search" name="q" th:value="${q}" autofocus required
+                   placeholder="Ví dụ: AB12CD34, 125 hoặc 0912345678" aria-label="Thông tin tra cứu">
+            <button class="btn primary" type="submit">Tra cứu</button>
+        </form>
+
+        <div class="alert bad" th:if="${loi}" th:text="${loi}"></div>
+
+        <!-- Mot ket qua: hien day du thong tin thanh toan -->
+        <th:block th:if="${ketQua != null and #lists.size(ketQua) == 1}" th:with="d=${ketQua[0]}">
+            <div class="detail">
+                <div class="card info">
+                    <div class="row">
+                        <span class="pill" th:classappend="${d.trangThai.css}" th:text="${d.trangThai.nhan}"></span>
+                        <span class="muted" th:text="'Đơn hàng ' + ${d.id}"></span>
+                    </div>
+                    <h2 class="section-title" th:text="${d.tenPhim}"></h2>
+                    <dl>
+                        <dt>Mã vé</dt><dd class="mono"><b th:text="${d.maVe} ?: 'Chưa cấp (đơn chưa thanh toán)'"></b></dd>
+                        <dt>Khách hàng</dt><dd th:text="${d.hoTen} + ' · ' + ${d.soDienThoai}"></dd>
+                        <dt>Suất chiếu</dt>
+                        <dd th:text="${#temporals.format(d.ngayChieu, 'dd/MM/yyyy')} + ' ' + ${#temporals.format(d.gioBatDau, 'HH:mm')} + ' · ' + ${d.tenPhong}"></dd>
+                        <dt>Số vé</dt><dd th:text="${d.soVe}"></dd>
+                        <dt>Tổng tiền</dt><dd th:text="${#numbers.formatDecimal(d.tongTien, 1, 'POINT', 0, 'COMMA')} + ' đ'"></dd>
+                        <dt>Thời gian đặt</dt><dd th:text="${#temporals.format(d.thoiGianDat, 'dd/MM/yyyy HH:mm')}"></dd>
+                    </dl>
+                    <div class="form-actions">
+                        <a class="btn" th:href="@{/admin/don-hang/{id}(id=${d.id})}">Xem chi tiết đơn</a>
+                    </div>
+                </div>
+                <div class="card side">
+                    <h2>Trạng thái thanh toán</h2>
+                    <th:block th:if="${d.giaoDichThanhCong}">
+                        <p><span class="pill ok">Đã thanh toán</span></p>
+                        <dl class="small">
+                            <dt class="muted">Phương thức</dt><dd th:text="${d.tenPhuongThuc}"></dd>
+                            <dt class="muted">Số tiền</dt><dd th:text="${#numbers.formatDecimal(d.soTienThanhToan, 1, 'POINT', 0, 'COMMA')} + ' đ'"></dd>
+                            <dt class="muted">Mã giao dịch</dt><dd class="mono" th:text="${d.maGiaoDichCong}"></dd>
+                            <dt class="muted">Thời gian</dt><dd th:text="${#temporals.format(d.thoiGianThanhToan, 'dd/MM/yyyy HH:mm:ss')}"></dd>
+                        </dl>
+                    </th:block>
+                    <th:block th:unless="${d.giaoDichThanhCong}">
+                        <p><span class="pill" th:classappend="${d.trangThai.css}" th:text="${d.trangThai.nhan}"></span></p>
+                        <p th:if="${d.trangThai.name() == 'choThanhToan'}">Còn giữ ghế:
+                            <span class="dem-nguoc" th:attr="data-giay=${d.conLaiGiay}" th:text="${d.conLai}"></span></p>
+                        <p class="muted small" th:if="${d.phuongThuc != null}"
+                           th:text="'Lần thanh toán gần nhất qua ' + ${d.tenPhuongThuc} + ' bị thất bại.'"></p>
+                    </th:block>
+                </div>
+            </div>
+        </th:block>
+
+        <!-- Nhieu ket qua (tra theo so dien thoai) -->
+        <th:block th:if="${ketQua != null and #lists.size(ketQua) > 1}">
+            <p class="muted small" th:text="'Có ' + ${#lists.size(ketQua)} + ' đơn hàng, mới nhất trước'"></p>
+            <div class="card table-wrap">
+                <table class="table">
+                    <thead>
+                    <tr><th>Mã đơn</th><th>Mã vé</th><th>Phim, suất chiếu</th><th class="r">Tổng tiền</th><th>Thanh toán</th><th>Trạng thái</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="d : ${ketQua}">
+                        <td class="mono"><a class="link" th:href="@{/admin/don-hang/{id}(id=${d.id})}" th:text="${d.id}"></a></td>
+                        <td class="mono" th:text="${d.maVe} ?: '—'"></td>
+                        <td><span th:text="${d.tenPhim}"></span>
+                            <div class="muted small" th:text="${#temporals.format(d.ngayChieu, 'dd/MM/yyyy')} + ' ' + ${#temporals.format(d.gioBatDau, 'HH:mm')} + ' · ' + ${d.tenPhong}"></div></td>
+                        <td class="r nowrap" th:text="${#numbers.formatDecimal(d.tongTien, 1, 'POINT', 0, 'COMMA')} + ' đ'"></td>
+                        <td class="small">
+                            <th:block th:if="${d.giaoDichThanhCong}">
+                                <span th:text="${d.tenPhuongThuc}"></span>
+                                <div class="muted mono" th:text="${d.maGiaoDichCong}"></div>
+                                <div class="muted" th:text="${#temporals.format(d.thoiGianThanhToan, 'dd/MM/yyyy HH:mm')}"></div>
+                            </th:block>
+                            <span th:if="${!d.giaoDichThanhCong and d.trangThai.name() == 'choThanhToan'}">Còn giữ ghế
+                                <span class="dem-nguoc" th:attr="data-giay=${d.conLaiGiay}" th:text="${d.conLai}"></span></span>
+                            <span class="muted" th:if="${!d.giaoDichThanhCong and d.trangThai.name() != 'choThanhToan'}">—</span>
+                        </td>
+                        <td><span class="pill" th:classappend="${d.trangThai.css}" th:text="${d.trangThai.nhan}"></span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </th:block>
+
+        <div class="empty" th:if="${q == null}">Chọn cách tra cứu và nhập mã vé, mã đơn hoặc số điện thoại của khách.</div>
+    </main>
+</div>
+
+<!-- Dem nguoc thoi gian giu ghe (dung lai o trang chi tiet don) -->
+<script th:fragment="demNguoc">
+    (function () {
+        var ds = document.querySelectorAll('.dem-nguoc[data-giay]');
+        if (!ds.length) return;
+        function hien(el, s) {
+            var m = Math.floor(s / 60), g = s % 60;
+            el.textContent = (m < 10 ? '0' : '') + m + ':' + (g < 10 ? '0' : '') + g;
+        }
+        var batDau = Date.now();
+        setInterval(function () {
+            ds.forEach(function (el) {
+                var s = Math.max(0, parseInt(el.dataset.giay, 10) - Math.floor((Date.now() - batDau) / 1000));
+                hien(el, s);
+            });
+        }, 1000);
+    })();
+</script>
+</body>
+</html>

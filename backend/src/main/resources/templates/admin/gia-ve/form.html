@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head(${quyTacGiaForm.themMoi ? 'Thiết lập giá vé' : 'Sửa quy tắc giá'})}"></head>
+<body>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+
+    <main class="content">
+        <a class="back" th:href="@{/admin/gia-ve}">← Danh sách quy tắc giá</a>
+        <div class="page-head">
+            <div>
+                <h1 th:text="${quyTacGiaForm.themMoi} ? 'Thiết lập giá vé' : 'Sửa quy tắc giá'">Thiết lập giá</h1>
+                <p class="muted" th:unless="${quyTacGiaForm.themMoi}"
+                   th:text="'QG' + ${#numbers.formatInteger(quyTacGiaForm.id, 4)} + ' · ' + ${quyTacGiaForm.moTaNgan}"></p>
+            </div>
+        </div>
+
+        <div th:replace="~{admin/fragments :: flash}"></div>
+
+        <form class="card form" method="post" novalidate th:object="${quyTacGiaForm}"
+              th:action="${quyTacGiaForm.themMoi} ? @{/admin/gia-ve/them} : @{/admin/gia-ve/{id}(id=${quyTacGiaForm.id})}">
+
+            <div class="alert bad" th:if="${#fields.hasErrors('*')}">Thông tin chưa hợp lệ, xem các ô được đánh dấu bên dưới.</div>
+
+            <!-- Khi sua: cac truong nay co dinh, gui kem de qua buoc kiem tra @Valid (server van lay lai tu database) -->
+            <th:block th:unless="*{themMoi}">
+                <input type="hidden" th:field="*{loaiVeId}">
+                <input type="hidden" th:field="*{doiTuongId}">
+                <input type="hidden" th:field="*{loaiNgay}">
+                <input type="hidden" th:field="*{khungGio}">
+            </th:block>
+
+            <div class="grid">
+                <th:block th:if="*{themMoi}">
+                    <div class="field">
+                        <label for="loaiVeId">Loại vé *</label>
+                        <select class="input" th:field="*{loaiVeId}" th:errorclass="has-err">
+                            <option value="">Chọn loại vé đang áp dụng</option>
+                            <option th:each="lv : ${dsLoaiVe}" th:value="${lv.id}" th:text="${lv.tenLoaiVe}"
+                                    th:attr="data-dt=${lv.idCacDoiTuong}"></option>
+                        </select>
+                        <span class="err" th:errors="*{loaiVeId}"></span>
+                    </div>
+                    <div class="field">
+                        <label for="doiTuongId">Đối tượng *</label>
+                        <select class="input" th:field="*{doiTuongId}" th:errorclass="has-err">
+                            <option value="">Chọn đối tượng</option>
+                            <option th:each="dt : ${dsDoiTuong}" th:value="${dt.id}" th:text="${dt.tenDoiTuong}"></option>
+                        </select>
+                        <span class="err" th:errors="*{doiTuongId}"></span>
+                        <span class="muted small">Chỉ hiện các đối tượng đã gán cho loại vé đã chọn.</span>
+                    </div>
+                    <div class="field">
+                        <label for="loaiNgay">Loại ngày *</label>
+                        <select class="input" th:field="*{loaiNgay}" th:errorclass="has-err">
+                            <option value="">Chọn loại ngày</option>
+                            <option th:each="ln : ${dsLoaiNgay}" th:value="${ln}" th:text="${ln.nhan}"></option>
+                        </select>
+                        <span class="err" th:errors="*{loaiNgay}"></span>
+                    </div>
+                    <div class="field">
+                        <label for="khungGio">Khung giờ *</label>
+                        <select class="input" th:field="*{khungGio}" th:errorclass="has-err">
+                            <option value="">Chọn khung giờ</option>
+                            <option th:each="kg : ${dsKhungGio}" th:value="${kg}" th:text="${kg.nhan + ' (' + kg.moTa + ')'}"></option>
+                        </select>
+                        <span class="err" th:errors="*{khungGio}"></span>
+                    </div>
+                </th:block>
+
+                <div class="field">
+                    <label for="gia">Giá vé (đồng) *</label>
+                    <input class="input" type="number" min="1000" step="1000" th:field="*{gia}" th:errorclass="has-err" placeholder="75000">
+                    <span class="err" th:errors="*{gia}"></span>
+                </div>
+                <div class="field" th:unless="*{themMoi}">
+                    <label for="trangThai">Trạng thái</label>
+                    <select class="input" th:field="*{trangThai}" th:errorclass="has-err">
+                        <option th:each="tt : ${dsTrangThai}" th:value="${tt}" th:text="${tt.nhan}"></option>
+                    </select>
+                    <span class="err" th:errors="*{trangThai}"></span>
+                </div>
+                <div class="field" th:if="*{themMoi}"></div>
+                <div class="field">
+                    <label for="ngayBatDau">Áp dụng từ ngày *</label>
+                    <input class="input" type="date" th:field="*{ngayBatDau}" th:errorclass="has-err">
+                    <span class="err" th:errors="*{ngayBatDau}"></span>
+                </div>
+                <div class="field">
+                    <label for="ngayKetThuc">Đến ngày</label>
+                    <input class="input" type="date" th:field="*{ngayKetThuc}" th:errorclass="has-err">
+                    <span class="err" th:errors="*{ngayKetThuc}"></span>
+                    <span class="muted small">Để trống nếu áp dụng không thời hạn.</span>
+                </div>
+            </div>
+
+            <p class="muted small">Mỗi tổ hợp loại vé, đối tượng, loại ngày, khung giờ chỉ có một quy tắc đang áp dụng trong cùng khoảng thời gian.
+                Giá mới chỉ áp dụng cho đơn đặt sau khi lưu, vé đã bán giữ nguyên giá.</p>
+
+            <div class="form-actions">
+                <button class="btn primary" type="submit" th:text="${quyTacGiaForm.themMoi} ? 'Lưu quy tắc giá' : 'Lưu thay đổi'">Lưu</button>
+                <a class="btn ghost" th:href="@{/admin/gia-ve}">Hủy</a>
+            </div>
+        </form>
+
+        <!-- Lich su cua quy tac nay -->
+        <th:block th:unless="${quyTacGiaForm.themMoi}">
+            <h2 class="section-title">Lịch sử thay đổi của quy tắc</h2>
+            <div class="card table-wrap" th:if="${!#lists.isEmpty(lichSu)}">
+                <table class="table">
+                    <thead><tr><th>Thời điểm</th><th>Người thực hiện</th><th>Thao tác</th><th class="r">Giá cũ</th><th class="r">Giá mới</th></tr></thead>
+                    <tbody>
+                    <tr th:each="l : ${lichSu}">
+                        <td class="nowrap" th:text="${#temporals.format(l.thoiDiem, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td th:text="${l.nguoiThucHien.hoTen} + ' (' + ${l.nguoiThucHien.maTaiKhoan} + ')'"></td>
+                        <td><span class="pill" th:classappend="${l.thaoTac.css}" th:text="${l.thaoTac.nhan}"></span></td>
+                        <td class="r nowrap" th:text="${l.giaCu} == null ? '—' : ${#numbers.formatDecimal(l.giaCu, 1, 'POINT', 0, 'COMMA')} + ' đ'"></td>
+                        <td class="r nowrap" th:text="${#numbers.formatDecimal(l.giaMoi, 1, 'POINT', 0, 'COMMA')} + ' đ'"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="empty" th:if="${#lists.isEmpty(lichSu)}">Chưa có lịch sử thay đổi giá.</div>
+        </th:block>
+    </main>
+</div>
+
+<!-- Loc danh sach doi tuong theo loai ve dang chon -->
+<script th:if="${quyTacGiaForm.themMoi}">
+    (function () {
+        var lv = document.getElementById('loaiVeId');
+        var dt = document.getElementById('doiTuongId');
+        if (!lv || !dt) return;
+        function loc() {
+            var opt = lv.options[lv.selectedIndex];
+            var ds = opt && opt.dataset.dt ? opt.dataset.dt.split(',') : null;
+            for (var i = 0; i < dt.options.length; i++) {
+                var o = dt.options[i];
+                if (!o.value) continue;
+                var hien = !ds || ds.indexOf(o.value) >= 0;
+                o.hidden = !hien;
+                o.disabled = !hien;
+                if (!hien && o.selected) dt.value = '';
+            }
+        }
+        lv.addEventListener('change', loc);
+        loc();
+    })();
+</script>
+</body>
+</html>

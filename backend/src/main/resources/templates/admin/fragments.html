@@ -24,12 +24,12 @@
         <a th:href="@{/admin/suat-chieu}" th:classappend="${menu == 'suatChieu'} ? 'on'">Suất chiếu</a>
         <a class="soon" title="Sẽ làm sau">Phòng &amp; sơ đồ ghế</a>
         <div class="grp">Giá &amp; dịch vụ</div>
-        <a class="soon" title="Sẽ làm sau">Giá vé</a>
-        <a class="soon" title="Sẽ làm sau">Thực phẩm</a>
-        <a class="soon" title="Sẽ làm sau">Đơn hàng</a>
+        <a th:href="@{/admin/gia-ve}" th:classappend="${menu == 'gia-ve'} ? 'on'">Giá vé</a>
+        <a th:href="@{/admin/thuc-pham}" th:classappend="${menu == 'thuc-pham'} ? 'on'">Thực phẩm</a>
+        <a th:href="@{/admin/don-hang}" th:classappend="${menu == 'don-hang'} ? 'on'">Đơn hàng</a>
         <div class="grp">Hệ thống</div>
-        <a class="soon" title="Sẽ làm sau">Tài khoản</a>
-        <a class="soon" title="Sẽ làm sau">Báo cáo</a>
+        <a th:href="@{/admin/tai-khoan}" th:classappend="${menu == 'tai-khoan'} ? 'on'">Tài khoản</a>
+        <a th:href="@{/admin/bao-cao}" th:classappend="${menu == 'bao-cao'} ? 'on'">Báo cáo</a>
         <a class="soon" title="Sẽ làm sau">Cài đặt</a>
     </nav>
 </aside>
@@ -39,6 +39,19 @@
     <div class="alert ok" th:if="${thongBao}" th:text="${thongBao}"></div>
     <div class="alert bad" th:if="${loi}" th:text="${loi}"></div>
 </div>
+
+<!-- Tab con cua muc Gia ve (UC5): tab = quy-tac | loai-ve | lich-su -->
+<nav th:fragment="tabsGiaVe(tab)" class="tabs">
+    <a th:href="@{/admin/gia-ve}" th:classappend="${tab == 'quy-tac'} ? 'on'">Quy tắc giá</a>
+    <a th:href="@{/admin/loai-ve}" th:classappend="${tab == 'loai-ve'} ? 'on'">Loại vé &amp; đối tượng</a>
+    <a th:href="@{/admin/gia-ve/lich-su}" th:classappend="${tab == 'lich-su'} ? 'on'">Lịch sử giá</a>
+</nav>
+
+<!-- Tab con cua muc Don hang (UC6.2): tab = danh-sach | tra-cuu -->
+<nav th:fragment="tabsDonHang(tab)" class="tabs">
+    <a th:href="@{/admin/don-hang}" th:classappend="${tab == 'danh-sach'} ? 'on'">Danh sách đơn hàng</a>
+    <a th:href="@{/admin/don-hang/tra-cuu}" th:classappend="${tab == 'tra-cuu'} ? 'on'">Tra cứu vé</a>
+</nav>
 
 </body>
 </html>

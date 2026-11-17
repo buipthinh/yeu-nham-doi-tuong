@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head('Loại vé')}"></head>
+<body>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+
+    <main class="content">
+        <div class="page-head">
+            <div>
+                <h1>Quản lý giá vé</h1>
+                <p class="muted">Thêm loại vé · Sửa · Đổi trạng thái · Đối tượng áp dụng</p>
+            </div>
+            <a class="btn primary" th:href="@{/admin/loai-ve/them}">+ Thêm loại vé</a>
+        </div>
+
+        <nav th:replace="~{admin/fragments :: tabsGiaVe(${tab})}"></nav>
+        <div th:replace="~{admin/fragments :: flash}"></div>
+
+        <div class="detail">
+            <div class="card table-wrap">
+                <table class="table">
+                    <thead>
+                    <tr><th>Loại vé</th><th class="r">Số chỗ / vé</th><th>Đối tượng áp dụng</th>
+                        <th class="r">Số ghế</th><th class="r">Giá đang áp dụng</th><th>Trạng thái</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="lv : ${dsLoaiVe}">
+                        <td><a class="link" th:href="@{/admin/loai-ve/{id}(id=${lv.id})}"><b th:text="${lv.tenLoaiVe}"></b></a>
+                            <div class="muted small" th:text="${lv.moTa}"></div></td>
+                        <td class="r" th:text="${lv.soChoMoiVe}"></td>
+                        <td class="small" th:text="${lv.tenCacDoiTuong}"></td>
+                        <td class="r" th:text="${soGhe.get(lv.id)}"></td>
+                        <td class="r" th:text="${soGia.get(lv.id)} + ' quy tắc'"></td>
+                        <td><span class="pill" th:classappend="${lv.trangThai.css}" th:text="${lv.trangThai.nhan}"></span></td>
+                        <td class="actions"><a class="btn sm ghost" th:href="@{/admin/loai-ve/{id}(id=${lv.id})}">Chi tiết</a></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="empty" th:if="${#lists.isEmpty(dsLoaiVe)}">Chưa có loại vé.</div>
+            </div>
+
+            <div class="card side">
+                <h2>Đối tượng</h2>
+                <p class="muted small">Đối tượng dùng để tính giá (ví dụ Người lớn, Học sinh – Sinh viên). Người lớn luôn áp dụng cho mọi loại vé.</p>
+                <ul>
+                    <li th:each="dt : ${dsDoiTuong}" th:text="${dt.tenDoiTuong}"></li>
+                </ul>
+                <form method="post" th:action="@{/admin/loai-ve/doi-tuong}" class="field">
+                    <label for="tenDoiTuong">Thêm đối tượng mới</label>
+                    <input class="input" id="tenDoiTuong" name="tenDoiTuong" maxlength="50" placeholder="Ví dụ: Trẻ em" required>
+                    <button class="btn" type="submit">Thêm đối tượng</button>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

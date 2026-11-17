@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head('Mức độ quan tâm theo phim')}"></head>
+<body>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+
+    <main class="content">
+        <a class="back no-print" th:href="@{/admin/bao-cao}">← Báo cáo doanh thu</a>
+        <div class="page-head">
+            <div>
+                <h1>Mức độ quan tâm theo phim</h1>
+                <p class="muted">Tính trên các suất chiếu có ngày chiếu nằm trong kỳ</p>
+            </div>
+        </div>
+
+        <form class="filters report-filters no-print" method="get" th:action="@{/admin/bao-cao/phim}">
+            <input class="input" type="date" name="tuNgay" th:value="${tuNgay}" aria-label="Từ ngày">
+            <input class="input" type="date" name="denNgay" th:value="${denNgay}" aria-label="Đến ngày">
+            <button class="btn primary" type="submit">Xem báo cáo</button>
+        </form>
+
+        <div class="alert bad" th:if="${loi}" th:text="${loi}"></div>
+
+        <div class="report-title" th:unless="${loi}">
+            <b th:text="'Từ ' + ${#temporals.format(tuNgay, 'dd/MM/yyyy')} + ' đến ' + ${#temporals.format(denNgay, 'dd/MM/yyyy')}"></b>
+            <div class="row no-print" th:if="${!#lists.isEmpty(ds)}">
+                <a class="btn sm" th:href="@{/admin/bao-cao/phim/xuat(tuNgay=${tuNgay}, denNgay=${denNgay})}">Xuất Excel (.csv)</a>
+                <button class="btn sm" type="button" onclick="window.print()">In / Lưu PDF</button>
+            </div>
+        </div>
+
+        <div class="empty" th:if="${#lists.isEmpty(ds) and loi == null}">Không có suất chiếu nào trong kỳ đã chọn.</div>
+
+        <th:block th:if="${!#lists.isEmpty(ds)}">
+            <div class="card table-wrap">
+                <table class="table">
+                    <thead>
+                    <tr><th class="r">Hạng</th><th>Phim</th><th class="r">Suất chiếu</th><th class="r">Vé bán ra</th><th class="r">Số đơn</th>
+                        <th class="r">Ghế đã bán / Tổng ghế</th><th class="r">Tỷ lệ lấp đầy</th><th class="r">Doanh thu vé</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="t, st : ${ds}">
+                        <td class="r" th:text="${st.count}"></td>
+                        <td><a class="link" th:href="@{/admin/phim/{id}(id=${t.phimId})}" th:text="${t.tenPhim}"></a></td>
+                        <td class="r" th:text="${t.soSuatChieu}"></td>
+                        <td class="r"><b th:text="${t.soVe}"></b></td>
+                        <td class="r" th:text="${t.soDon}"></td>
+                        <td class="r" th:text="${t.soGheDaBan} + ' / ' + ${t.tongSoGhe}"></td>
+                        <td class="r" th:text="${#numbers.formatDecimal(t.tyLeLapDay, 1, 1, 'COMMA')} + '%'"></td>
+                        <td class="r" th:text="${#numbers.formatDecimal(t.doanhThuVe, 1, 'POINT', 0, 'COMMA')} + ' đ'"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Bieu do ngang: xep hang theo so ve -->
+            <div class="card chart-card">
+                <h2>Xếp hạng phim theo số vé bán ra</h2>
+                <div class="hbar" th:each="t : ${ds}">
+                    <span class="hbar-name" th:text="${t.tenPhim}"></span>
+                    <div class="hbar-track"><div class="hbar-fill" th:style="'width:' + ${t.phanTram} + '%'"></div></div>
+                    <span class="hbar-val" th:text="${t.soVe}"></span>
+                </div>
+            </div>
+        </th:block>
+    </main>
+</div>
+</body>
+</html>

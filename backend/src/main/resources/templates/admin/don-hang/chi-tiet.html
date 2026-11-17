@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head('Đơn hàng ' + ${ct.don.id})}"></head>
+<body>
+<div class="layout" th:with="d=${ct.don}">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+
+    <main class="content">
+        <a class="back" th:href="@{/admin/don-hang}">← Danh sách đơn hàng</a>
+        <div class="page-head">
+            <div>
+                <div class="row">
+                    <span class="pill" th:classappend="${d.trangThai.css}" th:text="${d.trangThai.nhan}"></span>
+                    <span class="muted" th:text="'Đặt lúc ' + ${#temporals.format(d.thoiGianDat, 'dd/MM/yyyy HH:mm:ss')}"></span>
+                </div>
+                <h1 th:text="'Đơn hàng ' + ${d.id}">Đơn hàng</h1>
+                <p class="muted" th:if="${d.maVe != null}">Mã vé: <b class="mono" th:text="${d.maVe}"></b></p>
+            </div>
+            <button class="btn no-print" type="button" onclick="window.print()">In đơn</button>
+        </div>
+
+        <div class="alert info" th:if="${d.trangThai.name() == 'choThanhToan'}">
+            Đơn đang giữ ghế, còn <span class="dem-nguoc" th:attr="data-giay=${d.conLaiGiay}" th:text="${d.conLai}">05:00</span>
+            (hết hạn lúc <span th:text="${#temporals.format(d.hanGiuGhe, 'HH:mm:ss dd/MM/yyyy')}"></span>). Quá hạn chưa thanh toán thì ghế tự trả lại.
+        </div>
+
+        <div class="stats">
+            <div class="card stat"><span>Số vé</span><b th:text="${d.soVe}">0</b></div>
+            <div class="card stat"><span>Tiền vé</span><b th:text="${#numbers.formatDecimal(d.tongTienVe, 1, 'POINT', 0, 'COMMA')} + ' đ'">0</b></div>
+            <div class="card stat"><span>Tiền bắp nước</span><b th:text="${#numbers.formatDecimal(d.tongTienThucPham, 1, 'POINT', 0, 'COMMA')} + ' đ'">0</b></div>
+            <div class="card stat"><span>Tổng tiền</span><b th:text="${#numbers.formatDecimal(d.tongTien, 1, 'POINT', 0, 'COMMA')} + ' đ'">0</b></div>
+        </div>
+
+        <div class="detail">
+            <div class="card info">
+                <h2>Thông tin đặt vé</h2>
+                <dl>
+                    <dt>Khách hàng</dt>
+                    <dd><a class="link" th:href="@{/admin/tai-khoan/{id}(id=${d.taiKhoanId})}" th:text="${d.hoTen}"></a></dd>
+                    <dt>Số điện thoại</dt><dd class="mono" th:text="${d.soDienThoai}"></dd>
+                    <dt>Email</dt><dd th:text="${d.email}"></dd>
+                    <dt>Phim</dt><dd><b th:text="${d.tenPhim}"></b></dd>
+                    <dt>Phòng chiếu</dt><dd th:text="${d.tenPhong}"></dd>
+                    <dt>Suất chiếu</dt>
+                    <dd th:text="${#temporals.format(d.ngayChieu, 'dd/MM/yyyy')} + ', ' + ${#temporals.format(d.gioBatDau, 'HH:mm')} + ' – ' + ${#temporals.format(d.gioKetThuc, 'HH:mm')}"></dd>
+                    <dt>Ghế</dt><dd th:text="${#strings.listJoin(ct.dsVe.![maGhe], ', ')}"></dd>
+                </dl>
+            </div>
+
+            <div class="card side">
+                <h2>Thanh toán</h2>
+                <th:block th:if="${d.giaoDichThanhCong}">
+                    <p><span class="pill ok">Đã thanh toán</span></p>
+                    <dl class="small">
+                        <dt class="muted">Phương thức</dt><dd th:text="${d.tenPhuongThuc}"></dd>
+                        <dt class="muted">Số tiền</dt><dd th:text="${#numbers.formatDecimal(d.soTienThanhToan, 1, 'POINT', 0, 'COMMA')} + ' đ'"></dd>
+                        <dt class="muted">Mã giao dịch</dt><dd class="mono" th:text="${d.maGiaoDichCong}"></dd>
+                        <dt class="muted">Thời gian</dt><dd th:text="${#temporals.format(d.thoiGianThanhToan, 'dd/MM/yyyy HH:mm:ss')}"></dd>
+                    </dl>
+                </th:block>
+                <p th:unless="${d.giaoDichThanhCong}" class="muted"
+                   th:text="${#lists.isEmpty(ct.dsGiaoDich)} ? 'Chưa có giao dịch thanh toán.' : 'Chưa có giao dịch thành công.'"></p>
+                <p class="muted small">Xác nhận hoặc hủy đơn thủ công không thuộc chức năng này; trạng thái đơn do cổng thanh toán và hệ thống cập nhật.</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">Vé và ghế</h2>
+        <div class="card table-wrap" th:if="${!#lists.isEmpty(ct.dsVe)}">
+            <table class="table">
+                <thead><tr><th>Ghế</th><th>Loại vé</th><th>Đối tượng</th><th class="r">Giá vé</th><th>Trạng thái ghế</th></tr></thead>
+                <tbody>
+                <tr th:each="v : ${ct.dsVe}">
+                    <td class="mono"><b th:text="${v.maGhe}"></b></td>
+                    <td th:text="${v.tenLoaiVe}"></td>
+                    <td th:text="${v.tenDoiTuong}"></td>
+                    <td class="r nowrap" th:text="${#numbers.formatDecimal(v.giaVe, 1, 'POINT', 0, 'COMMA')} + ' đ'"></td>
+                    <td th:text="${v.tenTrangThaiGhe}"></td>
+                </tr>
+                <tr class="total"><td colspan="3">Tổng tiền vé</td>
+                    <td class="r nowrap" th:text="${#numbers.formatDecimal(d.tongTienVe, 1, 'POINT', 0, 'COMMA')} + ' đ'"></td><td></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="empty" th:if="${#lists.isEmpty(ct.dsVe)}">Đơn không có vé.</div>
+
+        <h2 class="section-title">Bắp nước</h2>
+        <div class="card table-wrap" th:if="${!#lists.isEmpty(ct.dsMon)}">
+            <table class="table">
+                <thead><tr><th>Món</th><th class="r">Số lượng</th><th class="r">Đơn giá lúc đặt</th><th class="r">Thành tiền</th></tr></thead>
+                <tbody>
+                <tr th:each="m : ${ct.dsMon}">
+                    <td><a class="link" th:href="@{/admin/thuc-pham/{id}(id=${m.thucPhamId})}" th:text="${m.tenMon}"></a></td>
+                    <td class="r" th:text="${m.soLuong}"></td>
+                    <td class="r nowrap" th:text="${#numbers.formatDecimal(m.donGia, 1, 'POINT', 0, 'COMMA')} + ' đ'"></td>
+                    <td class="r nowrap" th:text="${#numbers.formatDecimal(m.thanhTien, 1, 'POINT', 0, 'COMMA')} + ' đ'"></td>
+                </tr>
+                <tr class="total"><td colspan="3">Tổng tiền bắp nước</td>
+                    <td class="r nowrap" th:text="${#numbers.formatDecimal(d.tongTienThucPham, 1, 'POINT', 0, 'COMMA')} + ' đ'"></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="empty" th:if="${#lists.isEmpty(ct.dsMon)}">Đơn không mua bắp nước.</div>
+
+        <h2 class="section-title">Lịch sử thanh toán</h2>
+        <div class="card table-wrap" th:if="${!#lists.isEmpty(ct.dsGiaoDich)}">
+            <table class="table">
+                <thead><tr><th>Thời gian</th><th>Phương thức</th><th>Mã giao dịch cổng</th><th class="r">Số tiền</th><th>Kết quả</th></tr></thead>
+                <tbody>
+                <tr th:each="g : ${ct.dsGiaoDich}">
+                    <td class="nowrap" th:text="${#temporals.format(g.thoiGian, 'dd/MM/yyyy HH:mm:ss')}"></td>
+                    <td th:text="${g.tenPhuongThuc}"></td>
+                    <td class="mono small" th:text="${g.maGiaoDichCong}"></td>
+                    <td class="r nowrap" th:text="${#numbers.formatDecimal(g.soTien, 1, 'POINT', 0, 'COMMA')} + ' đ'"></td>
+                    <td><span class="pill" th:classappend="${g.thanhCong} ? 'ok' : 'bad'" th:text="${g.thanhCong} ? 'Thành công' : 'Thất bại'"></span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="empty" th:if="${#lists.isEmpty(ct.dsGiaoDich)}">Chưa có giao dịch.</div>
+    </main>
+</div>
+<script th:replace="~{admin/don-hang/tra-cuu :: demNguoc}"></script>
+</body>
+</html>

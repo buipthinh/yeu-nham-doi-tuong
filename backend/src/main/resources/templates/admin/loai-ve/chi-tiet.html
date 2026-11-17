@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head(${lv.tenLoaiVe})}"></head>
+<body>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+
+    <main class="content">
+        <a class="back" th:href="@{/admin/loai-ve}">← Danh sách loại vé</a>
+        <div class="page-head">
+            <div>
+                <div class="row">
+                    <span class="pill" th:classappend="${lv.trangThai.css}" th:text="${lv.trangThai.nhan}"></span>
+                    <span class="muted" th:text="${lv.soChoMoiVe} + ' chỗ mỗi vé'"></span>
+                </div>
+                <h1 th:text="'Loại vé ' + ${lv.tenLoaiVe}">Loại vé</h1>
+            </div>
+            <div class="row">
+                <a class="btn" th:href="@{/admin/gia-ve(loaiVeId=${lv.id})}">Xem bảng giá</a>
+                <a class="btn" th:href="@{/admin/loai-ve/{id}/sua(id=${lv.id})}">Sửa thông tin</a>
+            </div>
+        </div>
+
+        <div th:replace="~{admin/fragments :: flash}"></div>
+
+        <div class="stats">
+            <div class="card stat"><span>Ghế dùng loại vé này</span><b th:text="${soGhe}">0</b></div>
+            <div class="card stat"><span>Ghế ở phòng đang hoạt động</span><b th:text="${soGhePhongHoatDong}">0</b></div>
+            <div class="card stat"><span>Quy tắc giá đang áp dụng</span><b th:text="${soGia}">0</b></div>
+            <div class="card stat"><span>Vé đã bán</span><b th:text="${soVe}">0</b></div>
+        </div>
+
+        <div class="detail">
+            <div class="side-stack">
+                <div class="card info">
+                    <h2>Thông tin loại vé</h2>
+                    <dl>
+                        <dt>Tên loại vé</dt><dd th:text="${lv.tenLoaiVe}"></dd>
+                        <dt>Số chỗ mỗi vé</dt><dd th:text="${lv.soChoMoiVe == 2} ? '2 (ghế đôi, tính 1 vé)' : '1 (ghế đơn)'"></dd>
+                        <dt>Mô tả</dt><dd th:text="${lv.moTa} ?: '—'"></dd>
+                        <dt>Đối tượng</dt><dd th:text="${lv.tenCacDoiTuong}"></dd>
+                    </dl>
+                </div>
+
+                <!-- UC5.2.4 Thiet lap doi tuong ap dung -->
+                <form class="card info" method="post" th:action="@{/admin/loai-ve/{id}/doi-tuong(id=${lv.id})}">
+                    <h2>Đối tượng áp dụng (UC5.2.4)</h2>
+                    <div class="alert bad" th:if="${canXacNhan}">
+                        <span th:text="${canXacNhan}"></span>
+                        <div class="xac-nhan">
+                            <button class="btn danger sm" type="submit" name="xacNhan" value="true">Đồng ý, ngừng các giá đó</button>
+                            <a class="btn sm" th:href="@{/admin/loai-ve/{id}(id=${lv.id})}">Không lưu</a>
+                        </div>
+                    </div>
+                    <div class="checks">
+                        <label class="chk" th:each="d : ${dsDoiTuong}" th:classappend="${d.nguoiLon} ? 'khoa'">
+                            <input type="checkbox" name="doiTuongIds" th:value="${d.id}"
+                                   th:checked="${d.nguoiLon or (doiTuongChon != null ? #lists.contains(doiTuongChon, d.id) : lv.coDoiTuong(d.id))}"
+                                   th:disabled="${d.nguoiLon}">
+                            <span th:text="${d.tenDoiTuong}"></span>
+                            <span class="muted small" th:if="${soGiaTheoDoiTuong.get(d.id) != null}"
+                                  th:text="'(' + ${soGiaTheoDoiTuong.get(d.id)} + ' giá)'"></span>
+                        </label>
+                    </div>
+                    <p class="muted small">Người lớn luôn được chọn. Bỏ chọn một đối tượng còn giá đang áp dụng thì hệ thống hỏi lại,
+                        đồng ý thì các giá đó chuyển sang Ngừng áp dụng.</p>
+                    <button class="btn primary" type="submit" th:unless="${canXacNhan}">Lưu đối tượng</button>
+                </form>
+            </div>
+
+            <!-- UC5.2.3 Thay doi trang thai loai ve -->
+            <div class="side-stack">
+                <form class="card side" method="post" th:action="@{/admin/loai-ve/{id}/trang-thai(id=${lv.id})}">
+                    <h2>Trạng thái</h2>
+                    <p th:if="${lv.dangApDung}" class="muted small">Ngừng áp dụng thì mọi quy tắc giá của loại vé chuyển sang Ngừng áp dụng.
+                        Không ngừng được khi còn ghế loại này trong phòng đang hoạt động.</p>
+                    <p th:unless="${lv.dangApDung}" class="muted small">Áp dụng lại loại vé. Các quy tắc giá cũ vẫn ở trạng thái ngừng,
+                        cần mở lại ở mục Giá vé.</p>
+                    <button class="btn" th:classappend="${lv.dangApDung} ? 'danger' : 'primary'" type="submit"
+                            th:text="${lv.dangApDung} ? 'Ngừng áp dụng' : 'Áp dụng lại'"></button>
+                </form>
+                <div class="card side" th:if="${lv.dangApDung}">
+                    <h2>Giá vé</h2>
+                    <p class="muted small">Thiết lập giá cho loại vé này theo đối tượng, loại ngày và khung giờ.</p>
+                    <a class="btn primary" th:href="@{/admin/gia-ve/them(loaiVeId=${lv.id})}">+ Thiết lập giá</a>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

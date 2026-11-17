@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head('Quản lý tài khoản')}"></head>
+<body>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+
+    <main class="content">
+        <div class="page-head">
+            <div>
+                <h1>Quản lý tài khoản</h1>
+                <p class="muted">Tìm kiếm · Thêm · Xem chi tiết · Khóa/mở · Sửa · Mật khẩu · Chức vụ</p>
+            </div>
+            <a class="btn primary" th:href="@{/admin/tai-khoan/them}">+ Thêm tài khoản</a>
+        </div>
+
+        <div th:replace="~{admin/fragments :: flash}"></div>
+
+        <!-- UC8.7 Tim kiem tai khoan -->
+        <form class="filters wide" method="get" th:action="@{/admin/tai-khoan}">
+            <input class="input" type="search" name="q" th:value="${q}" placeholder="Họ tên, mã NV, email, số điện thoại…" aria-label="Từ khóa">
+            <select class="input" name="loai" aria-label="Loại tài khoản">
+                <option value="">Mọi loại tài khoản</option>
+                <option th:each="l : ${dsLoai}" th:value="${l}" th:text="${l.nhan}" th:selected="${l == loai}"></option>
+            </select>
+            <select class="input" name="trangThai" aria-label="Trạng thái">
+                <option value="">Mọi trạng thái</option>
+                <option th:each="tt : ${dsTrangThai}" th:value="${tt}" th:text="${tt.nhan}" th:selected="${tt == trangThai}"></option>
+            </select>
+            <button class="btn" type="submit">Tìm</button>
+            <a class="btn ghost" th:href="@{/admin/tai-khoan}">Xóa lọc</a>
+        </form>
+
+        <p class="muted small" th:text="'Tìm thấy ' + ${ketQua.totalElements} + ' tài khoản'"></p>
+
+        <div class="card table-wrap" th:if="${!ketQua.empty}">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Mã</th><th>Họ tên</th><th>Loại</th><th>Email</th><th>Số điện thoại</th><th>Trạng thái</th><th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="t : ${ketQua.content}">
+                    <td class="mono" th:text="${t.maTaiKhoan}">NV0001</td>
+                    <td><a class="link" th:href="@{/admin/tai-khoan/{id}(id=${t.id})}" th:text="${t.hoTen}">Họ tên</a></td>
+                    <td><span class="pill" th:classappend="${t.loaiTaiKhoan.css}" th:text="${t.loaiTaiKhoan.nhan}"></span></td>
+                    <td class="small" th:text="${t.email}"></td>
+                    <td class="mono" th:text="${t.soDienThoai}"></td>
+                    <td><span class="pill" th:classappend="${t.trangThai.css}" th:text="${t.trangThai.nhan}"></span></td>
+                    <td class="actions">
+                        <a class="btn sm" th:href="@{/admin/tai-khoan/{id}/sua(id=${t.id})}">Sửa</a>
+                        <a class="btn sm ghost" th:href="@{/admin/tai-khoan/{id}(id=${t.id})}">Chi tiết</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="empty" th:if="${ketQua.empty}">Không tìm thấy tài khoản phù hợp.</div>
+
+        <!-- Phan trang -->
+        <nav class="pager" th:if="${ketQua.totalPages > 1}">
+            <a th:each="i : ${#numbers.sequence(0, ketQua.totalPages - 1)}"
+               th:href="@{/admin/tai-khoan(q=${q}, loai=${loai}, trangThai=${trangThai}, trang=${i})}"
+               th:text="${i + 1}" th:classappend="${i == ketQua.number} ? 'on'"></a>
+        </nav>
+    </main>
+</div>
+</body>
+</html>

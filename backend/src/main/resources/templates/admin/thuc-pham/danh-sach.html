@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head('Thực phẩm')}"></head>
+<body>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+
+    <main class="content">
+        <div class="page-head">
+            <div>
+                <h1>Quản lý thực phẩm</h1>
+                <p class="muted">Thêm món · Sửa thông tin · Sửa giá · Ngừng bán · Nhập hàng và tồn kho</p>
+            </div>
+            <a class="btn primary" th:href="@{/admin/thuc-pham/them}">+ Thêm món</a>
+        </div>
+
+        <div th:replace="~{admin/fragments :: flash}"></div>
+
+        <div class="stats">
+            <div class="card stat"><span>Món đang bán</span><b th:text="${soDangBan}">0</b></div>
+            <div class="card stat"><span th:text="'Sắp hết hàng (tồn ≤ ' + ${nguong} + ')'">Sắp hết hàng</span>
+                <b th:classappend="${soSapHet > 0} ? 'ton-thap'" th:text="${soSapHet}">0</b></div>
+        </div>
+        <div class="alert bad" th:if="${soSapHet > 0 and !sapHet}">
+            Có <b th:text="${soSapHet}"></b> món đang bán sắp hết hàng.
+            <a class="link" th:href="@{/admin/thuc-pham(sapHet=true, trangThai='dangBan')}">Xem danh sách</a>
+        </div>
+
+        <form class="filters wide" method="get" th:action="@{/admin/thuc-pham}">
+            <input class="input" type="search" name="q" th:value="${q}" placeholder="Tên món, thành phần…" aria-label="Từ khóa">
+            <select class="input" name="loai" aria-label="Loại">
+                <option value="">Mọi loại</option>
+                <option th:each="l : ${dsLoai}" th:value="${l}" th:text="${l.nhan}" th:selected="${l == loai}"></option>
+            </select>
+            <select class="input" name="trangThai" aria-label="Trạng thái">
+                <option value="">Mọi trạng thái</option>
+                <option th:each="tt : ${dsTrangThai}" th:value="${tt}" th:text="${tt.nhan}" th:selected="${tt == trangThai}"></option>
+            </select>
+            <label class="chk"><input type="checkbox" name="sapHet" value="true" th:checked="${sapHet}"> Chỉ món sắp hết</label>
+            <div class="row">
+                <button class="btn" type="submit">Tìm</button>
+                <a class="btn ghost" th:href="@{/admin/thuc-pham}">Xóa lọc</a>
+            </div>
+        </form>
+
+        <p class="muted small" th:text="'Tìm thấy ' + ${ketQua.totalElements} + ' món'"></p>
+
+        <div class="card table-wrap" th:if="${!ketQua.empty}">
+            <table class="table">
+                <thead>
+                <tr><th>Mã</th><th>Tên món</th><th>Loại</th><th class="r">Giá bán</th><th class="r">Tồn kho</th><th>Trạng thái</th><th></th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="t : ${ketQua.content}">
+                    <td class="mono" th:text="${t.maMon}"></td>
+                    <td><a class="link" th:href="@{/admin/thuc-pham/{id}(id=${t.id})}" th:text="${t.tenMon}"></a>
+                        <div class="muted small" th:text="${t.thanhPhan}"></div></td>
+                    <td><span class="pill" th:classappend="${t.loai.css}" th:text="${t.loai.nhan}"></span></td>
+                    <td class="r nowrap" th:text="${#numbers.formatDecimal(t.giaBan, 1, 'POINT', 0, 'COMMA')} + ' đ'"></td>
+                    <td class="r" th:classappend="${t.tonKho <= nguong} ? 'ton-thap'" th:text="${t.tonKho}"></td>
+                    <td><span class="pill" th:classappend="${t.trangThai.css}" th:text="${t.trangThai.nhan}"></span></td>
+                    <td class="actions">
+                        <a class="btn sm" th:href="@{/admin/thuc-pham/{id}/sua(id=${t.id})}">Sửa</a>
+                        <a class="btn sm ghost" th:href="@{/admin/thuc-pham/{id}(id=${t.id})}">Kho</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="empty" th:if="${ketQua.empty}">Không tìm thấy món phù hợp.</div>
+
+        <nav class="pager" th:if="${ketQua.totalPages > 1}">
+            <a th:each="i : ${#numbers.sequence(0, ketQua.totalPages - 1)}"
+               th:href="@{/admin/thuc-pham(q=${q}, loai=${loai}, trangThai=${trangThai}, sapHet=${sapHet}, trang=${i})}"
+               th:text="${i + 1}" th:classappend="${i == ketQua.number} ? 'on'"></a>
+        </nav>
+    </main>
+</div>
+</body>
+</html>

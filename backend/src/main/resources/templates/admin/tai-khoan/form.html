@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head(${taiKhoanForm.themMoi ? 'Thêm tài khoản' : 'Sửa tài khoản'})}"></head>
+<body>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+
+    <main class="content">
+        <a class="back" th:href="@{/admin/tai-khoan}">← Danh sách tài khoản</a>
+        <div class="page-head">
+            <div>
+                <h1 th:text="${taiKhoanForm.themMoi} ? 'Thêm tài khoản nội bộ' : 'Sửa thông tin tài khoản'">Thêm tài khoản</h1>
+                <p class="muted" th:unless="${taiKhoanForm.themMoi}" th:text="'Mã tài khoản ' + ${taiKhoanForm.maTaiKhoan}"></p>
+                <p class="muted" th:if="${taiKhoanForm.themMoi}">Mã nhân viên và mật khẩu khởi tạo được hệ thống tự sinh.</p>
+            </div>
+        </div>
+
+        <form class="card form" method="post" novalidate th:object="${taiKhoanForm}"
+              th:action="${taiKhoanForm.themMoi} ? @{/admin/tai-khoan/them} : @{/admin/tai-khoan/{id}/sua(id=${taiKhoanForm.id})}"
+              onsubmit="return confirm('Xác nhận lưu thông tin tài khoản?')">
+
+            <div class="alert bad" th:if="${#fields.hasErrors('*')}">Thông tin chưa hợp lệ, xem các ô được đánh dấu bên dưới.</div>
+
+            <div class="grid">
+                <div class="field full">
+                    <label for="hoTen">Họ tên *</label>
+                    <input class="input" th:field="*{hoTen}" th:errorclass="has-err">
+                    <span class="err" th:errors="*{hoTen}"></span>
+                </div>
+
+                <div class="field" th:if="*{themMoi}">
+                    <label for="loaiTaiKhoan">Chức vụ *</label>
+                    <select class="input" th:field="*{loaiTaiKhoan}">
+                        <option value="nhanVien">Nhân viên</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                    <span class="err" th:errors="*{loaiTaiKhoan}"></span>
+                </div>
+                <div class="field" th:if="*{themMoi}">
+                    <label for="email">Email *</label>
+                    <input class="input" type="email" th:field="*{email}" th:errorclass="has-err">
+                    <span class="err" th:errors="*{email}"></span>
+                </div>
+                <div class="field" th:unless="*{themMoi}">
+                    <label>Email</label>
+                    <input class="input" th:value="*{email}" disabled>
+                    <span class="muted small">Email không chỉnh sửa được.</span>
+                </div>
+
+                <div class="field">
+                    <label for="soDienThoai">Số điện thoại *</label>
+                    <input class="input" th:field="*{soDienThoai}" maxlength="10" th:errorclass="has-err">
+                    <span class="err" th:errors="*{soDienThoai}"></span>
+                </div>
+                <div class="field">
+                    <label for="ngaySinh">Ngày sinh</label>
+                    <input class="input" type="date" th:field="*{ngaySinh}" th:errorclass="has-err">
+                    <span class="err" th:errors="*{ngaySinh}"></span>
+                </div>
+                <div class="field">
+                    <label for="gioiTinh">Giới tính</label>
+                    <select class="input" th:field="*{gioiTinh}">
+                        <option th:each="g : ${dsGioiTinh}" th:value="${g}" th:text="${g.nhan}"></option>
+                    </select>
+                </div>
+                <div class="field" th:if="*{noiBo}">
+                    <label for="ngayTuyenDung">Ngày tuyển dụng</label>
+                    <input class="input" type="date" th:field="*{ngayTuyenDung}" th:errorclass="has-err">
+                    <span class="err" th:errors="*{ngayTuyenDung}"></span>
+                </div>
+                <div class="field full">
+                    <label for="diaChi">Địa chỉ</label>
+                    <input class="input" th:field="*{diaChi}" th:errorclass="has-err">
+                    <span class="err" th:errors="*{diaChi}"></span>
+                </div>
+            </div>
+
+            <p class="muted small" th:unless="${taiKhoanForm.themMoi}">
+                Không sửa được mã tài khoản, email và chức vụ ở đây. Đổi chức vụ ở trang chi tiết (UC8.6).
+            </p>
+
+            <div class="form-actions">
+                <button class="btn primary" type="submit" th:text="${taiKhoanForm.themMoi} ? 'Tạo tài khoản' : 'Lưu thay đổi'">Lưu</button>
+                <a class="btn ghost" th:href="${taiKhoanForm.themMoi} ? @{/admin/tai-khoan} : @{/admin/tai-khoan/{id}(id=${taiKhoanForm.id})}">Hủy</a>
+            </div>
+        </form>
+    </main>
+</div>
+</body>
+</html>
