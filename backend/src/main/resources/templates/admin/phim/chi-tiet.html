@@ -53,7 +53,7 @@
             <!-- UC2.3 Thay doi trang thai phim -->
             <form class="card side" method="post" th:action="@{/admin/phim/{id}/trang-thai(id=${phim.id})}"
                   th:attr="data-suat=${thongKe.suatChuaKetThuc}" onsubmit="return xacNhanTrangThai(this)">
-                <h2>Trạng thái phim (UC2.3)</h2>
+                <h2>Trạng thái phim</h2>
                 <label class="radio" th:each="tt : ${dsTrangThai}">
                     <input type="radio" name="trangThai" th:value="${tt}" th:checked="${tt == phim.trangThai}">
                     <span th:text="${tt.nhan}"></span>

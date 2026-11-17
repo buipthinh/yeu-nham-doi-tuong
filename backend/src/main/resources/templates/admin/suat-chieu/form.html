@@ -9,7 +9,7 @@
         <a class="back" th:href="@{/admin/suat-chieu}">← Danh sách suất chiếu</a>
         <div class="page-head">
             <div>
-                <h1 th:text="${suatChieuForm.themMoi} ? 'Thêm suất chiếu (UC3.1)' : 'Sửa suất chiếu (UC3.2)'">Thêm suất chiếu</h1>
+                <h1 th:text="${suatChieuForm.themMoi} ? 'Thêm suất chiếu' : 'Sửa suất chiếu'">Thêm suất chiếu</h1>
                 <p class="muted" th:unless="${suatChieuForm.themMoi}" th:text="'Mã suất S' + ${#numbers.formatInteger(suatChieuForm.id, 4)}"></p>
             </div>
         </div>

@@ -61,7 +61,7 @@
             <form class="card side" method="post" th:unless="${daKetThuc}"
                   th:action="@{/admin/suat-chieu/{id}/trang-thai(id=${suat.id})}"
                   onsubmit="return confirm('Xác nhận đổi trạng thái suất chiếu?')">
-                <h2>Trạng thái suất (UC3.3)</h2>
+                <h2>Trạng thái suất</h2>
                 <label class="radio" th:each="tt : ${dsTrangThai}">
                     <input type="radio" name="trangThai" th:value="${tt}" th:checked="${tt == suat.trangThai}">
                     <span th:text="${tt.nhan}"></span>

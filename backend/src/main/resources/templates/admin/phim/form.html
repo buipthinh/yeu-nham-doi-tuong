@@ -9,7 +9,7 @@
         <a class="back" th:href="@{/admin/phim}">← Danh sách phim</a>
         <div class="page-head">
             <div>
-                <h1 th:text="${phimForm.themMoi} ? 'Thêm phim (UC2.1)' : 'Sửa phim (UC2.2)'">Thêm phim</h1>
+                <h1 th:text="${phimForm.themMoi} ? 'Thêm phim' : 'Sửa phim'">Thêm phim</h1>
                 <p class="muted" th:unless="${phimForm.themMoi}" th:text="'Mã phim P' + ${#numbers.formatInteger(phimForm.id, 4)}"></p>
             </div>
         </div>
