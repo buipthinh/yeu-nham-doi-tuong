@@ -21,7 +21,7 @@
     <nav>
         <div class="grp">Nội dung</div>
         <a th:href="@{/admin/phim}" th:classappend="${menu == 'phim'} ? 'on'">Phim <small>UC2</small></a>
-        <a class="soon" title="Sẽ làm sau">Suất chiếu <small>UC3</small></a>
+        <a th:href="@{/admin/suat-chieu}" th:classappend="${menu == 'suatChieu'} ? 'on'">Suất chiếu <small>UC3</small></a>
         <a class="soon" title="Sẽ làm sau">Phòng &amp; sơ đồ ghế <small>UC4</small></a>
         <div class="grp">Giá &amp; dịch vụ</div>
         <a class="soon" title="Sẽ làm sau">Giá vé <small>UC5</small></a>

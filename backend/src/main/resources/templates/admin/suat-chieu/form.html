@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head(${suatChieuForm.themMoi ? 'Thêm suất chiếu' : 'Sửa suất chiếu'})}"></head>
+<body>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+
+    <main class="content">
+        <a class="back" th:href="@{/admin/suat-chieu}">← Danh sách suất chiếu</a>
+        <div class="page-head">
+            <div>
+                <h1 th:text="${suatChieuForm.themMoi} ? 'Thêm suất chiếu (UC3.1)' : 'Sửa suất chiếu (UC3.2)'">Thêm suất chiếu</h1>
+                <p class="muted" th:unless="${suatChieuForm.themMoi}" th:text="'Mã suất S' + ${#numbers.formatInteger(suatChieuForm.id, 4)}"></p>
+            </div>
+        </div>
+
+        <div class="alert bad" th:if="${loi}" th:text="${loi}"></div>
+
+        <!-- Man hinh xac nhan (buoc 2) -->
+        <form class="card confirm-box" id="xacNhanBox" method="post" th:if="${xemTruoc != null}"
+              th:action="${suatChieuForm.themMoi} ? @{/admin/suat-chieu/them} : @{/admin/suat-chieu/{id}/sua(id=${suatChieuForm.id})}">
+            <h2 th:text="${suatChieuForm.themMoi} ? 'Xác nhận tạo suất chiếu' : 'Xác nhận cập nhật suất chiếu'">Xác nhận</h2>
+            <dl>
+                <dt>Phim</dt><dd th:text="${xemTruoc.tenPhim}"></dd>
+                <dt>Phòng</dt><dd th:text="${xemTruoc.tenPhong}"></dd>
+                <dt>Ngày chiếu</dt><dd th:text="${#temporals.format(xemTruoc.ngay, 'dd/MM/yyyy')}"></dd>
+                <dt>Giờ chiếu</dt>
+                <dd th:text="${#temporals.format(xemTruoc.gioBatDau, 'HH:mm')} + ' – ' + ${#temporals.format(xemTruoc.gioKetThuc, 'HH:mm')}"></dd>
+                <dt>Loại ngày / khung giờ</dt><dd th:text="${xemTruoc.loaiNgay.nhan} + ' · ' + ${xemTruoc.khungGio.nhan}"></dd>
+                <dt>Giá vé</dt>
+                <dd th:text="${xemTruoc.giaTu != null} ? 'từ ' + ${#numbers.formatDecimal(xemTruoc.giaTu, 1, 'POINT', 0, 'COMMA')} + ' đ' : '—'"></dd>
+                <dt>Số ghế sẽ tạo</dt><dd th:text="${xemTruoc.soGheSeTao}"></dd>
+            </dl>
+            <input type="hidden" name="phimId" th:value="${suatChieuForm.phimId}">
+            <input type="hidden" name="phongChieuId" th:value="${suatChieuForm.phongChieuId}">
+            <input type="hidden" name="ngayChieu" th:value="${suatChieuForm.ngayChieu}">
+            <input type="hidden" name="gioBatDau" th:value="${#temporals.format(suatChieuForm.gioBatDau, 'HH:mm')}">
+            <input type="hidden" name="xacNhan" value="true">
+            <div class="form-actions">
+                <button class="btn primary" type="submit">Xác nhận</button>
+                <button class="btn" type="button" onclick="document.getElementById('xacNhanBox').style.display='none'">Sửa lại</button>
+            </div>
+        </form>
+
+        <form class="card form" method="post" novalidate th:object="${suatChieuForm}"
+              th:action="${suatChieuForm.themMoi} ? @{/admin/suat-chieu/them} : @{/admin/suat-chieu/{id}/sua(id=${suatChieuForm.id})}">
+
+            <div class="alert bad" th:if="${#fields.hasGlobalErrors()}">
+                <div th:each="e : ${#fields.globalErrors()}" th:text="${e}"></div>
+            </div>
+            <div class="alert bad" th:if="${#fields.hasErrors('*') and !#fields.hasGlobalErrors()}">Thông tin chưa hợp lệ, xem các ô được đánh dấu bên dưới.</div>
+
+            <input type="hidden" name="xacNhan" value="false">
+
+            <div class="grid">
+                <div class="field full">
+                    <label for="phimId">Phim *</label>
+                    <select class="input" th:field="*{phimId}" th:errorclass="has-err">
+                        <option value="">— Chọn phim —</option>
+                        <option th:each="p : ${dsPhim}" th:value="${p.id}"
+                                th:text="${p.tenPhim} + ' (' + ${p.thoiLuong} + ' phút)'"
+                                th:attr="data-thoiluong=${p.thoiLuong}, data-tu=${p.ngayKhoiChieu}, data-den=${p.ngayKetThuc}"></option>
+                    </select>
+                    <span class="err" th:errors="*{phimId}"></span>
+                </div>
+                <div class="field full">
+                    <label for="phongChieuId">Phòng chiếu *</label>
+                    <select class="input" th:field="*{phongChieuId}" th:errorclass="has-err">
+                        <option value="">— Chọn phòng —</option>
+                        <option th:each="p : ${dsPhong}" th:value="${p.id}" th:text="${p.tenPhong} + ' (' + ${p.sucChua} + ' ghế)'"></option>
+                    </select>
+                    <span class="err" th:errors="*{phongChieuId}"></span>
+                </div>
+                <div class="field">
+                    <label for="ngayChieu">Ngày chiếu *</label>
+                    <input class="input" type="date" th:field="*{ngayChieu}" th:errorclass="has-err">
+                    <span class="err" th:errors="*{ngayChieu}"></span>
+                    <span class="muted small" id="khoangChieu"></span>
+                </div>
+                <div class="field">
+                    <label for="gioBatDau">Giờ bắt đầu *</label>
+                    <input class="input" type="time" th:field="*{gioBatDau}" th:errorclass="has-err">
+                    <span class="err" th:errors="*{gioBatDau}"></span>
+                    <span class="muted small" id="gioKetThuc"></span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn primary" type="submit">Kiểm tra &amp; xem trước</button>
+                <a class="btn ghost" th:href="${suatChieuForm.themMoi} ? @{/admin/suat-chieu} : @{/admin/suat-chieu/{id}(id=${suatChieuForm.id})}">Hủy</a>
+            </div>
+        </form>
+    </main>
+</div>
+<script>
+    (function () {
+        var phim = document.getElementById('phimId'), gio = document.getElementById('gioBatDau'),
+            ngay = document.getElementById('ngayChieu'), kt = document.getElementById('gioKetThuc'),
+            kc = document.getElementById('khoangChieu');
+        function dd(iso) { var p = iso.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+        function capNhat() {
+            var o = phim.options[phim.selectedIndex];
+            kt.textContent = ''; kc.textContent = '';
+            if (!o || !o.dataset.thoiluong) { ngay.removeAttribute('min'); ngay.removeAttribute('max'); return; }
+            ngay.min = o.dataset.tu; ngay.max = o.dataset.den;
+            kc.textContent = 'Phim chiếu từ ' + dd(o.dataset.tu) + ' đến ' + dd(o.dataset.den);
+            if (gio.value) {
+                var p = gio.value.split(':'), tong = parseInt(p[0], 10) * 60 + parseInt(p[1], 10) + parseInt(o.dataset.thoiluong, 10);
+                if (tong >= 1440) { kt.textContent = 'Suất sẽ kết thúc sau 24:00 (không hợp lệ)'; return; }
+                var h = Math.floor(tong / 60), m = tong % 60;
+                kt.textContent = 'Kết thúc dự kiến: ' + (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+            }
+        }
+        phim.addEventListener('change', capNhat);
+        gio.addEventListener('input', capNhat);
+        capNhat();
+    })();
+</script>
+</body>
+</html>

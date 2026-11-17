@@ -3,7 +3,6 @@ package vn.rapphuongnam.dto;
 import jakarta.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import vn.rapphuongnam.entity.DoTuoi;
-import vn.rapphuongnam.entity.TrangThaiPhim;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -48,6 +47,8 @@ public class PhimForm {
     private String moTa;
 
     @Size(max = 255, message = "Tối đa 255 ký tự")
+    @Pattern(regexp = "^$|(?i)^.+\\.(jpg|jpeg|png|webp)$",
+            message = "Poster phải là file ảnh .jpg, .jpeg, .png hoặc .webp")
     private String poster;
 
     @Size(max = 255, message = "Tối đa 255 ký tự")
@@ -56,9 +57,6 @@ public class PhimForm {
 
     @NotEmpty(message = "Chọn ít nhất một thể loại")
     private List<Integer> theLoaiIds = new ArrayList<>();
-
-    //Chi dung khi them moi, sua trang thai lam o UC2.3
-    private TrangThaiPhim trangThai = TrangThaiPhim.sapChieu;
 
     public boolean isThemMoi() { return id == null; }
 
@@ -90,6 +88,4 @@ public class PhimForm {
     public void setTrailer(String trailer) { this.trailer = trailer; }
     public List<Integer> getTheLoaiIds() { return theLoaiIds; }
     public void setTheLoaiIds(List<Integer> theLoaiIds) { this.theLoaiIds = theLoaiIds; }
-    public TrangThaiPhim getTrangThai() { return trangThai; }
-    public void setTrangThai(TrangThaiPhim trangThai) { this.trangThai = trangThai; }
 }

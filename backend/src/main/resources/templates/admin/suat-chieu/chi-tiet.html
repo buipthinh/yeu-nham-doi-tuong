@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head('Suất chiếu ' + ${suat.maSuat})}"></head>
+<body>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+
+    <main class="content">
+        <a class="back" th:href="@{/admin/suat-chieu(ngay=${suat.ngayChieu})}">← Lịch chiếu</a>
+        <div class="page-head">
+            <div>
+                <div class="row">
+                    <span class="mono muted" th:text="${suat.maSuat}">S0001</span>
+                    <span class="pill" th:classappend="${dong.tinhTrang.css}" th:text="${dong.tinhTrang.nhan}"></span>
+                </div>
+                <h1><a class="link" th:href="@{/admin/phim/{id}(id=${suat.phim.id})}" th:text="${suat.phim.tenPhim}">Phim</a></h1>
+            </div>
+            <div>
+                <a class="btn" th:if="${lyDoKhongSua == null}" th:href="@{/admin/suat-chieu/{id}/sua(id=${suat.id})}">Sửa suất chiếu</a>
+                <span class="btn disabled" th:if="${lyDoKhongSua != null}" aria-disabled="true">Sửa suất chiếu</span>
+            </div>
+        </div>
+        <p class="muted small" th:if="${lyDoKhongSua != null}" th:text="${lyDoKhongSua}"></p>
+
+        <div th:replace="~{admin/fragments :: flash}"></div>
+
+        <div class="stats">
+            <div class="card stat"><span>Ghế trống</span><b th:text="${dong.soGheTrong}">0</b></div>
+            <div class="card stat"><span>Đã đặt</span><b th:text="${dong.soGheDaDat}">0</b></div>
+            <div class="card stat"><span>Tổng ghế</span><b th:text="${tongGhe}">0</b></div>
+            <div class="card stat"><span>Số đơn</span><b th:text="${soDon}">0</b></div>
+        </div>
+
+        <div class="detail">
+            <div class="card info">
+                <h2>Thông tin suất chiếu</h2>
+                <dl>
+                    <dt>Phòng</dt><dd th:text="${suat.phongChieu.tenPhong}"></dd>
+                    <dt>Ngày chiếu</dt><dd th:text="${#temporals.format(suat.ngayChieu, 'dd/MM/yyyy')}"></dd>
+                    <dt>Giờ chiếu</dt>
+                    <dd th:text="${#temporals.format(suat.gioBatDau, 'HH:mm')} + ' – ' + ${#temporals.format(suat.gioKetThuc, 'HH:mm')}"></dd>
+                    <dt>Loại ngày</dt><dd th:text="${loaiNgay.nhan}"></dd>
+                    <dt>Khung giờ</dt><dd th:text="${dong.khungGio.nhan}"></dd>
+                    <dt>Trạng thái</dt><dd th:text="${suat.trangThai.nhan}"></dd>
+                </dl>
+                <h3>Bảng giá áp dụng</h3>
+                <p class="muted small" th:if="${bangGia.isEmpty()}">Chưa có giá vé hiệu lực cho suất này.</p>
+                <table class="table" th:unless="${bangGia.isEmpty()}">
+                    <thead><tr><th>Loại vé</th><th>Đối tượng</th><th class="r">Giá</th></tr></thead>
+                    <tbody>
+                    <tr th:each="g : ${bangGia}">
+                        <td th:text="${g.tenLoaiVe}"></td>
+                        <td th:text="${g.tenDoiTuong}"></td>
+                        <td class="r" th:text="${#numbers.formatDecimal(g.gia, 1, 'POINT', 0, 'COMMA')} + ' đ'"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- UC3.3 Doi trang thai suat -->
+            <form class="card side" method="post" th:unless="${daKetThuc}"
+                  th:action="@{/admin/suat-chieu/{id}/trang-thai(id=${suat.id})}"
+                  onsubmit="return confirm('Xác nhận đổi trạng thái suất chiếu?')">
+                <h2>Trạng thái suất (UC3.3)</h2>
+                <label class="radio" th:each="tt : ${dsTrangThai}">
+                    <input type="radio" name="trangThai" th:value="${tt}" th:checked="${tt == suat.trangThai}">
+                    <span th:text="${tt.nhan}"></span>
+                </label>
+                <p class="muted small">Tạm ngưng: khách không thấy suất và không đặt vé mới được; các đơn đã có giữ nguyên.</p>
+                <button class="btn primary" type="submit">Cập nhật trạng thái</button>
+            </form>
+        </div>
+    </main>
+</div>
+</body>
+</html>

@@ -10,6 +10,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.server.ResponseStatusException;
 import vn.rapphuongnam.dto.PhimForm;
 import vn.rapphuongnam.dto.PhimThongKe;
+import vn.rapphuongnam.entity.DoTuoi;
 import vn.rapphuongnam.entity.Phim;
 import vn.rapphuongnam.entity.TheLoai;
 import vn.rapphuongnam.entity.TrangThaiPhim;
@@ -36,10 +37,25 @@ public class PhimService {
 
     //UC2.4, UC2.5
     @Transactional(readOnly = true)
-    public Page<Phim> timKiem(String q, Integer theLoaiId, TrangThaiPhim trangThai, int trang) {
+    public Page<Phim> timKiem(String q, Integer theLoaiId, TrangThaiPhim trangThai, DoTuoi doTuoi, String sapXep, int trang) {
         String tuKhoa = (q == null || q.isBlank()) ? null : q.trim();
-        PageRequest pr = PageRequest.of(Math.max(trang, 0), SO_DONG_MOI_TRANG, Sort.by(Sort.Direction.DESC, "id"));
-        return phimRepo.timKiem(tuKhoa, theLoaiId, trangThai, pr);
+        Sort sort = switch (sapXep == null ? "" : sapXep) {
+            case "ten" -> Sort.by(Sort.Direction.ASC, "tenPhim");
+            case "ngayKhoiChieu" -> Sort.by(Sort.Direction.DESC, "ngayKhoiChieu");
+            default -> Sort.by(Sort.Direction.DESC, "id");
+        };
+        PageRequest pr = PageRequest.of(Math.max(trang, 0), SO_DONG_MOI_TRANG, sort);
+        return phimRepo.timKiem(tuKhoa, theLoaiId, trangThai, doTuoi, pr);
+    }
+
+    public long demTatCa() {
+        return phimRepo.count();
+    }
+
+    //Phim co the tao suat chieu (khong an)
+    @Transactional(readOnly = true)
+    public List<Phim> phimDeTaoSuat() {
+        return phimRepo.findByTrangThaiInOrderByTenPhim(List.of(TrangThaiPhim.sapChieu, TrangThaiPhim.dangChieu));
     }
 
     @Transactional(readOnly = true)
@@ -73,7 +89,6 @@ public class PhimService {
         f.setMoTa(p.getMoTa());
         f.setPoster(p.getPoster());
         f.setTrailer(p.getTrailer());
-        f.setTrangThai(p.getTrangThai());
         f.setTheLoaiIds(p.getTheLoai().stream().map(TheLoai::getId).collect(Collectors.toList()));
         return f;
     }
@@ -88,7 +103,7 @@ public class PhimService {
         if (f.getTenPhim() != null && f.getNgayKhoiChieu() != null
                 && phimRepo.existsByTenPhimIgnoreCaseAndNgayKhoiChieuAndIdNot(f.getTenPhim().trim(), f.getNgayKhoiChieu(),
                         f.getId() == null ? 0 : f.getId())) {
-            errors.rejectValue("tenPhim", "trung", "Đã có phim cùng tên và cùng ngày khởi chiếu");
+            errors.rejectValue("tenPhim", "trung", "Tên phim đã tồn tại (cùng ngày khởi chiếu)");
         }
         if (f.getId() != null) {
             Phim cu = layTheoId(f.getId());
@@ -124,7 +139,7 @@ public class PhimService {
         p.setPoster(rongThanhNull(f.getPoster()));
         p.setTrailer(rongThanhNull(f.getTrailer()));
         if (f.getId() == null) {
-            p.setTrangThai(f.getTrangThai() == TrangThaiPhim.dangChieu ? TrangThaiPhim.dangChieu : TrangThaiPhim.sapChieu);
+            p.setTrangThai(TrangThaiPhim.sapChieu);
         }
         p.setTheLoai(new LinkedHashSet<>(theLoaiRepo.findAllById(f.getTheLoaiIds())));
         return phimRepo.save(p);

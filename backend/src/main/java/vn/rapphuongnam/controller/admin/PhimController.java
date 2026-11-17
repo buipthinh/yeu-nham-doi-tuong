@@ -39,9 +39,14 @@ public class PhimController {
     public String danhSach(@RequestParam(required = false) String q,
                            @RequestParam(required = false) Integer theLoaiId,
                            @RequestParam(required = false) TrangThaiPhim trangThai,
+                           @RequestParam(required = false) DoTuoi doTuoi,
+                           @RequestParam(defaultValue = "moiNhat") String sapXep,
                            @RequestParam(defaultValue = "0") int trang,
                            Model model) {
-        Page<Phim> ketQua = phimService.timKiem(q, theLoaiId, trangThai, trang);
+        Page<Phim> ketQua = phimService.timKiem(q, theLoaiId, trangThai, doTuoi, sapXep, trang);
+        model.addAttribute("tongPhim", phimService.demTatCa());
+        model.addAttribute("doTuoi", doTuoi);
+        model.addAttribute("sapXep", sapXep);
         model.addAttribute("ketQua", ketQua);
         model.addAttribute("dsTheLoai", phimService.dsTheLoai());
         model.addAttribute("q", q);
@@ -65,7 +70,7 @@ public class PhimController {
     public String them(@Valid @ModelAttribute("phimForm") PhimForm f, BindingResult kq,
                        Model model, RedirectAttributes ra) {
         f.setId(null);
-        return luu(f, kq, model, ra, "Đã thêm phim mới");
+        return luu(f, kq, model, ra, "Thêm phim thành công");
     }
 
     //UC2.2 sua phim
@@ -80,7 +85,7 @@ public class PhimController {
     public String sua(@PathVariable Integer id, @Valid @ModelAttribute("phimForm") PhimForm f, BindingResult kq,
                       Model model, RedirectAttributes ra) {
         f.setId(id);
-        return luu(f, kq, model, ra, "Đã cập nhật thông tin phim");
+        return luu(f, kq, model, ra, "Cập nhật phim thành công");
     }
 
     private String luu(PhimForm f, BindingResult kq, Model model, RedirectAttributes ra, String thongBao) {
