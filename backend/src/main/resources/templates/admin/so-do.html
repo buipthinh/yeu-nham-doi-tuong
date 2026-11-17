@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- So do ghe dung chung. cheDo: 'suat' (trang thai theo suat), 'xem' (phong), 'sua' (moi ghe la mot nut gui form) -->
+<div th:fragment="soDo(soDo, cheDo)">
+    <div class="screen"></div>
+    <div class="screen-label">Màn hình</div>
+    <div class="empty" th:if="${#lists.isEmpty(soDo)}">Phòng chưa có sơ đồ ghế.</div>
+    <div class="seat-wrap" th:unless="${#lists.isEmpty(soDo)}">
+        <div class="seatmap">
+            <div class="seat-row" th:each="h : ${soDo}">
+                <span class="row-label" th:text="${h.hang}">A</span>
+                <th:block th:each="g : ${h.ghe}">
+                    <button th:if="${cheDo == 'sua'}" type="submit" name="gheId" th:value="${g.id}" class="seat"
+                            th:classappend="${(g.soChoMoiVe == 2 ? 'doi ' : '') + (g.trangThai == 'baoTri' ? 'baoTri' : '')}"
+                            th:title="${g.maGhe + ' · ' + g.tenLoaiVe}" th:text="${g.maGhe}">A1</button>
+                    <span th:unless="${cheDo == 'sua'}" class="seat"
+                          th:classappend="${(g.soChoMoiVe == 2 ? 'doi ' : '') + (g.trangThai == 'baoTri' ? 'baoTri ' : '') + (cheDo == 'suat' and g.trangThaiSuat != 'trong' ? g.trangThaiSuat : '')}"
+                          th:title="${g.maGhe + ' · ' + g.tenLoaiVe}" th:text="${g.maGhe}">A1</span>
+                </th:block>
+                <span class="row-label" th:text="${h.hang}">A</span>
+            </div>
+        </div>
+    </div>
+    <div class="legend">
+        <span><i></i>Ghế thường</span>
+        <span><i style="background:#f1e4f5;border-color:#c9a6d6"></i>Ghế đôi</span>
+        <span><i class="seat baoTri" style="width:14px;height:12px"></i>Bảo trì</span>
+        <th:block th:if="${cheDo == 'suat'}">
+            <span><i style="background:#fdf0d8;border-color:#e7b65c"></i>Đang giữ</span>
+            <span><i style="background:#e3dfd8"></i>Đã bán</span>
+        </th:block>
+    </div>
+</div>
+</body>
+</html>
