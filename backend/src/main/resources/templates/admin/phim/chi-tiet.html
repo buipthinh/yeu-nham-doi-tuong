@@ -41,7 +41,14 @@
                     <dt>Ngôn ngữ</dt><dd th:text="(${phim.ngonNgu} ?: '—') + ' · Phụ đề: ' + (${phim.phuDe} ?: 'Không')"></dd>
                     <dt>Thời gian chiếu</dt>
                     <dd th:text="${#temporals.format(phim.ngayKhoiChieu, 'dd/MM/yyyy')} + ' – ' + ${#temporals.format(phim.ngayKetThuc, 'dd/MM/yyyy')}"></dd>
-                    <dt>Poster</dt><dd class="mono small" th:text="${phim.poster} ?: '—'"></dd>
+                    <dt>Poster</dt>
+                    <dd>
+                        <img th:if="${phim.poster != null and !#strings.isEmpty(phim.poster)}"
+                            th:src="@{${phim.poster}}" th:alt="${phim.tenPhim}"
+                            style="width:160px;aspect-ratio:2/3;object-fit:cover;border-radius:8px;border:1px solid #ddd"
+                            onerror="this.replaceWith(document.createTextNode('Không tải được ảnh'))">
+                        <span th:unless="${phim.poster != null and !#strings.isEmpty(phim.poster)}">—</span>
+                    </dd>
                     <dt>Trailer</dt>
                     <dd><a class="link" th:if="${phim.trailer}" th:href="${phim.trailer}" target="_blank" rel="noopener">Xem trailer</a>
                         <span th:unless="${phim.trailer}">—</span></dd>

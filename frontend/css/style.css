@@ -181,3 +181,4 @@ footer a { color: var(--muted); }
     .lich-phim { grid-template-columns: 72px minmax(0, 1fr); gap: 12px; }
     .price th, .price td { padding: 8px 6px; }
 }
+.logo img { width: 34px; height: 34px; object-fit: contain; border-radius: 9px; }

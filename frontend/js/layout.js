@@ -58,7 +58,7 @@ function veHeader(trang) {
     const tk = Phien.taiKhoan();
     document.getElementById('header').innerHTML = `
         <div class="top"><div class="wrap">
-            <a class="logo" href="index.html"><span>RP</span>Rạp Phương Nam</a>
+            <a class="logo" href="index.html"><img src="uploads/logo.jpg" alt="Logo Rạp Phương Nam">Rạp Phương Nam</a>
             <nav class="nav">
                 <a href="index.html" class="${trang === 'phim' ? 'on' : ''}">Phim</a>
                 <a href="lich-chieu.html" class="${trang === 'lich' ? 'on' : ''}">Lịch chiếu</a>
