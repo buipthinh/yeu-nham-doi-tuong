@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head(${p.tenPhong})}"></head>
+<body>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+    <main class="content">
+        <a class="back" th:href="@{/admin/phong}">← Danh sách phòng</a>
+        <div class="page-head">
+            <div>
+                <div class="row"><span class="pill" th:classappend="${@nhan.css('phong', p.trangThai)}" th:text="${@nhan.ten('phong', p.trangThai)}"></span></div>
+                <h1 th:text="${p.tenPhong}"></h1>
+                <p class="muted" th:text="${p.soHang} + ' hàng × ' + ${p.soCot} + ' cột · sức chứa ' + ${p.sucChua} + ' chỗ (ghế đôi tính 2, không tính ghế bảo trì) · ' + ${p.suatSapToi} + ' suất sắp tới'"></p>
+            </div>
+        </div>
+        <div th:replace="~{admin/fragments :: flash}"></div>
+
+        <div class="two">
+            <form class="card card-pad" method="post" th:action="@{/admin/phong/{id}/sua(id=${p.id})}">
+                <h2>Thông tin phòng (UC4.2)</h2>
+                <div class="grid1">
+                    <div class="field"><label for="tenPhong">Tên phòng</label><input class="input" id="tenPhong" name="tenPhong" th:value="${p.tenPhong}" required></div>
+                    <div class="field"><label for="ghiChu">Ghi chú</label><input class="input" id="ghiChu" name="ghiChu" th:value="${p.ghiChu}"></div>
+                </div>
+                <div class="form-actions"><button class="btn primary" type="submit">Lưu</button></div>
+            </form>
+            <form class="card card-pad" method="post" th:action="@{/admin/phong/{id}/trang-thai(id=${p.id})}"
+                  onsubmit="return confirm('Đổi trạng thái phòng? Các suất sắp tới chưa có đơn sẽ chuyển sang Tạm ngưng.')">
+                <h2>Trạng thái phòng (UC4.3)</h2>
+                <label class="radio" th:each="e : ${@nhan.ds('phong')}">
+                    <input type="radio" name="trangThai" th:value="${e.key}" th:checked="${e.key == p.trangThai}"><span th:text="${e.value}"></span>
+                </label>
+                <p class="muted small">Phòng không Hoạt động thì không xếp được suất mới. Phòng còn suất đã có khách đặt vé thì không đổi được.</p>
+                <button class="btn" type="submit">Cập nhật trạng thái</button>
+            </form>
+        </div>
+
+        <h2 class="section">Sơ đồ chỗ ngồi (UC4.4)</h2>
+        <nav class="tabs">
+            <a th:href="@{/admin/phong/{id}(id=${p.id},cheDo='xem')}" th:classappend="${cheDo == 'xem'} ? 'on'">Xem sơ đồ · 4.4.4</a>
+            <a th:href="@{/admin/phong/{id}(id=${p.id},cheDo='maTran')}" th:classappend="${cheDo == 'maTran'} ? 'on'">Thiết lập ma trận · 4.4.1</a>
+            <a th:href="@{/admin/phong/{id}(id=${p.id},cheDo='loai')}" th:classappend="${cheDo == 'loai'} ? 'on'">Phân loại ghế · 4.4.2</a>
+            <a th:href="@{/admin/phong/{id}(id=${p.id},cheDo='trangThai')}" th:classappend="${cheDo == 'trangThai'} ? 'on'">Trạng thái ghế · 4.4.3</a>
+        </nav>
+
+        <form th:if="${cheDo == 'maTran'}" class="card card-pad" style="max-width:560px;margin-bottom:16px" method="post"
+              th:action="@{/admin/phong/{id}/ma-tran(id=${p.id})}" onsubmit="return confirm('Tạo lại toàn bộ sơ đồ ghế của phòng?')">
+            <div class="grid">
+                <div class="field"><label for="soHang">Số hàng (A, B, C…)</label><input class="input" type="number" min="1" max="26" id="soHang" name="soHang" th:value="${p.soHang > 0 ? p.soHang : 8}"></div>
+                <div class="field"><label for="soCot">Số cột</label><input class="input" type="number" min="1" max="30" id="soCot" name="soCot" th:value="${p.soCot > 0 ? p.soCot : 10}"></div>
+            </div>
+            <p class="muted small">Tất cả ghế tạo mới là ghế Thường, đang Hoạt động. Chỉ tạo được khi phòng chưa từng có suất chiếu.</p>
+            <button class="btn primary" type="submit" th:disabled="${p.tongSuat > 0}">Tạo sơ đồ</button>
+            <span class="small low" th:if="${p.tongSuat > 0}">Phòng đã có suất chiếu.</span>
+        </form>
+
+        <div th:if="${cheDo == 'loai'}" class="alert info">
+            Chọn loại ghế rồi bấm vào ghế trên sơ đồ để đổi loại:
+            <span class="row" style="margin-top:8px">
+                <a th:each="lv : ${dsLoaiVe}" class="btn sm" th:classappend="${lv.id == loaiVeId} ? 'primary'"
+                   th:href="@{/admin/phong/{id}(id=${p.id},cheDo='loai',loaiVeId=${lv.id})}" th:text="${lv.tenLoaiVe} + ' (' + ${lv.soChoMoiVe} + ' chỗ)'"></a>
+            </span>
+        </div>
+        <div th:if="${cheDo == 'trangThai'}" class="alert info">Bấm vào ghế để chuyển giữa Hoạt động và Bảo trì. Ghế đang được giữ hoặc đã bán cho suất sắp tới thì không đổi được.</div>
+
+        <form class="card card-pad" method="post" th:action="@{/admin/phong/{id}/ghe(id=${p.id})}">
+            <input type="hidden" name="cheDo" th:value="${cheDo}">
+            <input type="hidden" name="loaiVeId" th:value="${loaiVeId}">
+            <div th:replace="~{admin/so-do :: soDo(${soDo}, ${(cheDo == 'loai' or cheDo == 'trangThai') ? 'sua' : 'xem'})}"></div>
+        </form>
+    </main>
+</div>
+</body>
+</html>

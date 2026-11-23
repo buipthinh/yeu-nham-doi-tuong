@@ -18,20 +18,32 @@
         <span class="logo">RP</span>
         <span><b>Rạp Phương Nam</b><small>Trang quản lý</small></span>
     </a>
-    <nav>
-        <div class="grp">Nội dung</div>
-        <a th:href="@{/admin/phim}" th:classappend="${menu == 'phim'} ? 'on'">Phim</a>
-        <a th:href="@{/admin/suat-chieu}" th:classappend="${menu == 'suatChieu'} ? 'on'">Suất chiếu</a>
-        <a class="soon" title="Sẽ làm sau">Phòng &amp; sơ đồ ghế</a>
-        <div class="grp">Giá &amp; dịch vụ</div>
-        <a th:href="@{/admin/gia-ve}" th:classappend="${menu == 'gia-ve'} ? 'on'">Giá vé</a>
-        <a th:href="@{/admin/thuc-pham}" th:classappend="${menu == 'thuc-pham'} ? 'on'">Thực phẩm</a>
-        <a th:href="@{/admin/don-hang}" th:classappend="${menu == 'don-hang'} ? 'on'">Đơn hàng</a>
-        <div class="grp">Hệ thống</div>
-        <a th:href="@{/admin/tai-khoan}" th:classappend="${menu == 'tai-khoan'} ? 'on'">Tài khoản</a>
-        <a th:href="@{/admin/bao-cao}" th:classappend="${menu == 'bao-cao'} ? 'on'">Báo cáo</a>
-        <a class="soon" title="Sẽ làm sau">Cài đặt</a>
+    <!-- Nhan vien chi thay muc Tra cuu ve (UC6.2.2) -->
+    <nav th:if="${dangNhap != null and !dangNhap.admin}">
+        <div class="grp">Đặt vé</div>
+        <a th:href="@{/admin/don-hang/tra-cuu}" class="on">Tra cứu vé <small></small></a>
     </nav>
+    <nav th:unless="${dangNhap != null and !dangNhap.admin}">
+        <div class="grp">Nội dung</div>
+        <a th:href="@{/admin/phim}" th:classappend="${menu == 'phim'} ? 'on'">Phim <small></small></a>
+        <a th:href="@{/admin/suat-chieu}" th:classappend="${menu == 'suatChieu'} ? 'on'">Suất chiếu <small></small></a>
+        <a th:href="@{/admin/phong}" th:classappend="${menu == 'phong'} ? 'on'">Phòng &amp; sơ đồ ghế <small></small></a>
+        <div class="grp">Giá &amp; dịch vụ</div>
+        <a th:href="@{/admin/gia-ve}" th:classappend="${menu == 'gia-ve'} ? 'on'">Giá vé <small></small></a>
+        <a th:href="@{/admin/thuc-pham}" th:classappend="${menu == 'thuc-pham'} ? 'on'">Thực phẩm <small></small></a>
+        <a th:href="@{/admin/don-hang}" th:classappend="${menu == 'don-hang'} ? 'on'">Đơn hàng <small></small></a>
+        <div class="grp">Hệ thống</div>
+        <a th:href="@{/admin/tai-khoan}" th:classappend="${menu == 'tai-khoan'} ? 'on'">Tài khoản <small></small></a>
+        <a th:href="@{/admin/bao-cao}" th:classappend="${menu == 'bao-cao'} ? 'on'">Báo cáo <small></small></a>
+        <a class="soon" title="Sẽ làm sau">Cài đặt <small></small></a>
+    </nav>
+    <!-- Nguoi dang dang nhap + dang xuat -->
+    <form th:if="${dangNhap != null}" method="post" th:action="@{/admin/dang-xuat}"
+          style="margin:20px 6px 0;padding-top:14px;border-top:1px solid #3a3631;display:grid;gap:8px">
+        <span><b th:text="${dangNhap.hoTen}">Họ tên</b>
+            <small style="display:block;color:#a39d95;font-size:12px" th:text="${dangNhap.ma + ' · ' + dangNhap.tenVaiTro}">NV001 · Quản trị viên</small></span>
+        <button class="btn sm" type="submit" style="justify-content:center">Đăng xuất</button>
+    </form>
 </aside>
 
 <!-- Thong bao sau khi luu / loi nghiep vu (flash attribute) -->

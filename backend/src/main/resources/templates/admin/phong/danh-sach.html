@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head('Phòng chiếu')}"></head>
+<body>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+    <main class="content">
+        <div class="page-head">
+            <div><h1>Phòng chiếu</h1>
+                <p class="muted"></p></div>
+        </div>
+        <div th:replace="~{admin/fragments :: flash}"></div>
+
+        <div class="two">
+            <form class="filters" method="get" th:action="@{/admin/phong}" style="grid-template-columns: 1fr 180px auto; margin:0">
+                <input class="input" type="search" name="q" th:value="${q}" placeholder="Tìm theo tên phòng" aria-label="Tên phòng">
+                <select class="input" name="trangThai" onchange="this.form.submit()" aria-label="Trạng thái">
+                    <option value="">Mọi trạng thái</option>
+                    <option th:each="e : ${@nhan.ds('phong')}" th:value="${e.key}" th:text="${e.value}" th:selected="${e.key == trangThai}"></option>
+                </select>
+                <button class="btn" type="submit">Tìm</button>
+            </form>
+            <form class="filters" method="post" th:action="@{/admin/phong/them}" style="grid-template-columns: 1fr 1fr auto; margin:0">
+                <input class="input" name="tenPhong" placeholder="Tên phòng mới" required aria-label="Tên phòng mới">
+                <input class="input" name="ghiChu" placeholder="Ghi chú" aria-label="Ghi chú">
+                <button class="btn primary" type="submit">+ Thêm phòng</button>
+            </form>
+        </div>
+
+        <div class="card table-wrap section" th:unless="${#lists.isEmpty(ds)}">
+            <table class="table">
+                <thead><tr><th>Mã</th><th>Tên phòng</th><th>Hàng × Cột</th><th class="r">Sức chứa</th><th class="r">Ghế đôi</th><th class="r">Ghế bảo trì</th><th class="r">Suất sắp tới</th><th>Trạng thái</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="p : ${ds}">
+                    <td class="mono" th:text="${'R' + #numbers.formatInteger(p.id, 4)}"></td>
+                    <td><a class="link" th:href="@{/admin/phong/{id}(id=${p.id})}" th:text="${p.tenPhong}"></a><div class="muted small" th:text="${p.ghiChu}"></div></td>
+                    <td th:text="${p.soHang} + ' × ' + ${p.soCot}"></td>
+                    <td class="r" th:text="${p.sucChua}"></td>
+                    <td class="r" th:text="${p.soGheDoi}"></td>
+                    <td class="r" th:text="${p.soBaoTri}"></td>
+                    <td class="r" th:text="${p.suatSapToi}"></td>
+                    <td><span class="pill" th:classappend="${@nhan.css('phong', p.trangThai)}" th:text="${@nhan.ten('phong', p.trangThai)}"></span></td>
+                    <td class="actions"><a class="btn sm" th:href="@{/admin/phong/{id}(id=${p.id})}">Sơ đồ ghế</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="empty section" th:if="${#lists.isEmpty(ds)}">Không tìm thấy phòng phù hợp.</div>
+    </main>
+</div>
+</body>
+</html>

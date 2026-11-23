@@ -3,10 +3,10 @@
     Gồm 22 bảng.
 
     Tài khoản dùng thử:
-    Admin: NV0001 / admin123 (NV0002 cũng là Admin)
-    Nhân viên: NV0003 / nhanvien1 (NV0003 đến NV0008; NV0008 bị khóa)
+    Admin: NV001 / admin123 (NV002 cũng là Admin)
+    Nhân viên: NV003 / nhanvien1 (NV003 đến NV008; NV008 bị khóa)
     Khách hàng: khach@demo.vn / khach123 (các khách khác: matkhau123)
-    Suất chiếu từ 02/11 đến 22/11/2026.
+    Suất chiếu mẫu từ 15/11 đến 20/11/2026. Cuối file tự thêm suất cho 7 ngày tới (tính từ ngày chạy)
 */
 
 /** KHỞI TẠO DATABASE **/
@@ -8838,6 +8838,70 @@ BEGIN
 END
 GO
 
+/** THÊM SUẤT CHIẾU CHO 7 NGÀY TỚI **/
+-- Suất mẫu ở trên đã qua ngày, đoạn này tạo thêm suất từ hôm nay để trang khách đặt vé được.
+-- Phòng nào trong ngày đã có suất thì bỏ qua.
+SET NOCOUNT ON;
+
+DECLARE @soNgay INT = 7, @d INT = 0, @ngay DATE, @phong INT, @gio TIME(0), @ketThuc TIME(0),
+        @phim INT, @tl INT, @suatId INT, @k INT = 0, @thu INT, @phut INT, @tao INT = 0;
+
+--Phim dang chieu, xoay vong lan luot cho cac suat
+DECLARE @dsPhim TABLE (stt INT IDENTITY(0,1), id INT, thoiLuong INT, tuNgay DATE, denNgay DATE);
+INSERT INTO @dsPhim (id, thoiLuong, tuNgay, denNgay)
+SELECT id, thoiLuong, ngayKhoiChieu, ngayKetThuc FROM dbo.Phim WHERE trangThai = 'dangChieu' ORDER BY id;
+DECLARE @n INT = (SELECT COUNT(*) FROM @dsPhim);
+
+DECLARE @dsPhong TABLE (id INT);
+INSERT INTO @dsPhong SELECT id FROM dbo.PhongChieu WHERE trangThai = 'hoatDong';
+
+BEGIN TRAN;
+WHILE @d < @soNgay AND @n > 0
+BEGIN
+    SET @ngay = DATEADD(DAY, @d, CAST(GETDATE() AS DATE));
+    SET @phong = (SELECT MIN(id) FROM @dsPhong);
+    WHILE @phong IS NOT NULL
+    BEGIN
+        IF NOT EXISTS (SELECT 1 FROM dbo.SuatChieu WHERE phongChieuId = @phong AND ngayChieu = @ngay)
+        BEGIN
+            SET @gio = '09:00';
+            WHILE 1 = 1
+            BEGIN
+                --Lay phim ke tiep con trong thoi gian chieu cua ngay nay
+                SET @phim = NULL; SET @thu = 0;
+                WHILE @phim IS NULL AND @thu < @n
+                BEGIN
+                    SELECT @phim = id, @tl = thoiLuong FROM @dsPhim
+                    WHERE stt = @k % @n AND tuNgay <= @ngay AND denNgay >= @ngay;
+                    SET @k += 1; SET @thu += 1;
+                END
+                IF @phim IS NULL BREAK;
+                --Suat phai ket thuc truoc 23:30
+                IF DATEDIFF(MINUTE, CAST('00:00' AS TIME(0)), @gio) + @tl > 23 * 60 + 30 BREAK;
+
+                SET @ketThuc = DATEADD(MINUTE, @tl, @gio);
+                INSERT INTO dbo.SuatChieu (phimId, phongChieuId, ngayChieu, gioBatDau, gioKetThuc, trangThai)
+                VALUES (@phim, @phong, @ngay, @gio, @ketThuc, 'moBan');
+                SET @suatId = SCOPE_IDENTITY();
+                INSERT INTO dbo.GheSuatChieu (suatChieuId, gheId, trangThai)
+                SELECT @suatId, id, 'trong' FROM dbo.Ghe WHERE phongChieuId = @phong;
+                SET @tao += 1;
+
+                --Suat sau: nghi 15 phut don phong, lam tron len boi 5 phut
+                SET @phut = DATEDIFF(MINUTE, CAST('00:00' AS TIME(0)), @ketThuc) + 15;
+                SET @phut = ((@phut + 4) / 5) * 5;
+                SET @gio = DATEADD(MINUTE, @phut, CAST('00:00' AS TIME(0)));
+            END
+        END
+        SET @phong = (SELECT MIN(id) FROM @dsPhong WHERE id > @phong);
+    END
+    SET @d += 1;
+END
+COMMIT;
+
+PRINT N'Đã thêm ' + CAST(@tao AS NVARCHAR(10)) + N' suất chiếu mới.';
+GO
+
 /** PHẦN KIỂM TRA NHANH **/
 SELECT 'TaiKhoan' AS bang, COUNT(*) AS soDong FROM dbo.TaiKhoan UNION ALL
 SELECT 'TheLoai', COUNT(*) FROM dbo.TheLoai UNION ALL
@@ -8862,6 +8926,8 @@ SELECT 'GiaoDich', COUNT(*) FROM dbo.GiaoDich UNION ALL
 SELECT 'CaiDat', COUNT(*) FROM dbo.CaiDat UNION ALL
 SELECT 'NhatKySaoLuu', COUNT(*) FROM dbo.NhatKySaoLuu;
 
+-- Suất chiếu từ hôm nay trở đi
+SELECT ngayChieu, COUNT(*) AS soSuat FROM dbo.SuatChieu WHERE ngayChieu >= CAST(GETDATE() AS DATE) GROUP BY ngayChieu ORDER BY ngayChieu;
 -- Ví dụ: xem 10 ngày doanh thu gần nhất
 SELECT TOP 10 * FROM dbo.vw_DoanhThuNgay ORDER BY ngay DESC;
 -- Ví dụ: xếp hạng phim theo số vé bán
