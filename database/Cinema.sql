@@ -356,30 +356,56 @@ SET IDENTITY_INSERT dbo.TheLoai OFF;
 GO
 
 -- Phim: 21 dòng
+
 SET IDENTITY_INSERT dbo.Phim ON;
-INSERT INTO dbo.Phim (id, tenPhim, daoDien, dienVien, thoiLuong, ngonNgu, phuDe, ngayKhoiChieu, ngayKetThuc, doTuoi, moTa, poster, trailer, trangThai) VALUES
-(1, N'Mắt Bão Phương Nam', N'Lâm Quốc Huy', N'Trần Nam, Mai Thảo, Vũ Khang', 128, N'Tiếng Việt', N'Tiếng Anh', '2026-10-17', '2026-12-06', N'C16', N'Đội cứu hộ ven biển vượt qua cơn bão lớn nhất thập kỷ để đưa 40 ngư dân trở về.', N'/uploads/poster/phim-01.jpg', N'https://www.youtube.com/watch?v=demo0001', N'dangChieu'),
-(2, N'Chuyến Xe Cuối Năm', N'Phạm Thu Vân', N'Hồng Đào, Quang Minh', 112, N'Tiếng Việt', N'Tiếng Anh', '2026-10-22', '2026-12-11', N'C13', N'Chuyến xe khách Sài Gòn – Huế đêm 28 Tết gom đủ chuyện dở khóc dở cười.', N'/uploads/poster/phim-02.jpg', N'https://www.youtube.com/watch?v=demo0002', N'dangChieu'),
-(3, N'Khu Vườn Ánh Trăng', N'Nguyễn Hạ', N'Lồng tiếng: Thùy Chi, Minh Tú', 98, N'Tiếng Việt', N'Không', '2026-10-27', '2026-12-16', N'P', N'Cô bé Na lạc vào khu vườn chỉ hiện ra dưới trăng rằm.', N'/uploads/poster/phim-03.jpg', N'https://www.youtube.com/watch?v=demo0003', N'dangChieu'),
-(4, N'Tầng 13', N'Đinh Bảo', N'Lê Vy, Hoàng Phúc', 105, N'Tiếng Việt', N'Tiếng Anh', '2026-10-29', '2026-11-30', N'C18', N'Thang máy của chung cư cũ luôn dừng ở tầng 13, tầng không có trong bản vẽ.', N'/uploads/poster/phim-04.jpg', N'https://www.youtube.com/watch?v=demo0004', N'dangChieu'),
-(5, N'Mùa Hoa Gạo', N'Trịnh Lan', N'Khánh Ly, Tuấn Anh', 117, N'Tiếng Việt', N'Tiếng Anh', '2026-10-19', '2026-11-26', N'C13', N'Hai người bạn cũ gặp lại ở làng quê miền Bắc đúng mùa hoa gạo.', N'/uploads/poster/phim-05.jpg', N'https://www.youtube.com/watch?v=demo0005', N'dangChieu'),
-(6, N'Biệt Đội Sông Hàn', N'Hà Minh Trí', N'Isaac, Quốc Anh, Ngọc Trinh', 134, N'Tiếng Việt', N'Tiếng Anh', '2026-11-04', '2026-12-21', N'C16', N'Nhóm cảnh sát Đà Nẵng truy vết đường dây buôn lậu xuyên biên giới.', N'/uploads/poster/phim-06.jpg', N'https://www.youtube.com/watch?v=demo0006', N'dangChieu'),
-(7, N'Ngày Mai Trời Lại Sáng', N'Ngô Thanh Hà', N'Thu Trang, Kiều Minh Tuấn', 121, N'Tiếng Việt', N'Tiếng Anh', '2026-11-06', '2026-12-16', N'P', N'Người mẹ đơn thân mở lại quán phở cũ của cha sau biến cố.', N'/uploads/poster/phim-07.jpg', N'https://www.youtube.com/watch?v=demo0007', N'dangChieu'),
-(8, N'Thám Tử Phố Cổ', N'Vương Khải', N'Tuấn Trần, Trấn Thành', 109, N'Tiếng Việt', N'Tiếng Anh', '2026-11-08', '2026-12-18', N'C13', N'Thám tử nghiệp dư phá vụ trộm tranh quý ở Hội An.', N'/uploads/poster/phim-08.jpg', N'https://www.youtube.com/watch?v=demo0008', N'dangChieu'),
-(9, N'Cánh Diều Đỏ', N'Lý Minh Châu', N'Lồng tiếng: Bảo Anh', 92, N'Tiếng Việt', N'Không', '2026-11-01', '2026-12-11', N'P', N'Cậu bé làm cánh diều có thể bay qua những đám mây kể chuyện.', N'/uploads/poster/phim-09.jpg', N'https://www.youtube.com/watch?v=demo0009', N'dangChieu'),
-(10, N'Đêm Ở Rạp Cũ', N'Đinh Bảo', N'Lê Vy, Quang Tuấn', 101, N'Tiếng Việt', N'Tiếng Anh', '2026-11-11', '2026-12-06', N'C16', N'Nhân viên trực đêm phát hiện rạp phim bỏ hoang vẫn chiếu phim lúc nửa đêm.', N'/uploads/poster/phim-10.jpg', N'https://www.youtube.com/watch?v=demo0010', N'dangChieu'),
-(11, N'Quỹ Đạo Thứ Bảy', N'Hà Minh Trí', N'Isaac, Ngọc Trinh', 141, N'Tiếng Việt', N'Tiếng Anh', '2026-11-13', '2026-12-26', N'C13', N'Trạm vũ trụ Lạc Hồng mất liên lạc và chỉ còn 7 vòng quỹ đạo để sửa ăng-ten.', N'/uploads/poster/phim-11.jpg', N'https://www.youtube.com/watch?v=demo0011', N'dangChieu'),
-(12, N'Bản Tình Ca Mùa Đông', N'Trịnh Lan', N'Đông Nhi, Ông Cao Thắng', 115, N'Tiếng Việt', N'Tiếng Anh', '2026-10-25', '2026-11-24', N'C13', N'Nhạc sĩ trẻ tìm lại cảm hứng sáng tác ở Đà Lạt mùa sương.', N'/uploads/poster/phim-12.jpg', N'https://www.youtube.com/watch?v=demo0012', N'dangChieu'),
-(13, N'Ranh Giới Cuối Cùng', N'Phạm Hùng', N'Thái Hòa, Kaity Nguyễn', 126, N'Tiếng Việt', N'Tiếng Anh', '2026-11-02', '2026-12-02', N'C18', N'Luật sư trẻ đối mặt thân chủ là kẻ đã hại gia đình mình.', N'/uploads/poster/phim-13.jpg', N'https://www.youtube.com/watch?v=demo0013', N'dangChieu'),
-(14, N'Hành Trình Về Phương Bắc', N'Nguyễn Hạ', N'Lồng tiếng: Minh Tú', 96, N'Tiếng Việt', N'Không', '2026-11-07', '2026-12-14', N'P', N'Chú chim én nhỏ bay ngược mùa để tìm đàn.', N'/uploads/poster/phim-14.jpg', N'https://www.youtube.com/watch?v=demo0014', N'dangChieu'),
-(15, N'Tiếng Gọi Đại Dương', N'Lâm Quốc Huy', N'Vũ Khang, Hồng Ánh', 110, N'Tiếng Việt', N'Tiếng Anh', '2026-11-14', '2026-12-24', N'P', N'Phim tài liệu về hành trình bảo tồn rùa biển ở Côn Đảo.', N'/uploads/poster/phim-15.jpg', N'https://www.youtube.com/watch?v=demo0015', N'dangChieu'),
-(16, N'Sát Thủ Bất Đắc Dĩ', N'Vương Khải', N'Trấn Thành, Lan Ngọc', 118, N'Tiếng Việt', N'Tiếng Anh', '2026-11-10', '2026-12-13', N'C16', N'Đầu bếp hiền lành bị nhầm là sát thủ khét tiếng.', N'/uploads/poster/phim-16.jpg', N'https://www.youtube.com/watch?v=demo0016', N'dangChieu'),
-(17, N'Vệt Nắng Cuối Hè', N'Ngô Thanh Hà', N'Tiểu Vy, Song Luân', 104, N'Tiếng Việt', N'Tiếng Anh', '2026-11-28', '2027-01-15', N'C13', N'Mối tình đầu của hai học sinh lớp 12 trong mùa hè cuối cấp.', N'/uploads/poster/phim-17.jpg', N'https://www.youtube.com/watch?v=demo0017', N'sapChieu'),
-(18, N'Lời Nguyền Làng Cổ', N'Đinh Bảo', N'Hoàng Phúc, Lê Vy', 107, N'Tiếng Việt', N'Tiếng Anh', '2026-12-05', '2027-01-20', N'C18', N'Đoàn làm phim tài liệu kẹt lại ở ngôi làng bỏ hoang.', N'/uploads/poster/phim-18.jpg', N'https://www.youtube.com/watch?v=demo0018', N'sapChieu'),
-(19, N'Siêu Nhân Tí Hon', N'Lý Minh Châu', N'Lồng tiếng: Hari Won', 94, N'Tiếng Việt', N'Không', '2026-12-12', '2027-01-25', N'P', N'Cậu bé cao 10 cm bảo vệ khu vườn khỏi lũ sâu khổng lồ.', N'/uploads/poster/phim-19.jpg', N'https://www.youtube.com/watch?v=demo0019', N'sapChieu'),
-(20, N'Bản Giao Hưởng Cũ', N'Vương Khải', N'NSND Thanh Hoa', 124, N'Tiếng Việt', N'Tiếng Anh', '2026-08-18', '2026-10-16', N'P', N'Người nhạc công già dạy đàn cho cậu bé bán vé số.', N'/uploads/poster/phim-20.jpg', N'https://www.youtube.com/watch?v=demo0020', N'an'),
-(21, N'Gió Lốc Sa Mạc', N'Phạm Hùng', N'Isaac, Kaity Nguyễn', 119, N'Tiếng Việt', N'Tiếng Anh', '2026-08-28', '2026-10-22', N'C16', N'Hai anh em vượt sa mạc tìm người cha mất tích.', N'/uploads/poster/phim-21.jpg', N'https://www.youtube.com/watch?v=demo0021', N'an');
+
+INSERT INTO dbo.Phim
+(id, tenPhim, daoDien, dienVien, thoiLuong, ngonNgu, phuDe, ngayKhoiChieu, ngayKetThuc, doTuoi, moTa, poster, trailer, trangThai)
+VALUES
+(1, N'Mad Max: Fury Road', N'George Miller', N'Tom Hardy, Charlize Theron, Nicholas Hoult', 120, N'Tiếng Anh', N'Tiếng Việt', '2026-10-17', '2026-12-06', N'C18', N'Trong thế giới hậu tận thế, Max cùng nữ chiến binh Furiosa chiến đấu chống lại kẻ thống trị độc ác để giành lại tự do.', N'/uploads/poster/phim-01.jpg', N'https://www.youtube.com/watch?v=demo0001', N'dangChieu'),
+
+(2, N'The Dark Knight', N'Christopher Nolan', N'Christian Bale, Heath Ledger, Aaron Eckhart', 152, N'Tiếng Anh', N'Tiếng Việt', '2026-10-22', '2026-12-11', N'C16', N'Batman phải đối đầu với Joker, tên tội phạm nguy hiểm gieo rắc hỗn loạn và thử thách giới hạn đạo đức của thành phố Gotham.', N'/uploads/poster/phim-02.jpg', N'https://www.youtube.com/watch?v=demo0002', N'dangChieu'),
+
+(3, N'The Hangover', N'Todd Phillips', N'Bradley Cooper, Ed Helms, Zach Galifianakis', 100, N'Tiếng Anh', N'Tiếng Việt', '2026-10-27', '2026-12-16', N'C16', N'Ba người bạn thức dậy sau một đêm tiệc độc thân và phát hiện chú rể biến mất. Họ phải lần theo những ký ức khó hiểu để tìm bạn mình.', N'/uploads/poster/phim-03.jpg', N'https://www.youtube.com/watch?v=demo0003', N'dangChieu'),
+
+(4, N'Home Alone', N'Chris Columbus', N'Macaulay Culkin, Joe Pesci, Daniel Stern', 103, N'Tiếng Anh', N'Tiếng Việt', '2026-10-29', '2026-11-30', N'P', N'Cậu bé Kevin vô tình bị gia đình bỏ quên ở nhà trong kỳ nghỉ Giáng sinh và phải tự mình chống lại hai tên trộm vụng về.', N'/uploads/poster/phim-04.jpg', N'https://www.youtube.com/watch?v=demo0004', N'dangChieu'),
+
+(5, N'Titanic', N'James Cameron', N'Leonardo DiCaprio, Kate Winslet, Billy Zane', 194, N'Tiếng Anh', N'Tiếng Việt', '2026-10-19', '2026-11-26', N'C13', N'Câu chuyện tình yêu đầy cảm động giữa Jack và Rose trên con tàu Titanic huyền thoại trước thảm họa chìm tàu năm 1912.', N'/uploads/poster/phim-05.jpg', N'https://www.youtube.com/watch?v=demo0005', N'dangChieu'),
+
+(6, N'La La Land', N'Damien Chazelle', N'Ryan Gosling, Emma Stone, John Legend', 128, N'Tiếng Anh', N'Tiếng Việt', '2026-11-04', '2026-12-21', N'C13', N'Một nhạc công piano và một nữ diễn viên trẻ gặp nhau tại Los Angeles, cùng theo đuổi ước mơ và trải qua chuyện tình lãng mạn.', N'/uploads/poster/phim-06.jpg', N'https://www.youtube.com/watch?v=demo0006', N'dangChieu'),
+
+(7, N'The Conjuring', N'James Wan', N'Vera Farmiga, Patrick Wilson, Lili Taylor', 112, N'Tiếng Anh', N'Tiếng Việt', '2026-11-06', '2026-12-16', N'C18', N'Vợ chồng nhà điều tra hiện tượng siêu nhiên Warren đến giúp một gia đình đang bị thế lực ma quỷ đáng sợ quấy nhiễu.', N'/uploads/poster/phim-07.jpg', N'https://www.youtube.com/watch?v=demo0007', N'dangChieu'),
+
+(8, N'Train to Busan', N'Yeon Sang-ho', N'Gong Yoo, Jung Yu-mi, Ma Dong-seok', 118, N'Tiếng Hàn', N'Tiếng Việt', '2026-11-08', '2026-12-18', N'C18', N'Một đại dịch zombie bùng phát trên chuyến tàu đến Busan. Những hành khách phải chiến đấu để bảo vệ bản thân và những người thân yêu.', N'/uploads/poster/phim-08.jpg', N'https://www.youtube.com/watch?v=demo0008', N'dangChieu'),
+
+(9, N'Spirited Away', N'Hayao Miyazaki', N'Lồng tiếng: Rumi Hiiragi, Miyu Irino, Mari Natsuki', 125, N'Tiếng Nhật', N'Tiếng Việt', '2026-11-01', '2026-12-11', N'P', N'Cô bé Chihiro vô tình bước vào thế giới linh hồn kỳ bí và phải tìm cách giải cứu cha mẹ cũng như trở về thế giới loài người.', N'/uploads/poster/phim-09.jpg', N'https://www.youtube.com/watch?v=demo0009', N'dangChieu'),
+
+(10, N'Inside Out', N'Pete Docter', N'Lồng tiếng: Amy Poehler, Phyllis Smith, Bill Hader', 95, N'Tiếng Anh', N'Tiếng Việt', '2026-11-11', '2026-12-06', N'P', N'Câu chuyện về năm cảm xúc bên trong tâm trí cô bé Riley, cùng nhau giúp cô thích nghi với những thay đổi lớn trong cuộc sống.', N'/uploads/poster/phim-10.jpg', N'https://www.youtube.com/watch?v=demo0010', N'dangChieu'),
+
+(11, N'Interstellar', N'Christopher Nolan', N'Matthew McConaughey, Anne Hathaway, Jessica Chastain', 169, N'Tiếng Anh', N'Tiếng Việt', '2026-11-13', '2026-12-26', N'C13', N'Trong tương lai Trái Đất dần trở nên không thể sinh sống, một nhóm phi hành gia thực hiện chuyến du hành xuyên không gian để tìm kiếm hành tinh mới cho nhân loại.', N'/uploads/poster/phim-11.jpg', N'https://www.youtube.com/watch?v=demo0011', N'dangChieu'),
+
+(12, N'The Martian', N'Ridley Scott', N'Matt Damon, Jessica Chastain, Chiwetel Ejiofor', 144, N'Tiếng Anh', N'Tiếng Việt', '2026-10-25', '2026-11-24', N'C13', N'Một phi hành gia bị bỏ lại trên sao Hỏa sau tai nạn và phải sử dụng kiến thức khoa học để sinh tồn trong khi chờ đội cứu hộ.', N'/uploads/poster/phim-12.jpg', N'https://www.youtube.com/watch?v=demo0012', N'dangChieu'),
+
+(13, N'Joker', N'Todd Phillips', N'Joaquin Phoenix, Robert De Niro, Zazie Beetz', 122, N'Tiếng Anh', N'Tiếng Việt', '2026-11-02', '2026-12-02', N'C18', N'Câu chuyện về Arthur Fleck, một người đàn ông bị xã hội ruồng bỏ và dần biến đổi thành nhân vật phản diện Joker đầy ám ảnh.', N'/uploads/poster/phim-13.jpg', N'https://www.youtube.com/watch?v=demo0013', N'dangChieu'),
+
+(14, N'Black Swan', N'Darren Aronofsky', N'Natalie Portman, Mila Kunis, Vincent Cassel', 108, N'Tiếng Anh', N'Tiếng Việt', '2026-11-07', '2026-12-14', N'C18', N'Một nữ vũ công ballet khao khát vai diễn chính trong vở Hồ Thiên Nga nhưng dần rơi vào trạng thái tâm lý bất ổn.', N'/uploads/poster/phim-14.jpg', N'https://www.youtube.com/watch?v=demo0014', N'dangChieu'),
+
+(15, N'Indiana Jones and the Raiders of the Lost Ark', N'Steven Spielberg', N'Harrison Ford, Karen Allen, Paul Freeman', 115, N'Tiếng Anh', N'Tiếng Việt', '2026-11-14', '2026-12-24', N'C13', N'Nhà khảo cổ Indiana Jones bước vào cuộc phiêu lưu nguy hiểm nhằm tìm kiếm chiếc Rương Giao Ước trước khi rơi vào tay phát xít Đức.', N'/uploads/poster/phim-15.jpg', N'https://www.youtube.com/watch?v=demo0015', N'dangChieu'),
+
+(16, N'Knives Out', N'Rian Johnson', N'Daniel Craig, Chris Evans, Ana de Armas', 130, N'Tiếng Anh', N'Tiếng Việt', '2026-11-10', '2026-12-13', N'C16', N'Một thám tử tài ba điều tra cái chết bí ẩn của một nhà văn giàu có, từng bước khám phá những bí mật của các thành viên trong gia đình.', N'/uploads/poster/phim-16.jpg', N'https://www.youtube.com/watch?v=demo0016', N'dangChieu'),
+
+(17, N'The Godfather', N'Francis Ford Coppola', N'Marlon Brando, Al Pacino, James Caan', 175, N'Tiếng Anh', N'Tiếng Việt', '2026-11-28', '2027-01-15', N'C18', N'Bộ phim kể về gia đình Corleone, một gia tộc mafia quyền lực tại Mỹ và quá trình Michael Corleone bước vào thế giới tội phạm.', N'/uploads/poster/phim-17.jpg', N'https://www.youtube.com/watch?v=demo0017', N'sapChieu'),
+
+(18, N'Coco', N'Lee Unkrich', N'Lồng tiếng: Anthony Gonzalez, Gael García Bernal, Benjamin Bratt', 105, N'Tiếng Anh', N'Tiếng Việt', '2026-12-05', '2027-01-20', N'P', N'Cậu bé Miguel đam mê âm nhạc vô tình bước vào thế giới người chết và khám phá những bí mật về gia đình cùng nguồn gốc của mình.', N'/uploads/poster/phim-18.jpg', N'https://www.youtube.com/watch?v=demo0018', N'sapChieu'),
+
+(19, N'13th', N'Ava DuVernay', N'Phim tài liệu với sự tham gia của các học giả và nhà hoạt động xã hội', 100, N'Tiếng Anh', N'Tiếng Việt', '2026-12-12', '2027-01-25', N'C16', N'Phim tài liệu phân tích lịch sử hệ thống nhà tù tại Mỹ và mối liên hệ giữa chủng tộc, luật pháp và bất bình đẳng xã hội.', N'/uploads/poster/phim-19.jpg', N'https://www.youtube.com/watch?v=demo0019', N'sapChieu'),
+
+(20, N'Free Solo', N'Elizabeth Chai Vasarhelyi, Jimmy Chin', N'Alex Honnold, Sanni McCandless, Tommy Caldwell', 100, N'Tiếng Anh', N'Tiếng Việt', '2026-08-18', '2026-10-16', N'P', N'Phim tài liệu ghi lại hành trình của nhà leo núi Alex Honnold khi chinh phục vách đá El Capitan mà không sử dụng dây bảo hiểm.', N'/uploads/poster/phim-20.jpg', N'https://www.youtube.com/watch?v=demo0020', N'daChieu'),
+
+(21, N'Bohemian Rhapsody', N'Bryan Singer', N'Rami Malek, Lucy Boynton, Gwilym Lee', 134, N'Tiếng Anh', N'Tiếng Việt', '2026-08-28', '2026-10-22', N'C13', N'Bộ phim tái hiện hành trình âm nhạc của Freddie Mercury và ban nhạc Queen, từ những ngày đầu thành lập đến buổi biểu diễn Live Aid huyền thoại.', N'/uploads/poster/phim-21.jpg', N'https://www.youtube.com/watch?v=demo0021', N'daChieu');
+
 SET IDENTITY_INSERT dbo.Phim OFF;
+
 GO
 
 -- PhimTheLoai: 39 dòng
