@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head('Sao lưu dữ liệu')}"></head>
+<body>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+
+    <main class="content">
+        <div class="page-head">
+            <div>
+                <h1>Cài đặt hệ thống</h1>
+                <p class="muted">Tạo bản sao lưu toàn bộ cơ sở dữ liệu để phòng sự cố</p>
+            </div>
+        </div>
+        <nav class="tabs">
+            <a th:href="@{/admin/cai-dat}" th:classappend="${tab == 'thong-so'} ? 'on'">Thông số rạp</a>
+            <a th:href="@{/admin/cai-dat/sao-luu}" th:classappend="${tab == 'sao-luu'} ? 'on'">Sao lưu dữ liệu</a>
+        </nav>
+        <div th:replace="~{admin/fragments :: flash}"></div>
+
+        <!-- UC10.2 Sao luu du lieu -->
+        <section class="card form" style="max-width:none">
+            <div class="row" style="justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
+                <div>
+                    <b>Thư mục sao lưu</b>
+                    <div class="mono small" th:text="${thuMuc} ?: 'Chưa xác định — khai báo app.sao-luu.thu-muc trong application.properties'"></div>
+                    <div class="muted small">Thư mục nằm trên máy chạy SQL Server. Khôi phục dữ liệu làm trong SSMS (Restore Database).</div>
+                </div>
+                <form method="post" th:action="@{/admin/cai-dat/sao-luu}"
+                      onsubmit="this.querySelector('button').disabled = true; this.querySelector('button').textContent = 'Đang sao lưu...'; return true;">
+                    <button class="btn primary" type="submit" th:disabled="${dangChay}">Sao lưu ngay</button>
+                </form>
+            </div>
+        </section>
+
+        <h2 class="section-title">Các lần sao lưu gần đây</h2>
+        <div class="empty" th:if="${#lists.isEmpty(dsSaoLuu)}">Chưa có lần sao lưu nào.</div>
+        <div class="card table-wrap" th:unless="${#lists.isEmpty(dsSaoLuu)}">
+            <table class="table">
+                <thead><tr><th>Thời điểm</th><th>Người thực hiện</th><th>Tên tệp</th><th class="r">Dung lượng</th><th>Kết quả</th></tr></thead>
+                <tbody>
+                <tr th:each="s : ${dsSaoLuu}">
+                    <td class="nowrap" th:text="${s.luc}"></td>
+                    <td th:text="${s.hoTen} ?: '—'"></td>
+                    <td class="mono small" style="word-break:break-all" th:text="${s.tenTep}"></td>
+                    <td class="r nowrap" th:text="${s.dungLuong > 0} ? (${#numbers.formatDecimal(s.dungLuong / 1048576.0, 1, 'POINT', 1, 'COMMA')} + ' MB') : '—'"></td>
+                    <td><span class="pill" th:classappend="${s.trangThai == 'thanhCong'} ? 'ok' : 'bad'"
+                              th:text="${s.trangThai == 'thanhCong'} ? 'Thành công' : 'Thất bại'"></span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+</body>
+</html>

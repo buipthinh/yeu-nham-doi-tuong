@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head('Cài đặt hệ thống')}"></head>
+<body>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+
+    <main class="content">
+        <div class="page-head">
+            <div>
+                <h1>Cài đặt hệ thống</h1>
+                <p class="muted" th:if="${capNhatLuc}"
+                   th:text="'Cập nhật lần cuối ' + ${capNhatLuc} + (${capNhatBoi} != null ? ' bởi ' + ${capNhatBoi} : '')"></p>
+            </div>
+        </div>
+        <nav class="tabs">
+            <a th:href="@{/admin/cai-dat}" th:classappend="${tab == 'thong-so'} ? 'on'">Thông số rạp</a>
+            <a th:href="@{/admin/cai-dat/sao-luu}" th:classappend="${tab == 'sao-luu'} ? 'on'">Sao lưu dữ liệu</a>
+        </nav>
+        <div th:replace="~{admin/fragments :: flash}"></div>
+        <div class="alert bad" th:if="${loiForm}" th:text="${loiForm}"></div>
+
+        <!-- UC10.1 Thong so rap -->
+        <form class="card form" method="post" novalidate th:action="@{/admin/cai-dat}"
+              onsubmit="return confirm('Lưu các thông số mới?')">
+            <h2 style="margin-top:0">Thông tin rạp</h2>
+            <div class="grid">
+                <div class="field full">
+                    <label for="tenRap">Tên rạp *</label>
+                    <input class="input" id="tenRap" name="tenRap" type="text" maxlength="100" th:value="${f.tenRap}"
+                           th:classappend="${loiTruong['tenRap'] != null} ? 'has-err'">
+                    <span class="err" th:text="${loiTruong['tenRap']}"></span>
+                </div>
+                <div class="field full">
+                    <label for="diaChiRap">Địa chỉ *</label>
+                    <input class="input" id="diaChiRap" name="diaChiRap" type="text" maxlength="255" th:value="${f.diaChiRap}"
+                           th:classappend="${loiTruong['diaChiRap'] != null} ? 'has-err'">
+                    <span class="err" th:text="${loiTruong['diaChiRap']}"></span>
+                </div>
+                <div class="field">
+                    <label for="hotline">Hotline *</label>
+                    <input class="input" id="hotline" name="hotline" type="text" maxlength="10" placeholder="0283xxxxxxx" th:value="${f.hotline}"
+                           th:classappend="${loiTruong['hotline'] != null} ? 'has-err'">
+                    <span class="err" th:text="${loiTruong['hotline']}"></span>
+                </div>
+                <div class="field">
+                    <label for="emailRap">Email *</label>
+                    <input class="input" id="emailRap" name="emailRap" type="email" maxlength="100" th:value="${f.emailRap}"
+                           th:classappend="${loiTruong['emailRap'] != null} ? 'has-err'">
+                    <span class="err" th:text="${loiTruong['emailRap']}"></span>
+                </div>
+            </div>
+
+            <h2>Thông số vận hành</h2>
+            <div class="grid">
+                <div class="field">
+                    <label for="thoiGianGiuGhe">Thời gian giữ ghế (phút) *</label>
+                    <input class="input" id="thoiGianGiuGhe" name="thoiGianGiuGhe" type="number" min="1" max="30" th:value="${f.thoiGianGiuGhe}"
+                           th:classappend="${loiTruong['thoiGianGiuGhe'] != null} ? 'has-err'">
+                    <span class="err" th:text="${loiTruong['thoiGianGiuGhe']}"></span>
+                    <span class="muted small">Từ 1 đến 30 phút. Chỉ áp dụng cho đơn tạo sau khi lưu.</span>
+                </div>
+                <div class="field">
+                    <label for="soVeToiDaMoiDon">Số vé tối đa mỗi đơn *</label>
+                    <input class="input" id="soVeToiDaMoiDon" name="soVeToiDaMoiDon" type="number" min="1" max="10" th:value="${f.soVeToiDaMoiDon}"
+                           th:classappend="${loiTruong['soVeToiDaMoiDon'] != null} ? 'has-err'">
+                    <span class="err" th:text="${loiTruong['soVeToiDaMoiDon']}"></span>
+                    <span class="muted small">Từ 1 đến 10 vé.</span>
+                </div>
+                <div class="field">
+                    <label for="thoiGianDonPhong">Thời gian dọn phòng giữa hai suất (phút) *</label>
+                    <input class="input" id="thoiGianDonPhong" name="thoiGianDonPhong" type="number" min="0" max="60" th:value="${f.thoiGianDonPhong}"
+                           th:classappend="${loiTruong['thoiGianDonPhong'] != null} ? 'has-err'">
+                    <span class="err" th:text="${loiTruong['thoiGianDonPhong']}"></span>
+                    <span class="muted small">Từ 0 đến 60 phút, dùng khi kiểm tra trùng lịch phòng.</span>
+                </div>
+                <div class="field">
+                    <label for="nguongCanhBaoTonKho">Ngưỡng cảnh báo tồn kho *</label>
+                    <input class="input" id="nguongCanhBaoTonKho" name="nguongCanhBaoTonKho" type="number" min="0" th:value="${f.nguongCanhBaoTonKho}"
+                           th:classappend="${loiTruong['nguongCanhBaoTonKho'] != null} ? 'has-err'">
+                    <span class="err" th:text="${loiTruong['nguongCanhBaoTonKho']}"></span>
+                    <span class="muted small">Món có tồn kho từ mức này trở xuống được đánh dấu sắp hết.</span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn primary" type="submit">Lưu thông số</button>
+                <a class="btn" th:href="@{/admin/cai-dat}">Hủy</a>
+            </div>
+        </form>
+
+        <!-- Danh sach ngay le (anh huong gia ve Ngay le) -->
+        <section class="card form" id="ngay-le" style="margin-top:16px">
+            <h2 style="margin-top:0">Ngày lễ</h2>
+            <p class="muted" style="margin-top:0">Suất chiếu rơi vào các ngày này được tính giá vé loại "Ngày lễ".</p>
+            <form class="filters" method="post" th:action="@{/admin/cai-dat/ngay-le/them}" style="margin-bottom:14px">
+                <input class="input" type="date" name="ngay" required aria-label="Ngày">
+                <input class="input" name="tenNgayLe" maxlength="100" required placeholder="Tên ngày lễ, ví dụ: Giỗ Tổ Hùng Vương" aria-label="Tên ngày lễ" style="min-width:260px">
+                <button class="btn primary" type="submit">+ Thêm ngày lễ</button>
+            </form>
+            <div class="empty" th:if="${#lists.isEmpty(dsNgayLe)}">Chưa có ngày lễ nào.</div>
+            <div class="table-wrap" th:unless="${#lists.isEmpty(dsNgayLe)}">
+                <table class="table">
+                    <thead><tr><th>Ngày</th><th>Tên ngày lễ</th><th></th></tr></thead>
+                    <tbody>
+                    <tr th:each="n : ${dsNgayLe}" th:classappend="${n.daQua == 1} ? 'muted'">
+                        <td class="nowrap" th:text="${n.ngay}"></td>
+                        <td th:text="${n.tenNgayLe}"></td>
+                        <td class="r">
+                            <form method="post" th:action="@{/admin/cai-dat/ngay-le/{id}/xoa(id=${n.id})}" style="display:inline"
+                                  onsubmit="return confirm('Xóa ngày lễ này?')">
+                                <button class="btn sm" type="submit">Xóa</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

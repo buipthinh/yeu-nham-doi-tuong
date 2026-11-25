@@ -24,6 +24,7 @@
         <a th:href="@{/admin/don-hang/tra-cuu}" class="on">Tra cứu vé <small></small></a>
     </nav>
     <nav th:unless="${dangNhap != null and !dangNhap.admin}">
+        <a th:href="@{/admin/tong-quan}" th:classappend="${menu == 'tong-quan'} ? 'on'">Tổng quan <small></small></a>
         <div class="grp">Nội dung</div>
         <a th:href="@{/admin/phim}" th:classappend="${menu == 'phim'} ? 'on'">Phim <small></small></a>
         <a th:href="@{/admin/suat-chieu}" th:classappend="${menu == 'suatChieu'} ? 'on'">Suất chiếu <small></small></a>
@@ -35,7 +36,7 @@
         <div class="grp">Hệ thống</div>
         <a th:href="@{/admin/tai-khoan}" th:classappend="${menu == 'tai-khoan'} ? 'on'">Tài khoản <small></small></a>
         <a th:href="@{/admin/bao-cao}" th:classappend="${menu == 'bao-cao'} ? 'on'">Báo cáo <small></small></a>
-        <a class="soon" title="Sẽ làm sau">Cài đặt <small></small></a>
+        <a th:href="@{/admin/cai-dat}" th:classappend="${menu == 'cai-dat'} ? 'on'">Cài đặt <small></small></a>
     </nav>
     <!-- Nguoi dang dang nhap + dang xuat -->
     <form th:if="${dangNhap != null}" method="post" th:action="@{/admin/dang-xuat}"

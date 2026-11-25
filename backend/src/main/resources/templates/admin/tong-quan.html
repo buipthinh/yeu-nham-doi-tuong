@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head('Tổng quan')}"></head>
+<body>
+<style>
+    .tq-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; margin-bottom: 16px; }
+    .tq-card { padding: 16px 18px; }
+    .tq-card h2 { margin: 0 0 12px; font-size: 16px; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .tq-card h2 a { font-size: 13px; font-weight: 500; }
+    .tq-card .table th, .tq-card .table td { padding: 8px 10px; }
+    .tq-fill { display: flex; align-items: center; gap: 8px; min-width: 140px; }
+    .tq-fill .hbar-track { flex: 1; }
+    .tq-fill span { font-size: 12px; color: var(--muted); white-space: nowrap; }
+    .tq-sub { color: var(--muted); font-size: 12px; }
+    .tq-empty { padding: 20px; text-align: center; color: var(--muted); }
+    @media (max-width: 900px) { .tq-grid { grid-template-columns: minmax(0, 1fr); } }
+</style>
+<div class="layout">
+    <aside th:replace="~{admin/fragments :: sidebar(${menu})}"></aside>
+
+    <main class="content wide">
+        <div class="page-head">
+            <div>
+                <h1>Tổng quan</h1>
+                <p class="muted" th:text="'Hôm nay ' + ${homNay}">Hôm nay</p>
+            </div>
+        </div>
+
+        <!-- So lieu nhanh -->
+        <div class="stats">
+            <div class="card stat"><span>Doanh thu hôm nay</span>
+                <b th:text="${#numbers.formatDecimal(doanhThuHomNay, 1, 'POINT', 0, 'COMMA')} + ' đ'">0 đ</b></div>
+            <div class="card stat"><span>Doanh thu 7 ngày</span>
+                <b th:text="${#numbers.formatDecimal(doanhThu7Ngay, 1, 'POINT', 0, 'COMMA')} + ' đ'">0 đ</b></div>
+            <div class="card stat"><span>Vé bán 7 ngày</span><b th:text="${ve7Ngay}">0</b></div>
+            <div class="card stat"><span>Đơn chờ thanh toán</span><b th:text="${donCho}">0</b></div>
+            <div class="card stat"><span>Suất chiếu hôm nay</span><b th:text="${suatHomNay}">0</b></div>
+            <div class="card stat"><span>Phim đang chiếu</span><b th:text="${phimDangChieu}">0</b></div>
+        </div>
+
+        <!-- Bieu do doanh thu 14 ngay -->
+        <div class="card chart-card">
+            <h2 style="margin-top:0">Doanh thu 14 ngày gần nhất
+                <span class="tq-sub" th:text="'Tổng: ' + ${#numbers.formatDecimal(tong14Ngay, 1, 'POINT', 0, 'COMMA')} + ' đ'"></span></h2>
+            <div class="chart">
+                <div class="bar-col" th:each="c : ${bieuDo}"
+                     th:title="${c.nhan} + ': ' + ${#numbers.formatDecimal(c.tien, 1, 'POINT', 0, 'COMMA')} + ' đ'">
+                    <div class="bar" th:style="'height:' + ${c.phanTram} + '%'"></div>
+                    <span class="bar-label" th:text="${c.nhan}"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="tq-grid">
+            <!-- Suat chieu hom nay -->
+            <section class="card tq-card">
+                <h2>Suất chiếu hôm nay <a th:href="@{/admin/suat-chieu}">Xem lịch chiếu →</a></h2>
+                <div class="tq-empty" th:if="${#lists.isEmpty(suatChieu)}">Hôm nay chưa có suất chiếu nào.</div>
+                <div class="table-wrap" th:unless="${#lists.isEmpty(suatChieu)}">
+                    <table class="table">
+                        <thead><tr><th>Giờ</th><th>Phim</th><th>Phòng</th><th>Đã bán</th></tr></thead>
+                        <tbody>
+                        <tr th:each="s : ${suatChieu}">
+                            <td class="nowrap"><a th:href="@{/admin/suat-chieu/{id}(id=${s.id})}" th:text="${s.gio}"></a>
+                                <div class="tq-sub" th:text="'→ ' + ${s.gioKetThuc}"></div></td>
+                            <td th:text="${s.tenPhim}"></td>
+                            <td class="nowrap" th:text="${s.tenPhong}"></td>
+                            <td>
+                                <span class="pill mute" th:if="${s.tamNgung}">Tạm ngưng</span>
+                                <div class="tq-fill" th:unless="${s.tamNgung}">
+                                    <div class="hbar-track"><div class="hbar-fill" th:style="'width:' + ${s.phanTram} + '%'"></div></div>
+                                    <span th:text="${s.daBan} + '/' + ${s.tongGhe}"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Top phim + ton kho thap -->
+            <div style="display:grid;gap:16px">
+                <section class="card tq-card">
+                    <h2>Top phim 30 ngày (theo số vé) <a th:href="@{/admin/bao-cao/phim}">Chi tiết →</a></h2>
+                    <div class="tq-empty" th:if="${#lists.isEmpty(topPhim)}">Chưa có vé nào được bán trong 30 ngày.</div>
+                    <div class="hbar" th:each="t : ${topPhim}"
+                         th:title="${#numbers.formatDecimal(t.doanhThu, 1, 'POINT', 0, 'COMMA')} + ' đ'">
+                        <span class="hbar-name" th:text="${t.tenPhim}"></span>
+                        <div class="hbar-track"><div class="hbar-fill" th:style="'width:' + ${t.phanTram} + '%'"></div></div>
+                        <span class="hbar-val" th:text="${t.soVe}"></span>
+                    </div>
+                </section>
+
+                <section class="card tq-card">
+                    <h2>Thực phẩm sắp hết <a th:href="@{/admin/thuc-pham}">Quản lý →</a></h2>
+                    <div class="tq-empty" th:if="${#lists.isEmpty(tonThap)}">Tồn kho đều trên ngưỡng cảnh báo.</div>
+                    <table class="table" th:unless="${#lists.isEmpty(tonThap)}">
+                        <tbody>
+                        <tr th:each="t : ${tonThap}">
+                            <td th:text="${t.tenMon}"></td>
+                            <td class="r"><span th:class="${t.tonKho == 0} ? 'ton-thap' : 'low'"
+                                                th:text="${t.tonKho == 0} ? 'Hết hàng' : ('Còn ' + ${t.tonKho})"></span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+        </div>
+
+        <!-- Don moi nhat -->
+        <section class="card tq-card">
+            <h2>Đơn hàng mới nhất <a th:href="@{/admin/don-hang}">Tất cả đơn →</a></h2>
+            <div class="tq-empty" th:if="${#lists.isEmpty(donMoi)}">Chưa có đơn hàng nào.</div>
+            <div class="table-wrap" th:unless="${#lists.isEmpty(donMoi)}">
+                <table class="table">
+                    <thead><tr><th>Mã vé</th><th>Khách hàng</th><th>Phim</th><th>Thời gian đặt</th><th class="r">Tổng tiền</th><th>Trạng thái</th></tr></thead>
+                    <tbody>
+                    <tr th:each="d : ${donMoi}">
+                        <td class="mono"><a th:href="@{/admin/don-hang/{id}(id=${d.id})}" th:text="${d.maVe} ?: ('#' + ${d.id})"></a></td>
+                        <td th:text="${d.hoTen}"></td>
+                        <td th:text="${d.tenPhim}"></td>
+                        <td class="nowrap" th:text="${d.luc}"></td>
+                        <td class="r nowrap" th:text="${#numbers.formatDecimal(d.tongTien, 1, 'POINT', 0, 'COMMA')} + ' đ'"></td>
+                        <td><span class="pill" th:classappend="${d.cssTrangThai}" th:text="${d.nhanTrangThai}"></span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>
